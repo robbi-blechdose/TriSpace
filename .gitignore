@@ -1,3 +1,4 @@
 *.o
 main.elf
 main-funkey.elf
+.vscode/
