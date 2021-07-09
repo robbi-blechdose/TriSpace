@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "input.h": "c",
-        "ui.h": "c",
-        "image.h": "c"
-    }
-}
