@@ -2,6 +2,7 @@
 #define _STARSYSTEM_H
 
 #include <SDL.h>
+#include "GL/gl.h"
 #include "../engine/util.h"
 #include "../ship.h"
 
@@ -13,6 +14,7 @@ typedef struct {
 typedef struct {
     float size;
     Vector3 position;
+    GLuint texture;
 } Planet;
 
 typedef struct {

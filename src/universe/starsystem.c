@@ -62,7 +62,6 @@ void drawStarSystem()
         glPopMatrix();
     }
 
-    glBindTexture(GL_TEXTURE_2D, earthTexture);
     for(i = 0; i < sys.numPlanets; i++)
     {
         glPushMatrix();
@@ -71,6 +70,7 @@ void drawStarSystem()
         {
             glScalef(sys.planets[i].size, sys.planets[i].size, sys.planets[i].size);
         }
+        glBindTexture(GL_TEXTURE_2D, sys.planets[i].texture);
         glCallList(planetMesh);
         glPopMatrix();
     }
