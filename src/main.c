@@ -5,9 +5,10 @@
 #include "engine/input.h"
 #include "engine/camera.h"
 
-#include "starsystem.h"
 #include "ui.h"
 #include "ship.h"
+#include "universe/universe.h"
+#include "universe/generator.h"
 
 #define WINX 240
 #define WINY 240
@@ -23,7 +24,7 @@ uint8_t running = 1;
 //---------- Main game stuff ----------//
 
 //Temporary (TODO: REMOVE)
-ShipType test = {.maxSpeed = 5};
+ShipType test = {.maxSpeed = 5, .maxTurnSpeed = 5};
 
 Ship playerShip;
 //-------------------------------------//
@@ -63,7 +64,8 @@ void calcFrame(uint32_t ticks)
     {
         accelerateShip(&playerShip, -1, ticks);
     }
-    int8_t dirX, dirY;
+    int8_t dirX = 0;
+    int8_t dirY = 0;
     if(keyPressed(U))
     {
         dirX = 1;
@@ -85,6 +87,8 @@ void calcFrame(uint32_t ticks)
     calcShip(&playerShip, ticks);
     setCameraPos(playerShip.position);
     setCameraRot(playerShip.rotation);
+
+    calcUniverse(&playerShip);
 }
 
 void drawFrame()
@@ -94,7 +98,7 @@ void drawFrame()
 
     drawCamera();
 
-    drawStarSystem();
+    drawUniverse();
 
     drawFPS(fps);
 
@@ -139,11 +143,13 @@ int main(int argc, char **argv)
 
     //Initialize game
     initUI();
-    initStarSystem();
-    loadStarSystem();
+    initUniverse();
+    generateStarSystem(getStarSystem(), 1);
 
     //Temporary (TODO: REMOVE)
     playerShip.type = &test;
+    playerShip.position.x = 150;
+    playerShip.position.z = 100;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

@@ -11,4 +11,8 @@ typedef struct {
 
 #define RAD_TO_DEG(rad) ((rad) * 180.0f / M_PI)
 
+float clamp(float x, float min, float max);
+float squaref(float a);
+float distance3d(Vector3* a, Vector3* b);
+
 #endif
