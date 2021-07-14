@@ -12,6 +12,7 @@
 
 #define WINX 240
 #define WINY 240
+#define WINY_3D (WINY - 70)
 #define MAX_FPS 50
 
 SDL_Surface* screen;
@@ -24,7 +25,7 @@ uint8_t running = 1;
 //---------- Main game stuff ----------//
 
 //Temporary (TODO: REMOVE)
-ShipType test = {.maxSpeed = 5, .maxTurnSpeed = 5};
+ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5};
 
 Ship playerShip;
 //-------------------------------------//
@@ -122,7 +123,7 @@ int main(int argc, char **argv)
 	SDL_ShowCursor(SDL_DISABLE);
 
     //Initialize TinyGL
-	frameBuffer = ZB_open(WINX, WINY, ZB_MODE_5R6G5B, 0);
+	frameBuffer = ZB_open(WINX, WINY_3D, ZB_MODE_5R6G5B, 0);
 	glInit(frameBuffer);
 	glShadeModel(GL_FLAT);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -131,20 +132,20 @@ int main(int argc, char **argv)
 	glCullFace(GL_BACK);
 	glClearColor(0, 0, 0, 0);
 	glClearDepth(1.0f);
-    glViewport(0, 0, WINX, WINY);
+    glViewport(0, 0, WINX, WINY_3D);
 	glTextSize(GL_TEXT_SIZE8x8);
 	glEnable(GL_TEXTURE_2D);
 
     glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	mat4 matrix = perspective(70, (float)WINX / (float)WINY, 1, 512);
+	mat4 matrix = perspective(70, (float)WINX / (float)WINY_3D, 1, 512);
 	glLoadMatrixf(matrix.d);
 	glMatrixMode(GL_MODELVIEW);
 
     //Initialize game
     initUI();
     initUniverse();
-    generateStarSystem(getStarSystem(), 1);
+    generateStarSystem(getStarSystem(), 2);
 
     //Temporary (TODO: REMOVE)
     playerShip.type = &test;
