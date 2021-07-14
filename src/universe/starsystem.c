@@ -5,7 +5,8 @@
 StarSystem sys;
 
 GLuint planetMesh;
-GLuint earthTexture;
+GLuint planetRingMesh;
+GLuint planetRingTexture;
 GLuint sunTexture;
 
 GLuint stationMesh;
@@ -14,7 +15,8 @@ GLuint stationTexture;
 void initStarSystem()
 {
     planetMesh = loadModelList("res/obj/Planet.obj");
-    earthTexture = loadRGBTexture("res/tex/Earth.png");
+    planetRingMesh = loadModelList("res/obj/Planet_Ring.obj");
+    planetRingTexture = loadRGBTexture("res/tex/Planet_Ring.png");
     sunTexture = loadRGBTexture("res/tex/Sun.png");
 
     stationMesh = loadModelList("res/obj/SpaceStation.obj");
@@ -24,25 +26,6 @@ void initStarSystem()
 StarSystem* getStarSystem()
 {
     return &sys;
-}
-
-void loadStarSystem()
-{
-    //Testing with no generation
-    sys.stars[0].size = 50.0f;
-    sys.stars[0].position.x = 0;
-    sys.stars[0].position.y = 0;
-    sys.stars[0].position.z = -150;
-    sys.numStars = 1;
-    sys.planets[0].size = 10.0f;
-    sys.planets[0].position.x = 10;
-    sys.planets[0].position.y = 0;
-    sys.planets[0].position.z = -20;
-    sys.planets[1].size = 0.3f;
-    sys.planets[1].position.x = 0;
-    sys.planets[1].position.y = 0;
-    sys.planets[1].position.z = 10;
-    sys.numPlanets = 2;
 }
 
 void drawStarSystem()
@@ -72,6 +55,13 @@ void drawStarSystem()
         }
         glBindTexture(GL_TEXTURE_2D, sys.planets[i].texture);
         glCallList(planetMesh);
+        if(sys.planets[i].hasRing)
+        {
+            glDisable(GL_CULL_FACE);
+            glBindTexture(GL_TEXTURE_2D, planetRingTexture);
+            glCallList(planetRingMesh);
+            glEnable(GL_CULL_FACE);
+        }
         glPopMatrix();
     }
 
@@ -90,4 +80,9 @@ uint8_t hasDockingDistance(Ship* ship)
         return 1;
     }
     return 0;
+}
+
+Vector3 getExitPosition()
+{
+    return sys.station.exitPosition;
 }

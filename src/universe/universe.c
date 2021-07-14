@@ -19,7 +19,6 @@ void initUniverse()
     targetState = NONE;
     initStarSystem();
     initSpaceStation();
-    //loadStarSystem();
 }
 
 void calcUniverse(Ship* playerShip)
@@ -30,6 +29,7 @@ void calcUniverse(Ship* playerShip)
         {
             case SPACE:
             {
+                playerShip->position = getExitPosition();
                 break;
             }
             case STATION:

@@ -4,7 +4,7 @@
 #define FNL_IMPL
 #include "FastNoiseLite.h"
 
-#define NUM_PALETTES 2
+#define NUM_PALETTES 3
 Color palettes[NUM_PALETTES][8] = {
     //Earth-type planet
     {
@@ -30,7 +30,23 @@ Color palettes[NUM_PALETTES][8] = {
         {.r = 199, .g = 160, .b = 125},
         {.r = 199, .g = 145, .b = 97},
         {.r = 255, .g = 255, .b = 255}
+    },
+    //Venus-type planet
+    {
+        //Base colors
+        {.r = 41, .g = 6, .b = 4},
+        {.r = 99, .g = 14, .b = 10},
+        {.r = 133, .g = 72, .b = 3},
+        //Lava
+        {.r = 255, .g = 62, .b = 23},
+        {.r = 255, .g = 147, .b = 23},
+        {.r = 255, .g = 198, .b = 10},
+        //Mountains
+        {.r = 209, .g = 168, .b = 121},
+        {.r = 69, .g = 62, .b = 45},
     }
+    //Ocean-type planet
+    //Forest-type planet
 };
 
 Color getColorForValue(Color* palette, float value)
@@ -55,11 +71,13 @@ float randf(float max)
     return ((float)rand() / (float)(RAND_MAX)) * max;
 }
 
+//TODO: Fix texture seam in x direction (y technically has a seam but that's unimportant)
 GLuint generatePlanetTexture(uint32_t seed)
 {
     uint8_t data[256 * 256 * 3];
     uint16_t i, j;
-    uint8_t paletteIndex = randr(2);
+    uint8_t paletteIndex = randr(NUM_PALETTES);
+    float size = 2 + randf(4);
 
     //Generate texture
     fnl_state noise = fnlCreateState();
@@ -70,7 +88,7 @@ GLuint generatePlanetTexture(uint32_t seed)
     {
         for(j = 0; j < 256; j++)
         {
-            float temp = (fnlGetNoise2D(&noise, i * 4, j * 4) + 1.0f) * 128;
+            float temp = (fnlGetNoise2D(&noise, i * size, j * size) + 1.0f) * 128;
             Color c = getColorForValue(palettes[paletteIndex], temp);
             data[i * 256 * 3 + j * 3] = c.r;
             data[i * 256 * 3 + j * 3 + 1] = c.g;
@@ -93,35 +111,68 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
 {
     srand(seed);
 
-    system->numStars = randr(4);
+    system->numStars = 1 + randr(3);
     system->numPlanets = randr(9);
 
-    float baseStarSize = 30 + randf(50);
+    float baseStarSize = 40 + randf(30);
+    float firstOrbit = baseStarSize * 2;
 
     uint8_t i;
+    uint8_t xUsed = 0;
     for(i = 0; i < system->numStars; i++)
     {
         system->stars[i].size = baseStarSize + randf(5);
         system->stars[i].position.x = 0;
         system->stars[i].position.y = 0;
         system->stars[i].position.z = 0;
+        //Create binary or trinary star systems
+        if(i > 0)
+        {
+            firstOrbit = baseStarSize * 5;
+            if(!xUsed)
+            {
+                system->stars[i].position.x = baseStarSize * 2;
+                xUsed = 1;
+            }
+            else
+            {
+                system->stars[i].position.z = baseStarSize * 2;
+            }
+        }
     }
 
     for(i = 0; i < system->numPlanets; i++)
     {
         system->planets[i].size = 10.0f + randf(10);
-        system->planets[i].position.x = 20 * i + baseStarSize + randf(50 * i);
+
+        int8_t positive = randr(2) * 2 - 1;
+        uint8_t useX = randr(2);
+
+        if(useX)
+        {
+            system->planets[i].position.x = (firstOrbit + (20 * i) + randf(50 * i)) * positive;
+            system->planets[i].position.z = randf(50) - 25;
+        }
+        else
+        {
+            system->planets[i].position.x = randf(50) - 25;
+            system->planets[i].position.z = (firstOrbit + (20 * i) + randf(50 * i)) * positive;
+        }
         system->planets[i].position.y = randf(5 * i);
-        system->planets[i].position.z = 20 * i + baseStarSize + randf(50 * i);
         system->planets[i].texture = generatePlanetTexture(seed);
+
+        system->planets[i].hasRing = randr(10) < 2;
     }
 
     //Index of the planets we're putting the station next to
     uint8_t spIndex = randr(system->numPlanets);
-    system->station.position.x = system->planets[spIndex].position.x + 20;
+    system->station.position.x = system->planets[spIndex].position.x + system->planets[spIndex].size * 2;
     system->station.position.y = system->planets[spIndex].position.y;
     system->station.position.z = system->planets[spIndex].position.z;
     system->station.dockingPosition.x = system->station.position.x + 5;
     system->station.dockingPosition.y = system->station.position.y;
     system->station.dockingPosition.z = system->station.position.z + 1.25f;
+    system->station.exitPosition.x = system->station.position.x + 7;
+    system->station.exitPosition.y = system->station.position.y;
+    system->station.exitPosition.z = system->station.position.z + 3;
 }

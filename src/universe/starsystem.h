@@ -15,11 +15,13 @@ typedef struct {
     float size;
     Vector3 position;
     GLuint texture;
+    uint8_t hasRing;
 } Planet;
 
 typedef struct {
     Vector3 position;
     Vector3 dockingPosition;
+    Vector3 exitPosition;
 } SpaceStation;
 
 typedef struct {
@@ -37,5 +39,6 @@ void drawStarSystem();
 StarSystem* getStarSystem();
 
 uint8_t hasDockingDistance(Ship* ship);
+Vector3 getExitPosition();
 
 #endif
