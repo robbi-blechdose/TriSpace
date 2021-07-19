@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=TriSpace
+Comment=Space trading/fighting game
+Exec=main-funkey.elf
+Icon=icon
+Terminal=false
+Categories=games;

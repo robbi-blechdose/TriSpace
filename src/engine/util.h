@@ -2,12 +2,18 @@
 #define _UTIL_H
 
 #include <math.h>
+#include "includes/3dMath.h"
 
 typedef struct {
     float x;
     float y;
     float z;
 } Vector3;
+
+typedef struct {
+    float x;
+    float y;
+} Vector2;
 
 #define RAD_TO_DEG(rad) ((rad) * 180.0f / M_PI)
 

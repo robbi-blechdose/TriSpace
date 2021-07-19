@@ -1,4 +1,25 @@
 #include "ship.h"
+#include "engine/model.h"
+#include "engine/image.h"
+
+GLuint shipMesh;
+GLuint shipTexture;
+
+void initShip()
+{
+    shipMesh = loadModelList("res/obj/Ship.obj");
+    shipTexture = loadRGBTexture("res/tex/Ship.png");
+}
+
+void drawShip(Ship* ship)
+{
+    glBindTexture(GL_TEXTURE_2D, shipTexture);
+    glPushMatrix();
+    glTranslatef(ship->position.x, ship->position.y, ship->position.z);
+    //TODO: Rotation
+    glCallList(shipMesh);
+    glPopMatrix();
+}
 
 void calcShip(Ship* ship, uint32_t ticks)
 {
@@ -67,4 +88,9 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
         ship->speed = ship->type->maxSpeed;
     }
     ship->speed = clamp(ship->speed, 0, ship->type->maxSpeed);
+}
+
+void fireWeapons(Ship* ship)
+{
+    //TODO
 }

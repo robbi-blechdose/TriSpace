@@ -40,6 +40,11 @@ GLuint loadRGBTexture(unsigned char* path)
 	return t;
 }
 
+void deleteRGBTexture(GLuint texture)
+{
+    glDeleteTextures(1, &texture);
+}
+
 void blitSurface(SDL_Surface* target, SDL_Surface* source, uint8_t x, uint8_t y)
 {
     SDL_Rect dst = {.x = x, .y = y};

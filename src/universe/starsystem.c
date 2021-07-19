@@ -23,6 +23,15 @@ void initStarSystem()
     stationTexture = loadRGBTexture("res/tex/SpaceStation.png");
 }
 
+void deleteStarSystem()
+{
+    uint8_t i;
+    for(i = 0; i < sys.numPlanets; i++)
+    {
+        deleteRGBTexture(sys.planets[i].texture);
+    }
+}
+
 StarSystem* getStarSystem()
 {
     return &sys;

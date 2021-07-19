@@ -33,7 +33,7 @@ typedef struct {
 } StarSystem;
 
 void initStarSystem();
-void loadStarSystem();
+void deleteStarSystem();
 void drawStarSystem();
 
 StarSystem* getStarSystem();

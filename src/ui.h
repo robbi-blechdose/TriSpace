@@ -5,6 +5,6 @@
 #include "ship.h"
 
 void initUI();
-void drawUI(SDL_Surface* screen, Ship* playerShip);
+void drawUI(Ship* playerShip);
 
 #endif

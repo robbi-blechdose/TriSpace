@@ -161,7 +161,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         system->planets[i].position.y = randf(5 * i);
         system->planets[i].texture = generatePlanetTexture(seed);
 
-        system->planets[i].hasRing = randr(10) < 2;
+        system->planets[i].hasRing = randr(100) < 30;
     }
 
     //Index of the planets we're putting the station next to

@@ -4,21 +4,26 @@
 #include "engine/includes/3dMath.h"
 #include "engine/input.h"
 #include "engine/camera.h"
+#include "engine/view.h"
 
 #include "ui.h"
 #include "ship.h"
 #include "universe/universe.h"
-#include "universe/generator.h"
 
 #define WINX 240
 #define WINY 240
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
+//#define LIMIT_FPS
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
 SDL_Event event;
 uint16_t fps;
+
+uint8_t counterEnabled = 0;
+uint32_t counterFrames = 0;
+uint32_t counterTime = 0;
 
 uint8_t running = 1;
 
@@ -34,7 +39,7 @@ void drawFPS(uint16_t fps)
 {
     char buffer[12];
 	sprintf(buffer, "FPS: %i", fps);
-	glDrawText(buffer, 1, 1, 0xFFFFFF);
+	glDrawText(buffer, 3, 3, 0xFFFFFF);
 }
 
 void handleInput(uint16_t ticks)
@@ -43,6 +48,24 @@ void handleInput(uint16_t ticks)
     {
         switch(event.key.keysym.sym)
         {
+            case SDLK_q:
+            {
+                running = 0;
+                break;
+            }
+            case SDLK_c:
+            {
+                counterEnabled = !counterEnabled;
+                if(!counterEnabled)
+                {
+                    printf("%d frames in %d ms. %f fps. %f ms/frame.\n", counterFrames, counterTime,
+                                                                ((float) counterFrames / counterTime) * 1000.0f,
+                                                                (float) counterTime / counterFrames);
+                    counterTime = 0;
+                    counterFrames = 0;
+                }
+                break;
+            }
             default:
             {
                 break;
@@ -57,6 +80,12 @@ void handleInput(uint16_t ticks)
 
 void calcFrame(uint32_t ticks)
 {
+    if(counterEnabled)
+    {
+        counterTime += ticks;
+        counterFrames++;
+    }
+
     if(keyPressed(X))
     {
         accelerateShip(&playerShip, 1, ticks);
@@ -103,6 +132,12 @@ void drawFrame()
 
     drawFPS(fps);
 
+    setOrtho();
+    drawUI(&playerShip);
+    //drawTradingUI(&playerShip, 0);
+    //postdrawUI();
+    setPerspective();
+
     if(SDL_MUSTLOCK(screen))
     {
         SDL_LockSurface(screen);
@@ -112,7 +147,6 @@ void drawFrame()
     {
 		SDL_UnlockSurface(screen);
     }
-    drawUI(screen, &playerShip);
 	SDL_Flip(screen);
 }
 
@@ -123,7 +157,7 @@ int main(int argc, char **argv)
 	SDL_ShowCursor(SDL_DISABLE);
 
     //Initialize TinyGL
-	frameBuffer = ZB_open(WINX, WINY_3D, ZB_MODE_5R6G5B, 0);
+	frameBuffer = ZB_open(WINX, WINY, ZB_MODE_5R6G5B, 0);
 	glInit(frameBuffer);
 	glShadeModel(GL_FLAT);
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -136,16 +170,24 @@ int main(int argc, char **argv)
 	glTextSize(GL_TEXT_SIZE8x8);
 	glEnable(GL_TEXTURE_2D);
 
+    float winPersp[] = {WINX, WINY_3D};
+    float winOrtho[] = {WINX, WINY};
+    float clipPersp[] = {1, 512};
+    float clipOrtho[] = {0, 5};
+    initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
+    setPerspective();
+    /**
     glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	mat4 matrix = perspective(70, (float)WINX / (float)WINY_3D, 1, 512);
 	glLoadMatrixf(matrix.d);
 	glMatrixMode(GL_MODELVIEW);
+    **/
 
     //Initialize game
     initUI();
     initUniverse();
-    generateStarSystem(getStarSystem(), 2);
+    initShip();
 
     //Temporary (TODO: REMOVE)
     playerShip.type = &test;
@@ -170,11 +212,12 @@ int main(int argc, char **argv)
         calcFrame(ticks);
         drawFrame();
 
-        /**
+        #ifdef LIMIT_FPS
 		if((1000 / MAX_FPS) > (SDL_GetTicks() - tNow))
         {
 			SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); // Yay stable framerate!
-		}**/
+		}
+        #endif
 		fps = 1000.0f / (float)(tNow - tLastFrame);
 		tLastFrame = tNow;
     }

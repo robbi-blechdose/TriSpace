@@ -2,6 +2,7 @@
 
 #include "starsystem.h"
 #include "spacestation.h"
+#include "generator.h"
 
 typedef enum {
     NONE,
@@ -13,12 +14,52 @@ typedef enum {
 State state;
 State targetState;
 
+uint8_t currentSystem;
+uint8_t systemSeeds[] = {
+    2
+};
+
+#define MAX_NPC_SHIPS 8
+Ship npcShips[8];
+
 void initUniverse()
 {
     state = SPACE;
     targetState = NONE;
     initStarSystem();
     initSpaceStation();
+    //Init starting star system
+    currentSystem = 0;
+    generateStarSystem(getStarSystem(), systemSeeds[currentSystem]);
+
+    //TODO: Remove test
+    npcShips[0].type = 1;
+    npcShips[0].position.x = 150;
+    npcShips[0].position.z = 100;
+}
+
+void switchSystem(uint8_t newSystem)
+{
+    currentSystem = newSystem;
+    deleteStarSystem();
+    generateStarSystem(getStarSystem(), systemSeeds[currentSystem]);
+    uint8_t i;
+    for(i = 0; i < MAX_NPC_SHIPS; i++)
+    {
+        npcShips[i].type = NULL;
+    }
+}
+
+void calcNPCShips()
+{
+    uint8_t i;
+    for(i = 0; i < MAX_NPC_SHIPS; i++)
+    {
+        if(npcShips[i].type != NULL)
+        {
+
+        }
+    }
 }
 
 void calcUniverse(Ship* playerShip)
@@ -53,6 +94,7 @@ void calcUniverse(Ship* playerShip)
             {
                 targetState = STATION;
             }
+            calcNPCShips();
             break;
         }
         case STATION:
@@ -89,6 +131,14 @@ void drawUniverse()
         case SPACE:
         {
             drawStarSystem();
+            uint8_t i;
+            for(i = 0; i < MAX_NPC_SHIPS; i++)
+            {
+                if(npcShips[i].type != NULL)
+                {
+                    drawShip(&npcShips[i]);
+                }
+            }
             break;
         }
         case STATION:
