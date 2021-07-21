@@ -4,38 +4,18 @@
 #include "spacestation.h"
 #include "generator.h"
 
-typedef enum {
-    NONE,
-    SPACE,
-    STATION,
-    PLANET
-} State;
-
-State state;
-State targetState;
-
 uint8_t currentSystem;
 uint8_t systemSeeds[] = {
     2
 };
 
-#define MAX_NPC_SHIPS 8
-Ship npcShips[8];
-
 void initUniverse()
 {
-    state = SPACE;
-    targetState = NONE;
     initStarSystem();
     initSpaceStation();
     //Init starting star system
     currentSystem = 0;
     generateStarSystem(getStarSystem(), systemSeeds[currentSystem]);
-
-    //TODO: Remove test
-    npcShips[0].type = 1;
-    npcShips[0].position.x = 150;
-    npcShips[0].position.z = 100;
 }
 
 void switchSystem(uint8_t newSystem)
@@ -46,11 +26,11 @@ void switchSystem(uint8_t newSystem)
     uint8_t i;
     for(i = 0; i < MAX_NPC_SHIPS; i++)
     {
-        npcShips[i].type = NULL;
+        //npcShips[i].type = NULL;
     }
 }
 
-void calcNPCShips()
+void calcNPCShips(Ship npcShips[])
 {
     uint8_t i;
     for(i = 0; i < MAX_NPC_SHIPS; i++)
@@ -62,11 +42,11 @@ void calcNPCShips()
     }
 }
 
-void calcUniverse(Ship* playerShip)
+void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcShips[])
 {
-    if(targetState != NONE)
+    if(*targetState != NONE)
     {
-        switch(targetState)
+        switch(*targetState)
         {
             case SPACE:
             {
@@ -82,51 +62,35 @@ void calcUniverse(Ship* playerShip)
                 break;
             }
         }
-        state = targetState;
-        targetState = NONE;
+        *state = *targetState;
+        *targetState = NONE;
     }
 
-    switch(state)
+    switch(*state)
     {
         case SPACE:
         {
             if(hasDockingDistance(playerShip))
             {
-                targetState = STATION;
+                *targetState = STATION;
             }
-            calcNPCShips();
+            calcNPCShips(npcShips);
             break;
         }
         case STATION:
         {
             if(hasLeavingDistance(playerShip))
             {
-                targetState = SPACE;
+                *targetState = SPACE;
             }
             break;
         }
     }
 }
 
-void drawUniverse()
+void drawUniverse(State* state, Ship npcShips[])
 {
-    if(targetState != NONE)
-    {
-        //TODO: Visual transitions
-        switch(targetState)
-        {
-            case SPACE:
-            {
-                break;
-            }
-            case STATION:
-            {
-                break;
-            }
-        }
-    }
-
-    switch(state)
+    switch(*state)
     {
         case SPACE:
         {

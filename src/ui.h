@@ -3,8 +3,9 @@
 
 #include <SDL.h>
 #include "ship.h"
+#include "universe/universe.h"
 
 void initUI();
-void drawUI(Ship* playerShip);
+void drawUI(State state, Ship* playerShip, Ship npcShips[]);
 
 #endif

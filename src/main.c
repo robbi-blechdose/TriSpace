@@ -28,9 +28,13 @@ uint32_t counterTime = 0;
 uint8_t running = 1;
 
 //---------- Main game stuff ----------//
+State state;
+State targetState;
+
+Ship npcShips[MAX_NPC_SHIPS];
 
 //Temporary (TODO: REMOVE)
-ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5};
+ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 10};
 
 Ship playerShip;
 //-------------------------------------//
@@ -118,7 +122,7 @@ void calcFrame(uint32_t ticks)
     setCameraPos(playerShip.position);
     setCameraRot(playerShip.rotation);
 
-    calcUniverse(&playerShip);
+    calcUniverse(&state, &targetState, &playerShip, npcShips);
 }
 
 void drawFrame()
@@ -128,14 +132,13 @@ void drawFrame()
 
     drawCamera();
 
-    drawUniverse();
+    drawUniverse(&state, npcShips);
 
     drawFPS(fps);
 
     setOrtho();
-    drawUI(&playerShip);
+    drawUI(state, &playerShip, npcShips);
     //drawTradingUI(&playerShip, 0);
-    //postdrawUI();
     setPerspective();
 
     if(SDL_MUSTLOCK(screen))
@@ -173,18 +176,13 @@ int main(int argc, char **argv)
     float winPersp[] = {WINX, WINY_3D};
     float winOrtho[] = {WINX, WINY};
     float clipPersp[] = {1, 512};
-    float clipOrtho[] = {0, 5};
+    float clipOrtho[] = {0, 100};
     initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
     setPerspective();
-    /**
-    glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	mat4 matrix = perspective(70, (float)WINX / (float)WINY_3D, 1, 512);
-	glLoadMatrixf(matrix.d);
-	glMatrixMode(GL_MODELVIEW);
-    **/
 
     //Initialize game
+    state = SPACE;
+    targetState = NONE;
     initUI();
     initUniverse();
     initShip();
@@ -193,6 +191,10 @@ int main(int argc, char **argv)
     playerShip.type = &test;
     playerShip.position.x = 150;
     playerShip.position.z = 100;
+    playerShip.shields = 10;
+    npcShips[0].type = 1;
+    npcShips[0].position.x = 140;
+    npcShips[0].position.z = 100;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

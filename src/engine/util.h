@@ -20,5 +20,8 @@ typedef struct {
 float clamp(float x, float min, float max);
 float squaref(float a);
 float distance3d(Vector3* a, Vector3* b);
+Vector3 difference3d(Vector3* a, Vector3* b);
+float length3d(Vector3* v);
+void normalize(Vector3* v);
 
 #endif

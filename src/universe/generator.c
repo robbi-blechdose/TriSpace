@@ -150,13 +150,13 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
 
         if(useX)
         {
-            system->planets[i].position.x = (firstOrbit + (20 * i) + randf(50 * i)) * positive;
+            system->planets[i].position.x = (firstOrbit + (30 * i) + randf(50 * i)) * positive;
             system->planets[i].position.z = randf(50) - 25;
         }
         else
         {
             system->planets[i].position.x = randf(50) - 25;
-            system->planets[i].position.z = (firstOrbit + (20 * i) + randf(50 * i)) * positive;
+            system->planets[i].position.z = (firstOrbit + (30 * i) + randf(50 * i)) * positive;
         }
         system->planets[i].position.y = randf(5 * i);
         system->planets[i].texture = generatePlanetTexture(seed);
