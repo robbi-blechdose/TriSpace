@@ -89,8 +89,8 @@ void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks)
             ship->turnSpeedY = 0;
         }
     }
-    ship->turnSpeedX = clamp(ship->turnSpeedX, -ship->type->maxTurnSpeed, ship->type->maxTurnSpeed);
-    ship->turnSpeedY = clamp(ship->turnSpeedY, -ship->type->maxTurnSpeed, ship->type->maxTurnSpeed);
+    ship->turnSpeedX = clampf(ship->turnSpeedX, -ship->type->maxTurnSpeed, ship->type->maxTurnSpeed);
+    ship->turnSpeedY = clampf(ship->turnSpeedY, -ship->type->maxTurnSpeed, ship->type->maxTurnSpeed);
 }
 
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
@@ -104,7 +104,7 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
     {
         ship->speed = ship->type->maxSpeed;
     }
-    ship->speed = clamp(ship->speed, 0, ship->type->maxSpeed);
+    ship->speed = clampf(ship->speed, 0, ship->type->maxSpeed);
 }
 
 void fireWeapons(Ship* ship)

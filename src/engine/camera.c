@@ -2,9 +2,9 @@
 
 #include "GL/gl.h"
 
-Vector3 cameraPos;
+vec3 cameraPos;
 //x = pitch, y = yaw, z = roll
-Vector3 cameraRot;
+vec3 cameraRot;
 
 void drawCamera()
 {
@@ -15,12 +15,12 @@ void drawCamera()
     glTranslatef(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 }
 
-void setCameraPos(Vector3 pos)
+void setCameraPos(vec3 pos)
 {
     cameraPos = pos;
 }
 
-void setCameraRot(Vector3 rot)
+void setCameraRot(vec3 rot)
 {
     cameraRot = rot;
 }

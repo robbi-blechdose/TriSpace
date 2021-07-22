@@ -29,7 +29,16 @@ typedef float f_;
 typedef unsigned int uint;
 #define MAX(x,y) (x>y?x:y)
 #define MIN(x,y) (x<y?x:y)
-typedef struct {CHAD_ALIGN f_ d[3];} vec3;
+typedef struct {
+	union {
+		f_ d[3];
+		struct {
+			f_ x;
+			f_ y;
+			f_ z;
+		};
+	};
+} vec3;
 typedef struct {CHAD_ALIGN int d[3];} ivec3;
 typedef struct {CHAD_ALIGN f_ d[4];} vec4;
 typedef struct {CHAD_ALIGN f_ d[16];} mat4;
@@ -45,10 +54,6 @@ typedef struct{
 	vec3 e;
 }aabb;
 typedef aabb colshape; /*c.d[3] determines if it's a sphere or box. 0 or less = box, greater than 0 = sphere*/
-
-
-
-
 
 static inline mat4 scalemat4( vec4 s){
 	mat4 ret;
@@ -238,7 +243,6 @@ static inline mat4 rotate( vec3 rotation){
 	rm.d[3*4 + 2] = 0;
 	return rm;
 }
-
 
 static inline f_ clampf( f_ a,  f_ min,  f_ max){
 	if(a<min) return min;

@@ -2,6 +2,7 @@
 #define _SHIP_H
 
 #include <SDL.h>
+#include "engine/includes/3dMath.h"
 #include "engine/util.h"
 #include "cargo.h"
 
@@ -17,8 +18,8 @@ typedef struct {
 typedef struct {
     ShipType* type;
 
-    Vector3 position;
-    Vector3 rotation;
+    vec3 position;
+    vec3 rotation;
     float speed;
     float turnSpeedX;
     float turnSpeedY;

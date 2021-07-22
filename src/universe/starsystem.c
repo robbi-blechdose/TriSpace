@@ -91,7 +91,7 @@ uint8_t hasDockingDistance(Ship* ship)
     return 0;
 }
 
-Vector3 getExitPosition()
+vec3 getExitPosition()
 {
     return sys.station.exitPosition;
 }

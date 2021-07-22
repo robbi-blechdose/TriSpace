@@ -2,9 +2,10 @@
 #define _CAMERA_H
 
 #include "util.h"
+#include "includes/3dMath.h"
 
 void drawCamera();
-void setCameraPos(Vector3 pos);
-void setCameraRot(Vector3 rot);
+void setCameraPos(vec3 pos);
+void setCameraRot(vec3 rot);
 
 #endif
