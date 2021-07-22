@@ -8,6 +8,8 @@
 typedef struct {
     uint8_t maxShields;
     uint8_t maxEnergy;
+    uint8_t shieldRegen;
+    uint8_t energyRegen;
     float maxSpeed;
     float maxTurnSpeed;
 } ShipType;

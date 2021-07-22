@@ -25,7 +25,7 @@ void drawSpaceStation()
 
 uint8_t hasLeavingDistance(Ship* ship)
 {
-    if(ship->position.x < -2.1)
+    if(ship->position.x > 2.1)
     {
         return 1;
     }

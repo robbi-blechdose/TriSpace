@@ -34,7 +34,7 @@ State targetState;
 Ship npcShips[MAX_NPC_SHIPS];
 
 //Temporary (TODO: REMOVE)
-ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 10};
+ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 10, .maxEnergy = 10, .shieldRegen = 1, .energyRegen = 1};
 
 Ship playerShip;
 //-------------------------------------//
@@ -176,7 +176,7 @@ int main(int argc, char **argv)
     float winPersp[] = {WINX, WINY_3D};
     float winOrtho[] = {WINX, WINY};
     float clipPersp[] = {1, 512};
-    float clipOrtho[] = {0, 100};
+    float clipOrtho[] = {-15, 0};
     initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
     setPerspective();
 
@@ -191,8 +191,7 @@ int main(int argc, char **argv)
     playerShip.type = &test;
     playerShip.position.x = 150;
     playerShip.position.z = 100;
-    playerShip.shields = 10;
-    npcShips[0].type = 1;
+    npcShips[0].type = &test;
     npcShips[0].position.x = 140;
     npcShips[0].position.z = 100;
 

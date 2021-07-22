@@ -30,6 +30,23 @@ void calcShip(Ship* ship, uint32_t ticks)
     ship->position.z -= cos(ship->rotation.y) * cos(ship->rotation.x) * diff;
     ship->position.x += sin(ship->rotation.y) * cos(ship->rotation.x) * diff;
     ship->position.y -= sin(ship->rotation.x) * diff;
+
+    if(ship->shields < ship->type->maxShields)
+    {
+        ship->shields += ship->type->shieldRegen;
+        if(ship->shields > ship->type->maxShields)
+        {
+            ship->shields = ship->type->maxShields;
+        }
+    }
+    if(ship->energy < ship->type->maxEnergy)
+    {
+        ship->energy += ship->type->energyRegen;
+        if(ship->energy > ship->type->maxEnergy)
+        {
+            ship->energy = ship->type->maxEnergy;
+        }
+    }
 }
 
 void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks)

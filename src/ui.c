@@ -7,14 +7,12 @@
 
 GLuint mainTexture;
 GLuint rectTexture;
-GLuint radarMesh;
 
 void initUI()
 {
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
     rectTexture = loadRGBTexture("res/UI/rect.png");
-    radarMesh = loadModelList("res/UI/Radar.obj");
 }
 
 /**
@@ -38,30 +36,41 @@ void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
     glVertex3f(posX, posY + sizeY - 1, z);
 }
 
+//UI Base Height
+#define UIBH 10
+//UI Top Height
+#define UITH 11
+
 void drawUI(State state, Ship* playerShip, Ship npcShips[])
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
     glBegin(GL_QUADS);
     //Draw main UI background
-    drawTexQuad(0, 0, 240, 240, -80, 0, 0, PTC(240), PTC(240));
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
 
     uint8_t speedTemp = (playerShip->speed / playerShip->type->maxSpeed) * 16;
     if(speedTemp > 0)
     {
-        drawTexQuad(171, 26, speedTemp * 4, 4, -1, 0, PTC(249), PTC(4) * speedTemp, PTC(251));
+        drawTexQuad(171, 26, speedTemp * 4, 4, UITH, 0, PTC(249), PTC(4) * speedTemp, PTC(251));
     }
 
     int8_t turnXTemp = (playerShip->turnSpeedX / playerShip->type->maxTurnSpeed) * 30 + 30;
-    drawTexQuad(170 + turnXTemp, 56, 4, 4, -1, PTC(252), 0, 1, PTC(3));
+    drawTexQuad(170 + turnXTemp, 56, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
     int8_t turnYTemp = (playerShip->turnSpeedY / playerShip->type->maxTurnSpeed) * 30 + 30;
-    drawTexQuad(170 + turnYTemp, 41, 4, 4, -1, PTC(252), 0, 1, PTC(3));
+    drawTexQuad(170 + turnYTemp, 41, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
     uint8_t shieldsTemp = (playerShip->shields / playerShip->type->maxShields) * 16;
     if(shieldsTemp > 0)
     {
-        drawTexQuad(7, 57, shieldsTemp * 4, 4, -1, 0, PTC(253), PTC(4) * shieldsTemp, 1);
+        drawTexQuad(7, 57, shieldsTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * shieldsTemp, 1);
+    }
+
+    uint8_t energyTemp = (playerShip->energy / playerShip->type->maxEnergy) * 16;
+    if(energyTemp > 0)
+    {
+        drawTexQuad(7, 42, energyTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * energyTemp, 1);
     }
 
     //Radar
@@ -95,7 +104,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[])
                         rot.d[1] = 32 * sinf(angle);
                     }
 
-                    drawTexQuad(119.5f + rot.d[0] - 2, 36.5f + rot.d[1] - 2, 4, 4, -2,
+                    drawTexQuad(119.5f + rot.d[0] - 2, 36.5f + rot.d[1] - 2, 4, 4, UITH,
                                 PTC(252), PTC(4), 1, PTC(7));
                 }
             }
