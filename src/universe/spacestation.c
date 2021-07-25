@@ -23,9 +23,18 @@ void drawSpaceStation()
     glCallList(stationInteriorMesh);
 }
 
-uint8_t hasLeavingDistance(Ship* ship)
+uint8_t hasLeavingDistance(vec3 pos)
 {
-    if(ship->position.x > 2.1)
+    if(pos.x > 2.1)
+    {
+        return 1;
+    }
+    return 0;
+}
+
+uint8_t hasLandingDistance(vec3 pos)
+{
+    if(pos.y < -0.5f)
     {
         return 1;
     }

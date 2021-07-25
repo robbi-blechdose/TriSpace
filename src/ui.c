@@ -6,13 +6,17 @@
 #include "universe/universe.h"
 
 GLuint mainTexture;
-GLuint rectTexture;
+GLuint tradeTexture;
+
+//Trading
+uint8_t cursorPos;
 
 void initUI()
 {
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
-    rectTexture = loadRGBTexture("res/UI/rect.png");
+    tradeTexture = loadRGBTexture("res/UI/trading.png");
+    cursorPos = 0;
 }
 
 /**
@@ -20,8 +24,6 @@ void initUI()
  * Converts a pixel position (0-255) to a texture coordinate (0-1)
  **/
 #define PTC(X) (X / 256.0f)
-
-//TODO: Fix stuff being 1 pixel too tall (wtf???)
 
 void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
                     float texX1, float texY1, float texX2, float texY2)
@@ -41,7 +43,39 @@ void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
 //UI Top Height
 #define UITH 11
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[])
+void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t isEnemy)
+{
+    vec3 diff = subv3(playerPos, target);
+    vec3 axis = {.d = {0, 1, 0}};
+    vec3 rot = rotatev3(diff, axis, playerRot.y);
+    axis.d[0] = 1;
+    axis.d[1] = 0;
+    rot = rotatev3(rot, axis, playerRot.x);
+    rot = normalizev3(rot);
+
+    if(rot.d[2] > 0)
+    {
+        rot.d[0] = -rot.d[0] * 30;
+        rot.d[1] = -rot.d[1] * 30;
+    }
+    else
+    {
+        float angle = atan2f(-rot.d[1], -rot.d[0]);
+        rot.x = 32 * cosf(angle);
+        rot.y = 32 * sinf(angle);
+    }
+
+    float texY1 = PTC(4);
+    float texY2 = PTC(7);
+    if(!isEnemy)
+    {
+        texY1 = PTC(8);
+        texY2 = PTC(11);
+    }
+    drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
+}
+
+void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
@@ -76,36 +110,15 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[])
     //Radar
     if(state != STATION)
     {
+        drawRadarDot(playerShip->position, playerShip->rotation, stationPos, 0);
+
         for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
         {
             if(npcShips[i].type != NULL)
             {
                 if(distance3d(&playerShip->position, &npcShips[i].position) < 50)
                 {
-                    vec3 player = {.d = {playerShip->position.x, playerShip->position.y, playerShip->position.z}};
-                    vec3 enemy = {.d = {npcShips[i].position.x, npcShips[i].position.y, npcShips[i].position.z}};
-                    vec3 diff = subv3(player, enemy);
-                    vec3 axis = {.d = {0, 1, 0}};
-                    vec3 rot = rotatev3(diff, axis, playerShip->rotation.y);
-                    axis.d[0] = 1;
-                    axis.d[1] = 0;
-                    rot = rotatev3(rot, axis, playerShip->rotation.x);
-                    rot = normalizev3(rot);
-
-                    if(rot.d[2] > 0)
-                    {
-                        rot.d[0] = -rot.d[0] * 30;
-                        rot.d[1] = -rot.d[1] * 30;
-                    }
-                    else
-                    {
-                        float angle = atan2f(-rot.d[1], -rot.d[0]);
-                        rot.d[0] = 32 * cosf(angle);
-                        rot.d[1] = 32 * sinf(angle);
-                    }
-
-                    drawTexQuad(119.5f + rot.d[0] - 2, 36.5f + rot.d[1] - 2, 4, 4, UITH,
-                                PTC(252), PTC(4), 1, PTC(7));
+                    drawRadarDot(playerShip->position, playerShip->rotation, npcShips[i].position, 1);
                 }
             }
         }
@@ -114,19 +127,64 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[])
 }
 
 //TODO
-void drawTradingUI(Ship* playerShip, uint8_t techLevel)
+void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
 {
     glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, rectTexture);
+    glBindTexture(GL_TEXTURE_2D, tradeTexture);
     glBegin(GL_QUADS);
     //Draw rect background
-    drawTexQuad(0, 0, 240, 240, -2, 0, 0, PTC(240), PTC(240));
-
-    glDrawText("ITEM UNIT PRICE STATION SHIP", 8, 8, 0xFFFFFF);
-    uint8_t i;
-    for(i = 0; i < NUM_CARGO_TYPES; i++)
-    {
-        glDrawText("TEST   KG    10     256    0", 8, 16, 0xFFFFFF);
-    }
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
     glEnd();
+
+    char buffer[29];
+
+    glDrawText("ITEM       UNIT PRICE     QTY", 8, 8, 0xFFFFFF);
+    for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
+    {
+        printNameForCargo(buffer, i);
+        printUnitForCargo(&buffer[12], i);
+        sprintf(&buffer[15], " %5d  %2d|%2d", getPriceForCargo(i, info), stationHold->cargo[i], playerHold->cargo[i]);
+        if(i == cursorPos)
+        {
+            glDrawText(buffer, 8, 16 + i * 8, 0x000000);
+        }
+        else
+        {
+            glDrawText(buffer, 8, 16 + i * 8, 0xFFFFFF);
+        }
+    }
+
+    sprintf(buffer, "%d credits", playerHold->money);
+    glDrawText(buffer, 8, 224, 0xFFFFFF);
+}
+
+void moveTradeCursor(int8_t dir)
+{
+    if(dir > 0)
+    {
+        if(cursorPos < NUM_CARGO_TYPES - 1)
+        {
+            cursorPos++;
+        }
+        else
+        {
+            cursorPos = 0;
+        }
+    }
+    else
+    {
+        if(cursorPos > 0)
+        {
+            cursorPos--;
+        }
+        else
+        {
+            cursorPos = NUM_CARGO_TYPES - 1;
+        }
+    }
+}
+
+uint8_t getTradeCursor()
+{
+    return cursorPos;
 }

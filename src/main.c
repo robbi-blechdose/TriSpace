@@ -9,6 +9,10 @@
 #include "ui.h"
 #include "ship.h"
 #include "universe/universe.h"
+#include "universe/starsystem.h"
+
+//Compile with debug functionality
+#define DEBUG
 
 #define WINX 240
 #define WINY 240
@@ -21,15 +25,19 @@ ZBuffer* frameBuffer = NULL;
 SDL_Event event;
 uint16_t fps;
 
+#ifdef DEBUG
 uint8_t counterEnabled = 0;
 uint32_t counterFrames = 0;
 uint32_t counterTime = 0;
+#endif
 
 uint8_t running = 1;
 
 //---------- Main game stuff ----------//
 State state;
 State targetState;
+
+CargoHold stationHold;
 
 Ship npcShips[MAX_NPC_SHIPS];
 
@@ -46,83 +54,90 @@ void drawFPS(uint16_t fps)
 	glDrawText(buffer, 3, 3, 0xFFFFFF);
 }
 
-void handleInput(uint16_t ticks)
-{
-    if(event.type == SDL_KEYUP)
-    {
-        switch(event.key.keysym.sym)
-        {
-            case SDLK_q:
-            {
-                running = 0;
-                break;
-            }
-            case SDLK_c:
-            {
-                counterEnabled = !counterEnabled;
-                if(!counterEnabled)
-                {
-                    printf("%d frames in %d ms. %f fps. %f ms/frame.\n", counterFrames, counterTime,
-                                                                ((float) counterFrames / counterTime) * 1000.0f,
-                                                                (float) counterTime / counterFrames);
-                    counterTime = 0;
-                    counterFrames = 0;
-                }
-                break;
-            }
-            default:
-            {
-                break;
-            }
-        }
-    }
-    else if(event.type == SDL_QUIT)
-    {
-        running = 0;
-    }
-}
-
 void calcFrame(uint32_t ticks)
 {
+    #ifdef DEBUG
     if(counterEnabled)
     {
         counterTime += ticks;
         counterFrames++;
     }
+    #endif
 
-    if(keyPressed(X))
+    #ifdef DEBUG
+    if(keyUp(X))
     {
-        accelerateShip(&playerShip, 1, ticks);
+        counterEnabled = !counterEnabled;
+        if(!counterEnabled)
+        {
+            printf("%d frames in %d ms. %f fps. %f ms/frame.\n", counterFrames, counterTime,
+                                                        ((float) counterFrames / counterTime) * 1000.0f,
+                                                        (float) counterTime / counterFrames);
+            counterTime = 0;
+            counterFrames = 0;
+        }
     }
-    else if(keyPressed(Y))
+    #endif
+    
+    if(state == LANDED)
     {
-        accelerateShip(&playerShip, -1, ticks);
+        if(keyUp(D))
+        {
+            moveTradeCursor(1);
+        }
+        else if(keyUp(U))
+        {
+            moveTradeCursor(-1);
+        }
+        else if(keyUp(L))
+        {
+            transferCargo(&playerShip.hold, &stationHold, getTradeCursor(), &getStarSystem()->info);
+        }
+        else if(keyUp(R))
+        {
+            transferCargo(&stationHold, &playerShip.hold, getTradeCursor(), &getStarSystem()->info);
+        }
+        else if(keyUp(B))
+        {
+            state = STATION;
+        }
     }
-    int8_t dirX = 0;
-    int8_t dirY = 0;
-    if(keyPressed(U))
+    else
     {
-        dirX = 1;
-    }
-    else if(keyPressed(D))
-    {
-        dirX = -1;
-    }
-    if(keyPressed(L))
-    {
-        dirY = -1;
-    }
-    else if(keyPressed(R))
-    {
-        dirY = 1;
-    }
-    steerShip(&playerShip, dirX, dirY, ticks);
+        if(keyPressed(X))
+        {
+            accelerateShip(&playerShip, 1, ticks);
+        }
+        else if(keyPressed(Y))
+        {
+            accelerateShip(&playerShip, -1, ticks);
+        }
+        int8_t dirX = 0;
+        int8_t dirY = 0;
+        if(keyPressed(U))
+        {
+            dirX = 1;
+        }
+        else if(keyPressed(D))
+        {
+            dirX = -1;
+        }
+        if(keyPressed(L))
+        {
+            dirY = -1;
+        }
+        else if(keyPressed(R))
+        {
+            dirY = 1;
+        }
+        steerShip(&playerShip, dirX, dirY, ticks);
 
-    calcShip(&playerShip, ticks);
-    setCameraPos(playerShip.position);
-    setCameraRot(playerShip.rotation);
+        calcShip(&playerShip, ticks);
+        setCameraPos(playerShip.position);
+        setCameraRot(playerShip.rotation);
 
-    calcUniverse(&state, &targetState, &playerShip, npcShips);
+        calcUniverse(&state, &targetState, &playerShip, npcShips);
+    }
 }
 
 void drawFrame()
@@ -137,8 +152,14 @@ void drawFrame()
     drawFPS(fps);
 
     setOrtho();
-    drawUI(state, &playerShip, npcShips);
-    //drawTradingUI(&playerShip, 0);
+    if(state == LANDED)
+    {
+        drawTradingUI(&playerShip.hold, &stationHold, &getStarSystem()->info);
+    }
+    else
+    {
+        drawUI(state, &playerShip, npcShips, getStationPosition());
+    }
     setPerspective();
 
     if(SDL_MUSTLOCK(screen))
@@ -181,7 +202,7 @@ int main(int argc, char **argv)
     setPerspective();
 
     //Initialize game
-    state = SPACE;
+    state = LANDED;
     targetState = NONE;
     initUI();
     initUniverse();
@@ -194,6 +215,9 @@ int main(int argc, char **argv)
     npcShips[0].type = &test;
     npcShips[0].position.x = 140;
     npcShips[0].position.z = 100;
+    createStationHold(&stationHold);
+    playerShip.hold.money = 1000;
+    playerShip.hold.size = 25;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();
@@ -204,11 +228,14 @@ int main(int argc, char **argv)
 		tNow = SDL_GetTicks();
         ticks = tNow - tLastFrame;
         
+        /**
         while(SDL_PollEvent(&event))
         {
             handleKeys(&event);
             handleInput(ticks);
         }
+        **/
+        running = handleInput();
 
         calcFrame(ticks);
         drawFrame();

@@ -49,6 +49,18 @@ Color palettes[NUM_PALETTES][8] = {
     //Forest-type planet
 };
 
+//Diffs are: Tree, Rock, Water
+int8_t planetTradeDiffs[NUM_PALETTES][3] = {
+    //Earth-type planet
+    {1, -1, 0},
+    //Mars-type planet
+    {-1, 1, -1},
+    //Venus-type planet
+    {-2, 2, -2}
+    //Ocean-type planet
+    //Forest-type planet
+};
+
 Color getColorForValue(Color* palette, float value)
 {
     uint8_t index = value / 32;
@@ -72,11 +84,10 @@ float randf(float max)
 }
 
 //TODO: Fix texture seam in x direction (y technically has a seam but that's unimportant)
-GLuint generatePlanetTexture(uint32_t seed)
+GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
     uint16_t i, j;
-    uint8_t paletteIndex = randr(NUM_PALETTES);
     float size = 2 + randf(4);
 
     //Generate texture
@@ -105,6 +116,14 @@ GLuint generatePlanetTexture(uint32_t seed)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	return t;
+}
+
+void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
+{
+    info->techLevel = 1 + randr(MAX_TECH_LEVEL);
+    info->treeDiff = planetTradeDiffs[paletteIndex][0];
+    info->rockDiff = planetTradeDiffs[paletteIndex][1];
+    info->waterDiff = planetTradeDiffs[paletteIndex][2];
 }
 
 void generateStarSystem(StarSystem* system, uint32_t seed)
@@ -141,6 +160,10 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         }
     }
 
+    //Index of the planet we're putting the station next to
+    uint8_t spIndex = randr(system->numPlanets);
+    uint8_t spPaletteIndex;
+
     for(i = 0; i < system->numPlanets; i++)
     {
         system->planets[i].size = 10.0f + randf(10);
@@ -159,13 +182,17 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
             system->planets[i].position.z = (firstOrbit + (30 * i) + randf(50 * i)) * positive;
         }
         system->planets[i].position.y = randf(5 * i);
-        system->planets[i].texture = generatePlanetTexture(seed);
+        uint8_t paletteIndex = randr(NUM_PALETTES);
+        system->planets[i].texture = generatePlanetTexture(seed, paletteIndex);
+        //Save palette index
+        if(i == spIndex)
+        {
+            spPaletteIndex = paletteIndex;
+        }
 
         system->planets[i].hasRing = randr(100) < 30;
     }
 
-    //Index of the planets we're putting the station next to
-    uint8_t spIndex = randr(system->numPlanets);
     system->station.position.x = system->planets[spIndex].position.x + system->planets[spIndex].size * 2;
     system->station.position.y = system->planets[spIndex].position.y;
     system->station.position.z = system->planets[spIndex].position.z;
@@ -175,4 +202,6 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     system->station.exitPosition.x = system->station.position.x + 7;
     system->station.exitPosition.y = system->station.position.y;
     system->station.exitPosition.z = system->station.position.z + 3;
+
+    generateSystemInfo(&system->info, spPaletteIndex);
 }

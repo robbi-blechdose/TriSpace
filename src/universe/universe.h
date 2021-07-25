@@ -7,7 +7,8 @@ typedef enum {
     NONE,
     SPACE,
     STATION,
-    PLANET
+    PLANET,
+    LANDED
 } State;
 
 #define MAX_NPC_SHIPS 8

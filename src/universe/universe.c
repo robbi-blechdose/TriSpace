@@ -61,6 +61,11 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
                 playerShip->speed = 0;
                 break;
             }
+            case LANDED:
+            {
+                playerShip->position.y = 0;
+                break;
+            }
         }
         *state = *targetState;
         *targetState = NONE;
@@ -70,7 +75,7 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
     {
         case SPACE:
         {
-            if(hasDockingDistance(playerShip))
+            if(hasDockingDistance(&playerShip->position))
             {
                 *targetState = STATION;
             }
@@ -79,9 +84,13 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
         }
         case STATION:
         {
-            if(hasLeavingDistance(playerShip))
+            if(hasLeavingDistance(playerShip->position))
             {
                 *targetState = SPACE;
+            }
+            else if(hasLandingDistance(playerShip->position))
+            {
+                *targetState = LANDED;
             }
             break;
         }

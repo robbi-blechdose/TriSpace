@@ -4,7 +4,16 @@
 #include <SDL.h>
 #include "GL/gl.h"
 #include "../engine/util.h"
-#include "../ship.h"
+
+#define MAX_TECH_LEVEL 15
+
+typedef struct {
+    uint8_t techLevel;
+    //These diff values must be in the range [-2, 2]!
+    int8_t treeDiff;
+    int8_t rockDiff;
+    int8_t waterDiff;
+} SystemInfo;
 
 typedef struct {
     float size;
@@ -25,6 +34,7 @@ typedef struct {
 } SpaceStation;
 
 typedef struct {
+    SystemInfo info;
     Star stars[3];
     uint8_t numStars;
     Planet planets[8];
@@ -38,7 +48,8 @@ void drawStarSystem();
 
 StarSystem* getStarSystem();
 
-uint8_t hasDockingDistance(Ship* ship);
+uint8_t hasDockingDistance(vec3* pos);
 vec3 getExitPosition();
+vec3 getStationPosition();
 
 #endif

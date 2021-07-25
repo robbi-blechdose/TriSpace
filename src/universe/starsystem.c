@@ -82,9 +82,9 @@ void drawStarSystem()
     glPopMatrix();
 }
 
-uint8_t hasDockingDistance(Ship* ship)
+uint8_t hasDockingDistance(vec3* pos)
 {
-    if(distance3d(&ship->position, &sys.station.dockingPosition) < 2)
+    if(distance3d(pos, &sys.station.dockingPosition) < 2)
     {
         return 1;
     }
@@ -94,4 +94,9 @@ uint8_t hasDockingDistance(Ship* ship)
 vec3 getExitPosition()
 {
     return sys.station.exitPosition;
+}
+
+vec3 getStationPosition()
+{
+    return sys.station.position;
 }
