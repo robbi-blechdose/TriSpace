@@ -82,8 +82,7 @@ uint8_t getCargoHoldSize(CargoHold* hold)
 uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info)
 {
     uint8_t cost = getPriceForCargo(type, info);
-    if(holdBuy->money >= cost && getCargoHoldSize(holdBuy) < holdBuy->size &&
-        holdSell->cargo[type] > 0)
+    if(holdBuy->money >= cost && getCargoHoldSize(holdBuy) < holdBuy->size && holdSell->cargo[type] > 0)
     {
         holdBuy->money -= cost;
         holdSell->money += cost;
@@ -96,7 +95,7 @@ uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, S
 
 void createStationHold(CargoHold* hold)
 {
-    hold->money = 65535;
+    hold->money = 50000;
     hold->size = 65535;
     for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
     {
