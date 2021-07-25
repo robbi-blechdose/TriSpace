@@ -19,7 +19,8 @@ typedef enum {
     S
 } Key;
 
-void handleKeys(SDL_Event* event);
+uint8_t handleInput();
 uint8_t keyPressed(Key key);
+uint8_t keyUp(Key key);
 
 #endif
