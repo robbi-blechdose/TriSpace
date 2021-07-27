@@ -1,13 +1,13 @@
 #include "input.h"
 
-uint8_t keysLast[13];
-uint8_t keys[13];
+uint8_t keysLast[NUM_KEYS];
+uint8_t keys[NUM_KEYS];
 
 uint8_t handleInput()
 {
     uint8_t running = 1;
 
-    for(uint8_t i = 0; i < 13; i++)
+    for(uint8_t i = 0; i < NUM_KEYS; i++)
     {
         keysLast[i] = keys[i];
     }
@@ -71,9 +71,19 @@ uint8_t handleInput()
                 keys[Y] = state;
                 break;
             }
+            case SDLK_k:
+            {
+                keys[K] = state;
+                break;
+            }
             case SDLK_q:
             {
                 running = 0;
+                break;
+            }
+            case SDLK_z:
+            {
+                keys[Z] = state;
                 break;
             }
         }

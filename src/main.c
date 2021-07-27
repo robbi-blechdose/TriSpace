@@ -39,12 +39,14 @@ State targetState;
 
 CargoHold stationHold;
 
+Ship playerShip;
 Ship npcShips[MAX_NPC_SHIPS];
+
+uint8_t targetSystem = 0;
 
 //Temporary (TODO: REMOVE)
 ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 10, .maxEnergy = 10, .shieldRegen = 1, .energyRegen = 1};
 
-Ship playerShip;
 //-------------------------------------//
 
 void drawFPS(uint16_t fps)
@@ -65,7 +67,7 @@ void calcFrame(uint32_t ticks)
     #endif
 
     #ifdef DEBUG
-    if(keyUp(X))
+    if(keyUp(Z))
     {
         counterEnabled = !counterEnabled;
         if(!counterEnabled)
@@ -79,15 +81,15 @@ void calcFrame(uint32_t ticks)
     }
     #endif
     
-    if(state == LANDED)
+    if(state == TRADING)
     {
-        if(keyUp(D))
-        {
-            moveTradeCursor(1);
-        }
-        else if(keyUp(U))
+        if(keyUp(U))
         {
             moveTradeCursor(-1);
+        }
+        else if(keyUp(D))
+        {
+            moveTradeCursor(1);
         }
         else if(keyUp(L))
         {
@@ -100,6 +102,37 @@ void calcFrame(uint32_t ticks)
         else if(keyUp(B))
         {
             state = STATION;
+        }
+    }
+    else if(state == MAP)
+    {
+        int8_t dirX = 0;
+        int8_t dirY = 0;
+        if(keyUp(U))
+        {
+            dirY = 1;
+        }
+        else if(keyUp(D))
+        {
+            dirY = -1;
+        }
+        if(keyUp(L))
+        {
+            dirX = -1;
+        }
+        else if(keyUp(R))
+        {
+            dirX = 1;
+        }
+
+        moveMapCursor(dirX, dirY);
+        if(keyUp(K))
+        {
+            state = SPACE;
+        }
+        else if(keyUp(A))
+        {
+            switchSystem(getMapCursor());
         }
     }
     else
@@ -137,6 +170,11 @@ void calcFrame(uint32_t ticks)
         setCameraRot(playerShip.rotation);
 
         calcUniverse(&state, &targetState, &playerShip, npcShips);
+
+        if(keyUp(K))
+        {
+            state = MAP;
+        }
     }
 }
 
@@ -152,13 +190,24 @@ void drawFrame()
     drawFPS(fps);
 
     setOrtho();
-    if(state == LANDED)
+    switch(state)
     {
-        drawTradingUI(&playerShip.hold, &stationHold, &getStarSystem()->info);
-    }
-    else
-    {
-        drawUI(state, &playerShip, npcShips, getStationPosition());
+        case SPACE:
+        case STATION:
+        {
+            drawUI(state, &playerShip, npcShips, getStationPosition());
+            break;
+        }
+        case TRADING:
+        {
+            drawTradingUI(&playerShip.hold, &stationHold, &getStarSystem()->info);
+            break;
+        }
+        case MAP:
+        {
+            drawMap(getSystemSeeds());
+            break;
+        }
     }
     setPerspective();
 
@@ -202,11 +251,12 @@ int main(int argc, char **argv)
     setPerspective();
 
     //Initialize game
-    state = LANDED;
+    state = SPACE;
     targetState = NONE;
     initUI();
     initUniverse();
     initShip();
+    createStationHold(&stationHold);
 
     //Temporary (TODO: REMOVE)
     playerShip.type = &test;
@@ -215,7 +265,6 @@ int main(int argc, char **argv)
     npcShips[0].type = &test;
     npcShips[0].position.x = 140;
     npcShips[0].position.z = 100;
-    createStationHold(&stationHold);
     playerShip.hold.money = 1000;
     playerShip.hold.size = 25;
 
@@ -228,13 +277,6 @@ int main(int argc, char **argv)
 		tNow = SDL_GetTicks();
         ticks = tNow - tLastFrame;
         
-        /**
-        while(SDL_PollEvent(&event))
-        {
-            handleKeys(&event);
-            handleInput(ticks);
-        }
-        **/
         running = handleInput();
 
         calcFrame(ticks);
@@ -243,7 +285,7 @@ int main(int argc, char **argv)
         #ifdef LIMIT_FPS
 		if((1000 / MAX_FPS) > (SDL_GetTicks() - tNow))
         {
-			SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); // Yay stable framerate!
+			SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); //Yay stable framerate!
 		}
         #endif
 		fps = 1000.0f / (float)(tNow - tLastFrame);

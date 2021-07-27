@@ -4,36 +4,35 @@
 #include "spacestation.h"
 #include "generator.h"
 
-uint8_t currentSystem;
-uint8_t systemSeeds[] = {
-    2
-};
+uint16_t currentSystem;
+uint32_t systemSeeds[256]; //16x16
 
 void initUniverse()
 {
     initStarSystem();
     initSpaceStation();
+    //Generate system seeds
+    generateSystemSeeds(systemSeeds, 1);
     //Init starting star system
     currentSystem = 0;
     generateStarSystem(getStarSystem(), systemSeeds[currentSystem]);
 }
 
-void switchSystem(uint8_t newSystem)
+void switchSystem(uint16_t newSystem)
 {
+    if(newSystem == currentSystem)
+    {
+        return;
+    }
     currentSystem = newSystem;
     deleteStarSystem();
     generateStarSystem(getStarSystem(), systemSeeds[currentSystem]);
-    uint8_t i;
-    for(i = 0; i < MAX_NPC_SHIPS; i++)
-    {
-        //npcShips[i].type = NULL;
-    }
+    //TODO: Clear NPC ships!
 }
 
 void calcNPCShips(Ship npcShips[])
 {
-    uint8_t i;
-    for(i = 0; i < MAX_NPC_SHIPS; i++)
+    for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
         if(npcShips[i].type != NULL)
         {
@@ -61,9 +60,10 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
                 playerShip->speed = 0;
                 break;
             }
-            case LANDED:
+            case TRADING:
             {
                 playerShip->position.y = 0;
+                playerShip->speed = 0;
                 break;
             }
         }
@@ -90,7 +90,7 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
             }
             else if(hasLandingDistance(playerShip->position))
             {
-                *targetState = LANDED;
+                *targetState = TRADING;
             }
             break;
         }
@@ -120,4 +120,9 @@ void drawUniverse(State* state, Ship npcShips[])
             break;
         }
     }
+}
+
+uint32_t* getSystemSeeds()
+{
+    return systemSeeds;
 }

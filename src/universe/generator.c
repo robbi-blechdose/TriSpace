@@ -87,7 +87,6 @@ float randf(float max)
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
-    uint16_t i, j;
     float size = 2 + randf(4);
 
     //Generate texture
@@ -95,9 +94,9 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
     noise.noise_type = FNL_NOISE_VALUE;
     noise.fractal_type = FNL_FRACTAL_FBM;
     noise.seed = seed + rand();
-    for(i = 0; i < 256; i++)
+    for(uint16_t i = 0; i < 256; i++)
     {
-        for(j = 0; j < 256; j++)
+        for(uint16_t j = 0; j < 256; j++)
         {
             float temp = (fnlGetNoise2D(&noise, i * size, j * size) + 1.0f) * 128;
             Color c = getColorForValue(palettes[paletteIndex], temp);
@@ -126,19 +125,24 @@ void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
     info->waterDiff = planetTradeDiffs[paletteIndex][2];
 }
 
+uint8_t getNumStarsForSystem(uint32_t seed)
+{
+    srand(seed);
+    return 1 + randr(3);
+}
+
 void generateStarSystem(StarSystem* system, uint32_t seed)
 {
     srand(seed);
 
     system->numStars = 1 + randr(3);
-    system->numPlanets = randr(9);
+    system->numPlanets = 1 + randr(9);
 
     float baseStarSize = 40 + randf(30);
     float firstOrbit = baseStarSize * 2;
 
-    uint8_t i;
     uint8_t xUsed = 0;
-    for(i = 0; i < system->numStars; i++)
+    for(uint8_t i = 0; i < system->numStars; i++)
     {
         system->stars[i].size = baseStarSize + randf(5);
         system->stars[i].position.x = 0;
@@ -164,7 +168,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     uint8_t spIndex = randr(system->numPlanets);
     uint8_t spPaletteIndex;
 
-    for(i = 0; i < system->numPlanets; i++)
+    for(uint8_t i = 0; i < system->numPlanets; i++)
     {
         system->planets[i].size = 10.0f + randf(10);
 
@@ -204,4 +208,13 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     system->station.exitPosition.z = system->station.position.z + 3;
 
     generateSystemInfo(&system->info, spPaletteIndex);
+}
+
+void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed)
+{
+    srand(baseSeed);
+    for(uint16_t i = 0; i < 256; i++)
+    {
+        systemSeeds[i] = rand();
+    }
 }

@@ -3,6 +3,8 @@
 
 #include <SDL.h>
 
+#define NUM_KEYS 14
+
 typedef enum {
     U,
     D,
@@ -16,7 +18,8 @@ typedef enum {
     N,
     Q,
     K,
-    S
+    S,
+    Z //Debug key
 } Key;
 
 uint8_t handleInput();

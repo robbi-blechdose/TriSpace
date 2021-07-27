@@ -4,26 +4,36 @@
 #include "engine/includes/3dMath.h"
 #include "cargo.h"
 #include "universe/universe.h"
+#include "universe/generator.h"
 
 GLuint mainTexture;
 GLuint tradeTexture;
+GLuint mapTexture;
 
 //Trading
-uint8_t cursorPos;
+uint8_t tradeCursor;
+//Map
+float mapScrollX;
+float mapScrollY;
+uint8_t mapCursorX;
+uint8_t mapCursorY;
 
 void initUI()
 {
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
     tradeTexture = loadRGBTexture("res/UI/trading.png");
-    cursorPos = 0;
+    mapTexture = loadRGBTexture("res/UI/map.png");
+    tradeCursor = 0;
+    mapCursorX = 0;
+    mapCursorY = 0;
 }
 
 /**
  * Pixel To Coordinate
  * Converts a pixel position (0-255) to a texture coordinate (0-1)
  **/
-#define PTC(X) (X / 256.0f)
+#define PTC(X) ((X) / 256.0f)
 
 void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
                     float texX1, float texY1, float texX2, float texY2)
@@ -126,7 +136,6 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
     glEnd();
 }
 
-//TODO
 void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
 {
     glLoadIdentity();
@@ -144,7 +153,7 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
         printNameForCargo(buffer, i);
         printUnitForCargo(&buffer[12], i);
         sprintf(&buffer[15], " %5d  %2d|%2d", getPriceForCargo(i, info), stationHold->cargo[i], playerHold->cargo[i]);
-        if(i == cursorPos)
+        if(i == tradeCursor)
         {
             glDrawText(buffer, 8, 16 + i * 8, 0x000000);
         }
@@ -158,33 +167,76 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
     glDrawText(buffer, 8, 224, 0xFFFFFF);
 }
 
-void moveTradeCursor(int8_t dir)
+void moveWithRollover(uint8_t* i, uint8_t max, int8_t dir)
 {
     if(dir > 0)
     {
-        if(cursorPos < NUM_CARGO_TYPES - 1)
+        if(*i < max)
         {
-            cursorPos++;
+            (*i)++;
         }
         else
         {
-            cursorPos = 0;
+            (*i) = 0;
         }
     }
     else
     {
-        if(cursorPos > 0)
+        if(*i > 0)
         {
-            cursorPos--;
+            (*i)--;
         }
         else
         {
-            cursorPos = NUM_CARGO_TYPES - 1;
+            (*i) = max;
         }
     }
 }
 
+void moveTradeCursor(int8_t dir)
+{
+    moveWithRollover(&tradeCursor, NUM_CARGO_TYPES - 1, dir);
+}
+
 uint8_t getTradeCursor()
 {
-    return cursorPos;
+    return tradeCursor;
+}
+
+void drawMap(uint32_t systemSeeds[])
+{
+    glLoadIdentity();
+    glBindTexture(GL_TEXTURE_2D, mapTexture);
+    glBegin(GL_QUADS);
+    //Draw background
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+
+    for(uint8_t i = 0; i < 16; i++)
+    {
+        for(uint8_t j = 0; j < 16; j++)
+        {
+            uint8_t numStars = getNumStarsForSystem(systemSeeds[i + j * 16]) - 1;
+            drawTexQuad(8 + i * 48, 8 + j * 48, 16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
+        }
+    }
+    drawTexQuad(8 + mapCursorX * 48, 8 + mapCursorY * 48, 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
+    glEnd();
+}
+
+void moveMapCursor(int8_t x, int8_t y)
+{
+    if(x != 0)
+    {
+        moveWithRollover(&mapCursorX, 16, x);
+    }
+    if(y != 0)
+    {
+        moveWithRollover(&mapCursorY, 16, y);
+    }
+}
+
+uint16_t getMapCursor()
+{
+    uint16_t ret = mapCursorY * 16 + mapCursorX;
+    return ret;
 }

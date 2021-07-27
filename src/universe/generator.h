@@ -10,6 +10,9 @@ typedef struct {
     uint8_t b;
 } Color;
 
+uint8_t getNumStarsForSystem(uint32_t seed);
 void generateStarSystem(StarSystem* system, uint32_t seed);
+void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed);
+
 
 #endif
