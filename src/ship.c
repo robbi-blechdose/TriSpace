@@ -25,6 +25,23 @@ void calcShip(Ship* ship, uint32_t ticks)
 {
     ship->rotation.x += (ship->turnSpeedX * ticks) / 1000.0f;
     ship->rotation.y += (ship->turnSpeedY * ticks) / 1000.0f;
+    //Keep rotation in bounds
+    if(ship->rotation.x < 0)
+    {
+        ship->rotation.x += 2 * M_PI;
+    }
+    if(ship->rotation.x > 2 * M_PI)
+    {
+        ship->rotation.x -= 2 * M_PI;
+    }
+    if(ship->rotation.y < 0)
+    {
+        ship->rotation.y += 2 * M_PI;
+    }
+    if(ship->rotation.y > 2 * M_PI)
+    {
+        ship->rotation.y -= 2 * M_PI;
+    }
 
     float diff = (ship->speed * ticks) / 1000.0f;
     ship->position.z -= cos(ship->rotation.y) * cos(ship->rotation.x) * diff;
