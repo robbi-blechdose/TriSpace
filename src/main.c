@@ -37,6 +37,7 @@ uint8_t running = 1;
 State state;
 State targetState;
 
+StarSystem starSystem;
 CargoHold stationHold;
 
 Ship playerShip;
@@ -93,11 +94,11 @@ void calcFrame(uint32_t ticks)
         }
         else if(keyUp(L))
         {
-            transferCargo(&playerShip.hold, &stationHold, getTradeCursor(), &getStarSystem()->info);
+            transferCargo(&playerShip.hold, &stationHold, getTradeCursor(), &starSystem.info);
         }
         else if(keyUp(R))
         {
-            transferCargo(&stationHold, &playerShip.hold, getTradeCursor(), &getStarSystem()->info);
+            transferCargo(&stationHold, &playerShip.hold, getTradeCursor(), &starSystem.info);
         }
         else if(keyUp(B))
         {
@@ -132,7 +133,7 @@ void calcFrame(uint32_t ticks)
         }
         else if(keyUp(A))
         {
-            switchSystem(getMapCursor());
+            switchSystem(getMapCursor(), &starSystem);
         }
     }
     else
@@ -169,7 +170,7 @@ void calcFrame(uint32_t ticks)
         setCameraPos(playerShip.position);
         setCameraRot(playerShip.rotation);
 
-        calcUniverse(&state, &targetState, &playerShip, npcShips);
+        calcUniverse(&state, &targetState, &starSystem, &playerShip, npcShips);
 
         if(keyUp(K))
         {
@@ -185,7 +186,7 @@ void drawFrame()
 
     drawCamera();
 
-    drawUniverse(&state, npcShips);
+    drawUniverse(&state, &starSystem, npcShips);
 
     drawFPS(fps);
 
@@ -195,12 +196,12 @@ void drawFrame()
         case SPACE:
         case STATION:
         {
-            drawUI(state, &playerShip, npcShips, getStationPosition());
+            drawUI(state, &playerShip, npcShips, starSystem.station.position);
             break;
         }
         case TRADING:
         {
-            drawTradingUI(&playerShip.hold, &stationHold, &getStarSystem()->info);
+            drawTradingUI(&playerShip.hold, &stationHold, &starSystem.info);
             break;
         }
         case MAP:
@@ -254,7 +255,7 @@ int main(int argc, char **argv)
     state = SPACE;
     targetState = NONE;
     initUI();
-    initUniverse();
+    initUniverse(&starSystem);
     initShip();
     createStationHold(&stationHold);
 

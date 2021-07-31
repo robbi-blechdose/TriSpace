@@ -152,7 +152,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     srand(seed);
 
     system->numStars = 1 + randr(3);
-    system->numPlanets = 1 + randr(9);
+    system->numPlanets = 1 + randr(8);
 
     float baseStarSize = 40 + randf(30);
     float firstOrbit = baseStarSize * 2;

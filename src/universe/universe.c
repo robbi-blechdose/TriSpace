@@ -7,7 +7,7 @@
 uint16_t currentSystem;
 uint32_t systemSeeds[256]; //16x16
 
-void initUniverse()
+void initUniverse(StarSystem* starSystem)
 {
     initStarSystem();
     initSpaceStation();
@@ -15,18 +15,18 @@ void initUniverse()
     generateSystemSeeds(systemSeeds, 1);
     //Init starting star system
     currentSystem = 0;
-    generateStarSystem(getStarSystem(), systemSeeds[currentSystem]);
+    generateStarSystem(starSystem, systemSeeds[currentSystem]);
 }
 
-void switchSystem(uint16_t newSystem)
+void switchSystem(uint16_t newSystem, StarSystem* starSystem)
 {
     if(newSystem == currentSystem)
     {
         return;
     }
     currentSystem = newSystem;
-    deleteStarSystem();
-    generateStarSystem(getStarSystem(), systemSeeds[currentSystem]);
+    deleteStarSystem(starSystem);
+    generateStarSystem(starSystem, systemSeeds[currentSystem]);
     //TODO: Clear NPC ships!
 }
 
@@ -41,7 +41,7 @@ void calcNPCShips(Ship npcShips[])
     }
 }
 
-void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcShips[])
+void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship* playerShip, Ship npcShips[])
 {
     if(*targetState != NONE)
     {
@@ -49,7 +49,7 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
         {
             case SPACE:
             {
-                playerShip->position = getExitPosition();
+                playerShip->position = starSystem->station.exitPosition;
                 break;
             }
             case STATION:
@@ -75,7 +75,7 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
     {
         case SPACE:
         {
-            if(hasDockingDistance(&playerShip->position))
+            if(hasDockingDistance(&playerShip->position, &starSystem->station.dockingPosition))
             {
                 *targetState = STATION;
             }
@@ -97,13 +97,13 @@ void calcUniverse(State* state, State* targetState, Ship* playerShip, Ship npcSh
     }
 }
 
-void drawUniverse(State* state, Ship npcShips[])
+void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
 {
     switch(*state)
     {
         case SPACE:
         {
-            drawStarSystem();
+            drawStarSystem(starSystem);
             uint8_t i;
             for(i = 0; i < MAX_NPC_SHIPS; i++)
             {

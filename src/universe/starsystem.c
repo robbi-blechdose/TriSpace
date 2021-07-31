@@ -2,8 +2,6 @@
 #include "../engine/model.h"
 #include "../engine/image.h"
 
-StarSystem sys;
-
 GLuint planetMesh;
 GLuint planetRingMesh;
 GLuint planetRingTexture;
@@ -23,48 +21,45 @@ void initStarSystem()
     stationTexture = loadRGBTexture("res/tex/SpaceStation.png");
 }
 
-void deleteStarSystem()
+void deleteStarSystem(StarSystem* starSystem)
 {
     uint8_t i;
-    for(i = 0; i < sys.numPlanets; i++)
+    for(i = 0; i < starSystem->numPlanets; i++)
     {
-        deleteRGBTexture(sys.planets[i].texture);
+        deleteRGBTexture(starSystem->planets[i].texture);
     }
 }
 
-StarSystem* getStarSystem()
-{
-    return &sys;
-}
-
-void drawStarSystem()
+void drawStarSystem(StarSystem* starSystem)
 {
     uint8_t i;
 
     glBindTexture(GL_TEXTURE_2D, sunTexture);
-    for(i = 0; i < sys.numStars; i++)
+    for(i = 0; i < starSystem->numStars; i++)
     {
         glPushMatrix();
-        glTranslatef(sys.stars[i].position.x, sys.stars[i].position.y, sys.stars[i].position.z);
-        if(sys.stars[i].size != 1.0f)
+        glTranslatef(starSystem->stars[i].position.x, starSystem->stars[i].position.y, starSystem->stars[i].position.z);
+        if(starSystem->stars[i].size != 1.0f)
         {
-            glScalef(sys.stars[i].size, sys.stars[i].size, sys.stars[i].size);
+            float size = starSystem->stars[i].size;
+            glScalef(size, size, size);
         }
         glCallList(planetMesh);
         glPopMatrix();
     }
 
-    for(i = 0; i < sys.numPlanets; i++)
+    for(i = 0; i < starSystem->numPlanets; i++)
     {
         glPushMatrix();
-        glTranslatef(sys.planets[i].position.x, sys.planets[i].position.y, sys.planets[i].position.z);
-        if(sys.planets[i].size != 1.0f)
+        glTranslatef(starSystem->planets[i].position.x, starSystem->planets[i].position.y, starSystem->planets[i].position.z);
+        if(starSystem->planets[i].size != 1.0f)
         {
-            glScalef(sys.planets[i].size, sys.planets[i].size, sys.planets[i].size);
+            float size = starSystem->planets[i].size;
+            glScalef(size, size, size);
         }
-        glBindTexture(GL_TEXTURE_2D, sys.planets[i].texture);
+        glBindTexture(GL_TEXTURE_2D, starSystem->planets[i].texture);
         glCallList(planetMesh);
-        if(sys.planets[i].hasRing)
+        if(starSystem->planets[i].hasRing)
         {
             glDisable(GL_CULL_FACE);
             glBindTexture(GL_TEXTURE_2D, planetRingTexture);
@@ -76,27 +71,17 @@ void drawStarSystem()
 
     glBindTexture(GL_TEXTURE_2D, stationTexture);
     glPushMatrix();
-    glTranslatef(sys.station.position.x, sys.station.position.y, sys.station.position.z);
+    glTranslatef(starSystem->station.position.x, starSystem->station.position.y, starSystem->station.position.z);
     glScalef(5, 5, 5);
     glCallList(stationMesh);
     glPopMatrix();
 }
 
-uint8_t hasDockingDistance(vec3* pos)
+uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos)
 {
-    if(distance3d(pos, &sys.station.dockingPosition) < 2)
+    if(distance3d(pos, dockingPos) < 2)
     {
         return 1;
     }
     return 0;
-}
-
-vec3 getExitPosition()
-{
-    return sys.station.exitPosition;
-}
-
-vec3 getStationPosition()
-{
-    return sys.station.position;
 }

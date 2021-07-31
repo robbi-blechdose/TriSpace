@@ -43,13 +43,9 @@ typedef struct {
 } StarSystem;
 
 void initStarSystem();
-void deleteStarSystem();
-void drawStarSystem();
+void deleteStarSystem(StarSystem* starSystem);
+void drawStarSystem(StarSystem* starSystem);
 
-StarSystem* getStarSystem();
-
-uint8_t hasDockingDistance(vec3* pos);
-vec3 getExitPosition();
-vec3 getStationPosition();
+uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos);
 
 #endif
