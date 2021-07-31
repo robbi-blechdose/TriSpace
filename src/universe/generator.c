@@ -4,7 +4,7 @@
 #define FNL_IMPL
 #include "FastNoiseLite.h"
 
-#define NUM_PALETTES 3
+#define NUM_PALETTES 4
 Color palettes[NUM_PALETTES][8] = {
     //Earth-type planet
     {
@@ -44,9 +44,23 @@ Color palettes[NUM_PALETTES][8] = {
         //Mountains
         {.r = 209, .g = 168, .b = 121},
         {.r = 69, .g = 62, .b = 45},
-    }
+    },
     //Ocean-type planet
     //Forest-type planet
+    //Ice-type planet
+    {
+        //Frozen oceans
+        {.r = 51, .g = 181, .b = 181},
+        {.r = 54, .g = 129, .b = 191},
+        {.r = 107, .g = 182, .b = 214},
+        {.r = 145, .g = 209, .b = 237},
+        //Mountains
+        {.r = 85, .g = 86, .b = 87},
+        {.r = 61, .g = 61, .b = 61},
+        //Snow caps
+        {.r = 224, .g = 224, .b = 224},
+        {.r = 230, .g = 240, .b = 245}
+    }
 };
 
 //Diffs are: Tree, Rock, Water
@@ -56,9 +70,11 @@ int8_t planetTradeDiffs[NUM_PALETTES][3] = {
     //Mars-type planet
     {-1, 1, -1},
     //Venus-type planet
-    {-2, 2, -2}
+    {-2, 2, -2},
     //Ocean-type planet
     //Forest-type planet
+    //Ice-type planet
+    {-2, 2, 2}
 };
 
 Color getColorForValue(Color* palette, float value)
