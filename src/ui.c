@@ -216,10 +216,23 @@ void drawMap(uint32_t systemSeeds[])
         for(uint8_t j = 0; j < 16; j++)
         {
             uint8_t numStars = getNumStarsForSystem(systemSeeds[i + j * 16]) - 1;
-            drawTexQuad(8 + i * 48, 8 + j * 48, 16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
+            drawTexQuad(8 + i * 48, 56 + j * 48, 16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
         }
     }
-    drawTexQuad(8 + mapCursorX * 48, 8 + mapCursorY * 48, 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
+    drawTexQuad(8 + mapCursorX * 48, 56 + mapCursorY * 48, 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
+
+    //System info box
+    SystemBaseData sbd;
+    generateSystemBaseData(&sbd, systemSeeds[getMapCursor()]);
+    char buffer[29];
+    glDrawText("System information", 8, 200, 0xFFFFFF);
+    sprintf(buffer, "Tech level: %d", sbd.info.techLevel);
+    glDrawText(buffer, 8, 208, 0xFFFFFF);
+    for(uint8_t i = 0; i < sbd.numPlanets; i++)
+    {
+        drawTexQuad(8 + i * 12, 8, 7, 8, UITH,
+                    PTC(241), PTC(80 + sbd.paletteIndices[i] * 8), PTC(248), PTC(87 + sbd.paletteIndices[i] * 8));
+    }
     glEnd();
 }
 

@@ -18,7 +18,7 @@ typedef enum {
 #define MAX_NPC_SHIPS 8
 
 void initUniverse(StarSystem* starSystem);
-void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship* playerShip, Ship npcShips[]);
+void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
 void switchSystem(uint16_t newSystem, StarSystem* starSystem);
 uint32_t* getSystemSeeds();

@@ -3,6 +3,7 @@
 #include "starsystem.h"
 #include "spacestation.h"
 #include "generator.h"
+#include "../shipAi.h"
 
 uint16_t currentSystem;
 uint32_t systemSeeds[256]; //16x16
@@ -30,18 +31,20 @@ void switchSystem(uint16_t newSystem, StarSystem* starSystem)
     //TODO: Clear NPC ships!
 }
 
-void calcNPCShips(Ship npcShips[])
+void calcNPCShips(Ship* playerShip, Ship npcShips[], uint32_t ticks)
 {
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
         if(npcShips[i].type != NULL)
         {
-
+            calcNPCAi(playerShip, &npcShips[i], ticks);
+            //TODO
+            //calcShip(&npcShips[i], ticks);
         }
     }
 }
 
-void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship* playerShip, Ship npcShips[])
+void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
 {
     if(*targetState != NONE)
     {
@@ -79,7 +82,7 @@ void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship
             {
                 *targetState = STATION;
             }
-            calcNPCShips(npcShips);
+            calcNPCShips(playerShip, npcShips, ticks);
             break;
         }
         case STATION:

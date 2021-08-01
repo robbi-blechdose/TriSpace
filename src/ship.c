@@ -21,7 +21,7 @@ void drawShip(Ship* ship)
     glPopMatrix();
 }
 
-void calcShip(Ship* ship, uint32_t ticks)
+void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks)
 {
     ship->rotation.x += (ship->turnSpeedX * ticks) / 1000.0f;
     ship->rotation.y += (ship->turnSpeedY * ticks) / 1000.0f;
@@ -48,6 +48,19 @@ void calcShip(Ship* ship, uint32_t ticks)
     ship->position.x += sin(ship->rotation.y) * cos(ship->rotation.x) * diff;
     ship->position.y -= sin(ship->rotation.x) * diff;
 
+    //Basic collisions for planets
+    for(uint8_t i = 0; i < starSystem->numPlanets; i++)
+    {
+        if(distance3d(&starSystem->planets[i].position, &ship->position) < starSystem->planets[i].size + 2)
+        {
+            ship->speed = 0;
+            ship->shields = 0;
+            //TODO: Move ship away from planets
+            break;
+        }
+    }
+
+    //TODO: Use ticks here!
     if(ship->shields < ship->type->maxShields)
     {
         ship->shields += ship->type->shieldRegen;

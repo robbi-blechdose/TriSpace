@@ -38,12 +38,12 @@ State state;
 State targetState;
 
 StarSystem starSystem;
+uint8_t targetSystem = 0;
+
 CargoHold stationHold;
 
 Ship playerShip;
 Ship npcShips[MAX_NPC_SHIPS];
-
-uint8_t targetSystem = 0;
 
 //Temporary (TODO: REMOVE)
 ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 10, .maxEnergy = 10, .shieldRegen = 1, .energyRegen = 1};
@@ -127,13 +127,14 @@ void calcFrame(uint32_t ticks)
         }
 
         moveMapCursor(dirX, dirY);
-        if(keyUp(K))
+        if(keyUp(S))
         {
             state = SPACE;
         }
         else if(keyUp(A))
         {
             switchSystem(getMapCursor(), &starSystem);
+            state = SPACE;
         }
     }
     else
@@ -166,13 +167,13 @@ void calcFrame(uint32_t ticks)
         }
         steerShip(&playerShip, dirX, dirY, ticks);
 
-        calcShip(&playerShip, ticks);
+        calcShip(&playerShip, &starSystem, ticks);
         setCameraPos(playerShip.position);
         setCameraRot(playerShip.rotation);
 
-        calcUniverse(&state, &targetState, &starSystem, &playerShip, npcShips);
+        calcUniverse(&state, &targetState, &starSystem, &playerShip, npcShips, ticks);
 
-        if(keyUp(K))
+        if(keyUp(S) && state == SPACE)
         {
             state = MAP;
         }
