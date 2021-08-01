@@ -116,9 +116,26 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
         {
             float temp = (fnlGetNoise2D(&noise, i * size, j * size) + 1.0f) * 128;
             Color c = getColorForValue(palettes[paletteIndex], temp);
-            data[i * 256 * 3 + j * 3] = c.r;
-            data[i * 256 * 3 + j * 3 + 1] = c.g;
-            data[i * 256 * 3 + j * 3 + 2] = c.b;
+            uint32_t index = i * 256 * 3 + j * 3;
+            data[index] = c.r;
+            data[index + 1] = c.g;
+            data[index + 2] = c.b;
+        }
+    }
+
+    //Texture seam fix
+    for(uint16_t i = 0; i < 256; i++)
+    {
+        for(uint16_t j = 0; j < 16; j++)
+        {
+            float temp = (fnlGetNoise2D(&noise, i * size, 255 * size + j * size) + 1.0f) * 128;
+            Color c = getColorForValue(palettes[paletteIndex], temp);
+            uint32_t index = i * 256 * 3 + j * 3;
+            float multA = j / 16.0f;
+            float multB = (16 - j) / 16.0f;
+            data[index] = (c.r * multB) + (data[index] * multA);
+            data[index + 1] = (c.g * multB) + (data[index + 1] * multA);
+            data[index + 2] = (c.b * multB) + (data[index + 2] * multA);
         }
     }
 
