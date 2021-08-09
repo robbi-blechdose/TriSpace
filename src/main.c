@@ -171,6 +171,11 @@ void calcFrame(uint32_t ticks)
         setCameraPos(playerShip.position);
         setCameraRot(playerShip.rotation);
 
+        if(keyUp(A))
+        {
+            fireWeapons(&playerShip, npcShips, 1);
+        }
+
         calcUniverse(&state, &targetState, &starSystem, &playerShip, npcShips, ticks);
 
         if(keyUp(S) && state == SPACE)
@@ -188,6 +193,9 @@ void drawFrame()
     drawCamera();
 
     drawUniverse(&state, &starSystem, npcShips);
+    
+    //TODO: Remove temp
+    drawWeapon(&playerShip);
 
     drawFPS(fps);
 

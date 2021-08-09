@@ -225,12 +225,13 @@ void drawMap(uint32_t systemSeeds[])
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, systemSeeds[getMapCursor()]);
     char buffer[29];
-    glDrawText("System information", 8, 200, 0xFFFFFF);
+    glDrawText("System information", 48, 196, 0xFFFFFF);
     sprintf(buffer, "Tech level: %d", sbd.info.techLevel);
     glDrawText(buffer, 8, 208, 0xFFFFFF);
+    glDrawText("Planets:", 8, 220, 0xFFFFFF);
     for(uint8_t i = 0; i < sbd.numPlanets; i++)
     {
-        drawTexQuad(8 + i * 12, 8, 7, 8, UITH,
+        drawTexQuad(80 + i * 12, 12, 7, 8, UITH,
                     PTC(241), PTC(80 + sbd.paletteIndices[i] * 8), PTC(248), PTC(87 + sbd.paletteIndices[i] * 8));
     }
     glEnd();

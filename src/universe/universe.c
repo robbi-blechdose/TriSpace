@@ -107,8 +107,7 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
         case SPACE:
         {
             drawStarSystem(starSystem);
-            uint8_t i;
-            for(i = 0; i < MAX_NPC_SHIPS; i++)
+            for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
             {
                 if(npcShips[i].type != NULL)
                 {

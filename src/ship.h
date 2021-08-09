@@ -28,13 +28,19 @@ typedef struct {
     uint8_t energy;
 
     CargoHold hold;
+
+    uint8_t weaponFired;
+    int16_t weaponTimer;
+    vec3 weaponTarget;
 } Ship;
+
+#define SHIP_SPHERE_RADIUS 1.5f
 
 void initShip();
 void drawShip(Ship* ship);
 void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks);
 void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks);
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks);
-void fireWeapons(Ship* ship);
+void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets);
 
 #endif

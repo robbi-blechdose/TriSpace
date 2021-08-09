@@ -21,6 +21,26 @@ void drawShip(Ship* ship)
     glPopMatrix();
 }
 
+void drawWeapon(Ship* ship)
+{
+    if(ship->weaponFired)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glTranslatef(ship->position.x, ship->position.y, ship->position.z);
+        glRotatef(RAD_TO_DEG(M_PI - ship->rotation.y), 0, 1, 0);
+        glRotatef(RAD_TO_DEG(ship->rotation.x), 1, 0, 0);
+        glColor3f(0, 0.9f, 1.0f);
+        glBegin(GL_LINES);
+        glVertex3f(1, -1, 0);
+        glVertex3f(0, -1, 10);
+        glVertex3f(-1, -1, 0);
+        glVertex3f(0, -1, 10);
+        glEnd();
+        glColor3f(1, 1, 1);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+}
+
 void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks)
 {
     ship->rotation.x += (ship->turnSpeedX * ticks) / 1000.0f;
@@ -75,6 +95,15 @@ void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks)
         if(ship->energy > ship->type->maxEnergy)
         {
             ship->energy = ship->type->maxEnergy;
+        }
+    }
+
+    if(ship->weaponFired)
+    {
+        ship->weaponTimer -= ticks;
+        if(ship->weaponTimer < 0)
+        {
+            ship->weaponFired = 0;
         }
     }
 }
@@ -137,7 +166,40 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
     ship->speed = clampf(ship->speed, 0, ship->type->maxSpeed);
 }
 
-void fireWeapons(Ship* ship)
+void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
 {
-    //TODO
+    if(ship->weaponFired)
+    {
+        return;
+    }
+
+    ship->weaponFired = 1;
+    ship->weaponTimer = 200;
+
+    for(uint8_t i = 0; i < numTargets; i++)
+    {
+        //OC = ray origin to sphere center
+        vec3 oc = subv3(ship->position, targetShips[i].position);
+
+        vec3 rot = {.x = 0, .y = 0, .z = 1};
+        vec3 dir = {.x = 1, .y = 0, .z = 0};
+        rot = rotatev3(rot, dir, ship->rotation.x);
+        dir.x = 0;
+        dir.y = 1;
+        rot = rotatev3(rot, dir, M_PI - ship->rotation.y);
+        
+        //"Broadphase" hit detection
+        float b = dotv3(oc, rot);
+        float c = dotv3(oc, oc) - (SHIP_SPHERE_RADIUS * SHIP_SPHERE_RADIUS);
+        if(!(c > 0.0f && b > 0.0f))
+        {
+            float discr = b * b - c;
+            if(discr >= 0)
+            {
+                printf("HIT\n");
+                //TODO: Fine detection
+                break;
+            }
+        }
+    }
 }
