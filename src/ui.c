@@ -7,6 +7,7 @@
 #include "universe/generator.h"
 
 GLuint mainTexture;
+GLuint firingTexture;
 GLuint tradeTexture;
 GLuint mapTexture;
 
@@ -22,6 +23,7 @@ void initUI()
 {
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
+    firingTexture = loadRGBTexture("res/UI/firing.png");
     tradeTexture = loadRGBTexture("res/UI/trading.png");
     mapTexture = loadRGBTexture("res/UI/map.png");
     tradeCursor = 0;
@@ -92,7 +94,6 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
     glBegin(GL_QUADS);
     //Draw main UI background
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-
     uint8_t speedTemp = (playerShip->speed / playerShip->type->maxSpeed) * 16;
     if(speedTemp > 0)
     {
@@ -133,6 +134,14 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
             }
         }
     }
+
+    //Draw effect if firing
+    if(playerShip->weapon.timer)
+    {
+        glBindTexture(GL_TEXTURE_2D, firingTexture);
+        drawTexQuad(2, 72, 237, 167, UIBH, 0, 0, PTC(235), PTC(165));
+    }
+
     glEnd();
 }
 

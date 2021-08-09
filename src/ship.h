@@ -9,11 +9,22 @@
 typedef struct {
     uint8_t maxShields;
     uint8_t maxEnergy;
-    uint8_t shieldRegen;
-    uint8_t energyRegen;
+    float shieldRegen;
+    float energyRegen;
     float maxSpeed;
     float maxTurnSpeed;
 } ShipType;
+
+typedef struct {
+    uint8_t damage;
+    int16_t cooldown;
+    uint8_t energyUsage;
+} WeaponType;
+
+typedef struct {
+    WeaponType* type;
+    int16_t timer;
+} Weapon;
 
 typedef struct {
     ShipType* type;
@@ -24,14 +35,11 @@ typedef struct {
     float turnSpeedX;
     float turnSpeedY;
 
-    uint8_t shields;
-    uint8_t energy;
+    float shields;
+    float energy;
 
     CargoHold hold;
-
-    uint8_t weaponFired;
-    int16_t weaponTimer;
-    vec3 weaponTarget;
+    Weapon weapon;
 } Ship;
 
 #define SHIP_SPHERE_RADIUS 1.5f

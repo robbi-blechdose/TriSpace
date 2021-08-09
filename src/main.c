@@ -46,7 +46,8 @@ Ship playerShip;
 Ship npcShips[MAX_NPC_SHIPS];
 
 //Temporary (TODO: REMOVE)
-ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 10, .maxEnergy = 10, .shieldRegen = 1, .energyRegen = 1};
+ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1};
+WeaponType testWeapon = {.cooldown = 200, .damage = 2, .energyUsage = 1};
 
 //-------------------------------------//
 
@@ -193,9 +194,6 @@ void drawFrame()
     drawCamera();
 
     drawUniverse(&state, &starSystem, npcShips);
-    
-    //TODO: Remove temp
-    drawWeapon(&playerShip);
 
     drawFPS(fps);
 
@@ -272,11 +270,12 @@ int main(int argc, char **argv)
     playerShip.type = &test;
     playerShip.position.x = 150;
     playerShip.position.z = 100;
+    playerShip.hold.money = 1000;
+    playerShip.hold.size = 25;
+    playerShip.weapon.type = &testWeapon;
     npcShips[0].type = &test;
     npcShips[0].position.x = 140;
     npcShips[0].position.z = 100;
-    playerShip.hold.money = 1000;
-    playerShip.hold.size = 25;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

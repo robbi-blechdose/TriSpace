@@ -21,26 +21,6 @@ void drawShip(Ship* ship)
     glPopMatrix();
 }
 
-void drawWeapon(Ship* ship)
-{
-    if(ship->weaponFired)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glTranslatef(ship->position.x, ship->position.y, ship->position.z);
-        glRotatef(RAD_TO_DEG(M_PI - ship->rotation.y), 0, 1, 0);
-        glRotatef(RAD_TO_DEG(ship->rotation.x), 1, 0, 0);
-        glColor3f(0, 0.9f, 1.0f);
-        glBegin(GL_LINES);
-        glVertex3f(1, -1, 0);
-        glVertex3f(0, -1, 10);
-        glVertex3f(-1, -1, 0);
-        glVertex3f(0, -1, 10);
-        glEnd();
-        glColor3f(1, 1, 1);
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    }
-}
-
 void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks)
 {
     ship->rotation.x += (ship->turnSpeedX * ticks) / 1000.0f;
@@ -80,10 +60,9 @@ void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks)
         }
     }
 
-    //TODO: Use ticks here!
     if(ship->shields < ship->type->maxShields)
     {
-        ship->shields += ship->type->shieldRegen;
+        ship->shields += ship->type->shieldRegen * ticks / 1000.0f;
         if(ship->shields > ship->type->maxShields)
         {
             ship->shields = ship->type->maxShields;
@@ -91,19 +70,19 @@ void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks)
     }
     if(ship->energy < ship->type->maxEnergy)
     {
-        ship->energy += ship->type->energyRegen;
+        ship->energy += ship->type->energyRegen * ticks / 1000.0f;
         if(ship->energy > ship->type->maxEnergy)
         {
             ship->energy = ship->type->maxEnergy;
         }
     }
 
-    if(ship->weaponFired)
+    if(ship->weapon.timer)
     {
-        ship->weaponTimer -= ticks;
-        if(ship->weaponTimer < 0)
+        ship->weapon.timer -= ticks;
+        if(ship->weapon.timer < 0)
         {
-            ship->weaponFired = 0;
+            ship->weapon.timer = 0;
         }
     }
 }
@@ -166,15 +145,32 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
     ship->speed = clampf(ship->speed, 0, ship->type->maxSpeed);
 }
 
+void damageShip(Ship* ship, uint8_t damage)
+{
+    if(damage > ship->shields)
+    {
+        printf("Destroyed\n");
+        //TODO: Mark as destroyed
+    }
+    else
+    {
+        ship->shields -= damage;
+    }
+}
+
 void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
 {
-    if(ship->weaponFired)
+    if(ship->weapon.timer)
+    {
+        return;
+    }
+    if(ship->energy - ship->weapon.type->energyUsage < 0)
     {
         return;
     }
 
-    ship->weaponFired = 1;
-    ship->weaponTimer = 200;
+    ship->energy -= ship->weapon.type->energyUsage;
+    ship->weapon.timer = ship->weapon.type->cooldown;
 
     for(uint8_t i = 0; i < numTargets; i++)
     {
@@ -198,6 +194,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
             {
                 printf("HIT\n");
                 //TODO: Fine detection
+                damageShip(&targetShips[i], ship->weapon.type->damage);
                 break;
             }
         }

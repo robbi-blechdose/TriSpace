@@ -31,15 +31,14 @@ void switchSystem(uint16_t newSystem, StarSystem* starSystem)
     //TODO: Clear NPC ships!
 }
 
-void calcNPCShips(Ship* playerShip, Ship npcShips[], uint32_t ticks)
+void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uint32_t ticks)
 {
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
         if(npcShips[i].type != NULL)
         {
             calcNPCAi(playerShip, &npcShips[i], ticks);
-            //TODO
-            //calcShip(&npcShips[i], ticks);
+            calcShip(&npcShips[i], starSystem, ticks);
         }
     }
 }
@@ -82,7 +81,7 @@ void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship
             {
                 *targetState = STATION;
             }
-            calcNPCShips(playerShip, npcShips, ticks);
+            calcNPCShips(playerShip, npcShips, starSystem, ticks);
             break;
         }
         case STATION:
