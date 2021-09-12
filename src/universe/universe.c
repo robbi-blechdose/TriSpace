@@ -39,6 +39,11 @@ void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uin
         {
             calcNPCAi(playerShip, &npcShips[i], ticks);
             calcShip(&npcShips[i], starSystem, ticks);
+            if(shipIsDestroyed(&npcShips[i]))
+            {
+                npcShips[i].type = NULL;
+                //TODO: Explosion
+            }
         }
     }
 }

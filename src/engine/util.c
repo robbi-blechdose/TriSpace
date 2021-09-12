@@ -10,6 +10,18 @@ float distance3d(vec3* a, vec3* b)
     return sqrtf(squaref(b->x - a->x) + squaref(b->y - a->y) + squaref(b->z - a->z));
 }
 
+void clampAngle(float* angle)
+{
+    if(*angle < 0)
+    {
+        *angle += 2 * M_PI;
+    }
+    if(*angle > 2 * M_PI)
+    {
+        *angle -= 2 * M_PI;
+    }
+}
+
 //Möller-Trumbore algorithm
 int intersectTriangle(vec3 origin, vec3 direction, vec3 vert0, vec3 vert1, vec3 vert2,
                       float* t, float* u, float* v)

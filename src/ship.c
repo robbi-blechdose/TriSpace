@@ -16,7 +16,8 @@ void drawShip(Ship* ship)
     glBindTexture(GL_TEXTURE_2D, shipTexture);
     glPushMatrix();
     glTranslatef(ship->position.x, ship->position.y, ship->position.z);
-    //TODO: Rotation
+    glRotatef(RAD_TO_DEG(-ship->rotation.y), 0, 1, 0);
+    glRotatef(RAD_TO_DEG(M_PI - ship->rotation.x), 1, 0, 0);
     glCallList(shipMesh);
     glPopMatrix();
 }
@@ -147,15 +148,12 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
 
 void damageShip(Ship* ship, uint8_t damage)
 {
-    if(damage > ship->shields)
-    {
-        printf("Destroyed\n");
-        //TODO: Mark as destroyed
-    }
-    else
-    {
-        ship->shields -= damage;
-    }
+    ship->shields -= damage;
+}
+
+uint8_t shipIsDestroyed(Ship* ship)
+{
+    return ship->shields < 0;
 }
 
 void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
@@ -178,11 +176,11 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
         vec3 oc = subv3(ship->position, targetShips[i].position);
 
         vec3 rot = {.x = 0, .y = 0, .z = 1};
-        vec3 dir = {.x = 1, .y = 0, .z = 0};
-        rot = rotatev3(rot, dir, ship->rotation.x);
-        dir.x = 0;
-        dir.y = 1;
+        vec3 dir = {.x = 0, .y = 1, .z = 0};
         rot = rotatev3(rot, dir, M_PI - ship->rotation.y);
+        dir.x = 1;
+        dir.y = 0;
+        rot = rotatev3(rot, dir, ship->rotation.x);
         
         //"Broadphase" hit detection
         float b = dotv3(oc, rot);
@@ -193,7 +191,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
             if(discr >= 0)
             {
                 printf("HIT\n");
-                //TODO: Fine detection
+                //TODO: Fine detection (?)
                 damageShip(&targetShips[i], ship->weapon.type->damage);
                 break;
             }

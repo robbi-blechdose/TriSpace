@@ -274,8 +274,9 @@ int main(int argc, char **argv)
     playerShip.hold.size = 25;
     playerShip.weapon.type = &testWeapon;
     npcShips[0].type = &test;
-    npcShips[0].position.x = 140;
-    npcShips[0].position.z = 100;
+    npcShips[0].position.x = 120;
+    npcShips[0].position.z = 80;
+    npcShips[0].weapon.type = &testWeapon;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

@@ -49,6 +49,7 @@ void drawShip(Ship* ship);
 void calcShip(Ship* ship, StarSystem* starSystem, uint32_t ticks);
 void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks);
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks);
+uint8_t shipIsDestroyed(Ship* ship);
 void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets);
 
 #endif
