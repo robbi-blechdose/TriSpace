@@ -14,6 +14,11 @@ uint8_t getPriceForCargo(CargoType type, SystemInfo* info)
             return 7 + info->treeDiff + (info->techLevel / 4);
             break;
         }
+        case Liquor:
+        {
+            return 10 - info->government * 2;
+            break;
+        }
         case Computers:
         {
             return 50 + (MAX_TECH_LEVEL - info->techLevel) * 5;
@@ -23,6 +28,18 @@ uint8_t getPriceForCargo(CargoType type, SystemInfo* info)
         {
             return 55 + (MAX_TECH_LEVEL - info->techLevel) * 3;
             break;
+        }
+        case Slaves:
+        {
+            return 50 + ((float) info->government / MAX_GOVERNMENT) * 150.0f;
+        }
+        case Firearms:
+        {
+            return 20 + (MAX_TECH_LEVEL / (float) info->techLevel) * 40 + ((float) info->government / MAX_GOVERNMENT) * 40;
+        }
+        case Narcotics:
+        {
+            return 10 + (MAX_TECH_LEVEL / (float) info->techLevel) * 20 + ((float) info->government / MAX_GOVERNMENT) * 40;
         }
     }
 }
@@ -41,6 +58,11 @@ void printNameForCargo(char* str, CargoType type)
             strcpy(str, "Textiles    ");
             break;
         }
+        case Liquor:
+        {
+            strcpy(str, "Liquor      ");
+            break;
+        }
         case Computers:
         {
             strcpy(str, "Computers   ");
@@ -49,6 +71,21 @@ void printNameForCargo(char* str, CargoType type)
         case Machinery:
         {
             strcpy(str, "Machinery   ");
+            break;
+        }
+        case Slaves:
+        {
+            strcpy(str, "Slaves      ");
+            break;
+        }
+        case Firearms:
+        {
+            strcpy(str, "Firearms    ");
+            break;
+        }
+        case Narcotics:
+        {
+            strcpy(str, "Narcotics   ");
             break;
         }
     }
@@ -62,8 +99,16 @@ void printUnitForCargo(char* str, CargoType type)
         case Textiles:
         case Computers:
         case Machinery:
+        case Firearms:
+        case Narcotics:
+        case Slaves:
         {
             strcpy(str, "  t");
+            break;
+        }
+        case Liquor:
+        {
+            strcpy(str, "  l");
             break;
         }
     }
