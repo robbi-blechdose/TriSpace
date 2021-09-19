@@ -4,16 +4,24 @@
 #include <stdint.h>
 #include "universe/starsystem.h"
 
-#define NUM_CARGO_TYPES 8
+#define NUM_CARGO_TYPES 14
 
 typedef enum {
     Food,
     Textiles,
     Liquor,
+    Furs,
+    Radioactives,
+    Luxuries,
 
     //Technical goods
     Computers,
     Machinery,
+
+    //Mine-able goods
+    Gold,
+    Platinum,
+    Dilithium,
 
     //Illegal goods
     Slaves,

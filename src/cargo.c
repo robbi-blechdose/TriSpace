@@ -7,27 +7,46 @@ uint8_t getPriceForCargo(CargoType type, SystemInfo* info)
         case Food:
         {
             return 5 + info->waterDiff + (info->techLevel / 4);
-            break;
         }
         case Textiles:
         {
             return 7 + info->treeDiff + (info->techLevel / 4);
-            break;
         }
         case Liquor:
         {
             return 10 - info->government * 2;
-            break;
+        }
+        case Furs:
+        {
+            return 7 + ((float) info->techLevel / MAX_TECH_LEVEL) * 5;
+        }
+        case Radioactives:
+        {
+            return 20 + ((float) info->techLevel / MAX_TECH_LEVEL) * 10;
+        }
+        case Luxuries:
+        {
+            return 60 + (((float) (MAX_TECH_LEVEL - info->techLevel)) / MAX_TECH_LEVEL) * 60;
         }
         case Computers:
         {
             return 50 + (MAX_TECH_LEVEL - info->techLevel) * 5;
-            break;
         }
         case Machinery:
         {
             return 55 + (MAX_TECH_LEVEL - info->techLevel) * 3;
-            break;
+        }
+        case Gold:
+        {
+            return 45 + (((float) (MAX_TECH_LEVEL - info->techLevel)) / MAX_TECH_LEVEL) * 30;
+        }
+        case Platinum:
+        {
+            return 55 + (((float) (MAX_TECH_LEVEL - info->techLevel)) / MAX_TECH_LEVEL) * 30;
+        }
+        case Dilithium:
+        {
+            return 10 + ((float) info->techLevel / MAX_TECH_LEVEL) * 90;
         }
         case Slaves:
         {
@@ -63,6 +82,21 @@ void printNameForCargo(char* str, CargoType type)
             strcpy(str, "Liquor      ");
             break;
         }
+        case Furs:
+        {
+            strcpy(str, "Furs        ");
+            break;
+        }
+        case Radioactives:
+        {
+            strcpy(str, "Radioactives");
+            break;
+        }
+        case Luxuries:
+        {
+            strcpy(str, "Luxuries    ");
+            break;
+        }
         case Computers:
         {
             strcpy(str, "Computers   ");
@@ -71,6 +105,21 @@ void printNameForCargo(char* str, CargoType type)
         case Machinery:
         {
             strcpy(str, "Machinery   ");
+            break;
+        }
+        case Gold:
+        {
+            strcpy(str, "Gold        ");
+            break;
+        }
+        case Platinum:
+        {
+            strcpy(str, "Platinum    ");
+            break;
+        }
+        case Dilithium:
+        {
+            strcpy(str, "Dilithium   ");
             break;
         }
         case Slaves:
@@ -97,6 +146,9 @@ void printUnitForCargo(char* str, CargoType type)
     {
         case Food:
         case Textiles:
+        case Furs:
+        case Radioactives:
+        case Luxuries:
         case Computers:
         case Machinery:
         case Firearms:
@@ -110,6 +162,12 @@ void printUnitForCargo(char* str, CargoType type)
         {
             strcpy(str, "  l");
             break;
+        }
+        case Gold:
+        case Platinum:
+        case Dilithium:
+        {
+            strcpy(str, " kg");
         }
     }
 }
