@@ -47,7 +47,7 @@ Ship npcShips[MAX_NPC_SHIPS];
 
 //Temporary (TODO: REMOVE)
 ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1};
-WeaponType testWeapon = {.cooldown = 200, .damage = 2, .energyUsage = 1};
+WeaponType testWeapon = {.cooldown = 400, .damage = 2, .energyUsage = 1};
 
 //-------------------------------------//
 

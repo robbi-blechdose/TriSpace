@@ -3,6 +3,7 @@
 #include "starsystem.h"
 #include "spacestation.h"
 #include "generator.h"
+#include "../engine/effects.h"
 #include "../shipAi.h"
 
 uint16_t currentSystem;
@@ -10,6 +11,7 @@ uint32_t systemSeeds[256]; //16x16
 
 void initUniverse(StarSystem* starSystem)
 {
+    initEffects();
     initStarSystem();
     initSpaceStation();
     //Generate system seeds
@@ -41,8 +43,8 @@ void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uin
             calcShip(&npcShips[i], starSystem, ticks);
             if(shipIsDestroyed(&npcShips[i]))
             {
+                createEffect(npcShips[i].position, EXPLOSION);
                 npcShips[i].type = NULL;
-                //TODO: Explosion
             }
         }
     }
@@ -87,6 +89,7 @@ void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship
                 *targetState = STATION;
             }
             calcNPCShips(playerShip, npcShips, starSystem, ticks);
+            calcEffects(ticks);
             break;
         }
         case STATION:
@@ -118,6 +121,7 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
                     drawShip(&npcShips[i]);
                 }
             }
+            drawEffects();
             break;
         }
         case STATION:

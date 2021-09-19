@@ -31,12 +31,6 @@ void initUI()
     mapCursorY = 0;
 }
 
-/**
- * Pixel To Coordinate
- * Converts a pixel position (0-255) to a texture coordinate (0-1)
- **/
-#define PTC(X) ((X) / 256.0f)
-
 void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
                     float texX1, float texY1, float texX2, float texY2)
 {
@@ -236,11 +230,13 @@ void drawMap(uint32_t systemSeeds[])
     char buffer[29];
     glDrawText("System information", 48, 196, 0xFFFFFF);
     sprintf(buffer, "Tech level: %d", sbd.info.techLevel);
-    glDrawText(buffer, 8, 208, 0xFFFFFF);
-    glDrawText("Planets:", 8, 220, 0xFFFFFF);
+    glDrawText(buffer, 8, 207, 0xFFFFFF);
+    sprintf(buffer, "Government level: %d", sbd.info.government);
+    glDrawText(buffer, 8, 218, 0xFFFFFF);
+    glDrawText("Planets:", 8, 229, 0xFFFFFF);
     for(uint8_t i = 0; i < sbd.numPlanets; i++)
     {
-        drawTexQuad(80 + i * 12, 12, 7, 8, UITH,
+        drawTexQuad(80 + i * 12, 3, 7, 8, UITH,
                     PTC(241), PTC(80 + sbd.paletteIndices[i] * 8), PTC(248), PTC(87 + sbd.paletteIndices[i] * 8));
     }
     glEnd();

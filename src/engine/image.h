@@ -4,6 +4,12 @@
 #include "GL/gl.h"
 #include <SDL.h>
 
+/**
+ * Pixel To Coordinate
+ * Converts a pixel position (0-255) to a texture coordinate (0-1)
+ **/
+#define PTC(X) ((X) / 256.0f)
+
 void initPNG();
 SDL_Surface* loadPNG(const char* path);
 GLuint loadRGBTexture(unsigned char* path);

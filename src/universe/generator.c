@@ -99,7 +99,6 @@ float randf(float max)
     return ((float)rand() / (float)(RAND_MAX)) * max;
 }
 
-//TODO: Fix texture seam in x direction (y technically has a seam but that's unimportant)
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
@@ -153,6 +152,7 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
 {
     info->techLevel = 1 + randr(MAX_TECH_LEVEL);
+    info->government = 1 + ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 2);
     info->treeDiff = planetTradeDiffs[paletteIndex][0];
     info->rockDiff = planetTradeDiffs[paletteIndex][1];
     info->waterDiff = planetTradeDiffs[paletteIndex][2];
@@ -168,7 +168,7 @@ void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed)
 {
     srand(seed);
     sbd->numStars = 1 + randr(3);
-    sbd->numPlanets = 1 + randr(8);
+    sbd->numPlanets = 1 + randr(MAX_PLANETS);
     sbd->spIndex = randr(sbd->numPlanets);
     for(uint8_t i = 0; i < sbd->numPlanets; i++)
     {
@@ -182,7 +182,9 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     //This takes care of the srand() call for us
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, seed);
+    //TODO: We could prolly skip this by passing a direct pointer above
     system->info.techLevel = sbd.info.techLevel;
+    system->info.government = sbd.info.government;
     system->info.treeDiff = sbd.info.treeDiff;
     system->info.rockDiff = sbd.info.rockDiff;
     system->info.waterDiff = sbd.info.waterDiff;

@@ -1,6 +1,7 @@
 #include "ship.h"
 #include "engine/model.h"
 #include "engine/image.h"
+#include "engine/effects.h"
 
 GLuint shipMesh;
 GLuint shipTexture;
@@ -19,6 +20,19 @@ void drawShip(Ship* ship)
     glRotatef(RAD_TO_DEG(-ship->rotation.y), 0, 1, 0);
     glRotatef(RAD_TO_DEG(M_PI - ship->rotation.x), 1, 0, 0);
     glCallList(shipMesh);
+    if(ship->weapon.timer > (ship->weapon.type->cooldown / 2))
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glColor3f(0, 0.9f, 1.0f);
+        glBegin(GL_LINES);
+        glVertex3f(0.5f, 0, 0);
+        glVertex3f(0, 0.5f, ship->weapon.distanceToHit - 2.5f);
+        glVertex3f(-0.5f, 0, 0);
+        glVertex3f(0, 0.5f, ship->weapon.distanceToHit - 2.5f);
+        glEnd();
+        glColor3f(1, 1, 1);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
     glPopMatrix();
 }
 
@@ -146,9 +160,10 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
     ship->speed = clampf(ship->speed, 0, ship->type->maxSpeed);
 }
 
-void damageShip(Ship* ship, uint8_t damage)
+uint8_t damageShip(Ship* ship, uint8_t damage)
 {
     ship->shields -= damage;
+    return ship->shields < 0;
 }
 
 uint8_t shipIsDestroyed(Ship* ship)
@@ -190,9 +205,15 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
             float discr = b * b - c;
             if(discr >= 0)
             {
-                printf("HIT\n");
-                //TODO: Fine detection (?)
-                damageShip(&targetShips[i], ship->weapon.type->damage);
+                //TODO: Fine detection?
+                printf("HIT %f %f\n", b, distance3d(&ship->position, &targetShips[i].position));
+
+                ship->weapon.distanceToHit = -b;
+                uint8_t destroyed = damageShip(&targetShips[i], ship->weapon.type->damage);
+                if(!destroyed)
+                {
+                    createEffect(targetShips[i].position, SPARKS);
+                }
                 break;
             }
         }

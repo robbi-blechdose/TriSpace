@@ -24,6 +24,7 @@ typedef struct {
 typedef struct {
     WeaponType* type;
     int16_t timer;
+    float distanceToHit;
 } Weapon;
 
 typedef struct {
@@ -40,6 +41,10 @@ typedef struct {
 
     CargoHold hold;
     Weapon weapon;
+
+    uint8_t aiState;
+    float aiRotX;
+    float aiRotY;
 } Ship;
 
 #define SHIP_SPHERE_RADIUS 1.5f
