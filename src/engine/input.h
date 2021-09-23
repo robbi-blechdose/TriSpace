@@ -6,20 +6,25 @@
 #define NUM_KEYS 14
 
 typedef enum {
+    //Keypad
     U,
     D,
     L,
     R,
+    //ABXY
     A,
     B,
     X,
     Y,
+    //Shoulder buttons
     M,
     N,
+    //Power, Start, Select
     Q,
     K,
     S,
-    Z //Debug key
+    //Debug key (PC only, the FK doesn't have it)
+    Z
 } Key;
 
 uint8_t handleInput();

@@ -259,3 +259,17 @@ void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed)
         systemSeeds[i] = rand();
     }
 }
+
+void generateNPCShips(Ship npcShips[], uint8_t maxShips, ShipType* type, WeaponType* weaponType, StarSystem* system)
+{
+    uint8_t numShips = randr(maxShips);
+
+    for(uint8_t i = 0; i < numShips; i++)
+    {
+        npcShips[i].type = type;
+        npcShips[i].weapon.type = weaponType;
+        npcShips[i].position.x = randf(500) - 250;
+        npcShips[i].position.z = randf(500) - 250;
+        npcShips[i].position.y = randf(50) - 25;
+    }
+}

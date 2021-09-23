@@ -21,7 +21,7 @@ void initUniverse(StarSystem* starSystem)
     generateStarSystem(starSystem, systemSeeds[currentSystem]);
 }
 
-void switchSystem(uint16_t newSystem, StarSystem* starSystem)
+void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[], ShipType* type, WeaponType* weaponType)
 {
     if(newSystem == currentSystem)
     {
@@ -30,7 +30,11 @@ void switchSystem(uint16_t newSystem, StarSystem* starSystem)
     currentSystem = newSystem;
     deleteStarSystem(starSystem);
     generateStarSystem(starSystem, systemSeeds[currentSystem]);
-    //TODO: Clear NPC ships!
+    for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
+    {
+        npcShips[i].type = NULL;
+    }
+    generateNPCShips(npcShips, MAX_NPC_SHIPS, type, weaponType, starSystem);
 }
 
 void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uint32_t ticks)

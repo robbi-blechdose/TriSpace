@@ -8,8 +8,12 @@
 
 GLuint mainTexture;
 GLuint firingTexture;
+GLuint stationUITexture;
 GLuint tradeTexture;
 GLuint mapTexture;
+
+uint8_t cursorX;
+uint8_t cursorY;
 
 //Trading
 uint8_t tradeCursor;
@@ -24,8 +28,12 @@ void initUI()
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
+    stationUITexture = loadRGBTexture("res/UI/StationUI.png");
     tradeTexture = loadRGBTexture("res/UI/trading.png");
     mapTexture = loadRGBTexture("res/UI/map.png");
+    cursorX = 0;
+    cursorY = 0;
+
     tradeCursor = 0;
     mapCursorX = 0;
     mapCursorY = 0;
@@ -121,7 +129,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
         {
             if(npcShips[i].type != NULL)
             {
-                if(distance3d(&playerShip->position, &npcShips[i].position) < 50)
+                if(distance3d(&playerShip->position, &npcShips[i].position) < RADAR_RANGE)
                 {
                     drawRadarDot(playerShip->position, playerShip->rotation, npcShips[i].position, 1);
                 }
@@ -142,15 +150,15 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
 void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
 {
     glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, tradeTexture);
+    glBindTexture(GL_TEXTURE_2D, stationUITexture);
     glBegin(GL_QUADS);
-    //Draw rect background
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
     glEnd();
+    glDrawText("Trading", CENTER(7), 2, 0xFFFFFF);
 
     char buffer[29];
 
-    glDrawText("ITEM       UNIT PRICE     QTY", 8, 8, 0xFFFFFF);
+    glDrawText("ITEM       UNIT PRICE     QTY", 8, 16, 0xFFFFFF);
     for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
     {
         printNameForCargo(buffer, i);
@@ -158,16 +166,35 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
         sprintf(&buffer[15], " %5d  %2d|%2d", getPriceForCargo(i, info), stationHold->cargo[i], playerHold->cargo[i]);
         if(i == tradeCursor)
         {
-            glDrawText(buffer, 8, 16 + i * 8, 0x000000);
+            glDrawText(buffer, 8, 24 + i * 8, 0x00FFFF);
         }
         else
         {
-            glDrawText(buffer, 8, 16 + i * 8, 0xFFFFFF);
+            glDrawText(buffer, 8, 24 + i * 8, 0xFFFFFF);
         }
     }
 
     sprintf(buffer, "%d credits", playerHold->money);
-    glDrawText(buffer, 8, 224, 0xFFFFFF);
+    glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
+
+    glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
+}
+
+void drawEquipUI(Ship* playerShip)
+{
+    glLoadIdentity();
+    glBindTexture(GL_TEXTURE_2D, stationUITexture);
+    glBegin(GL_QUADS);
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+    glEnd();
+    glDrawText("Equip ship", CENTER(10), 2, 0xFFFFFF);
+
+    char buffer[29];
+
+    sprintf(buffer, "%d credits", playerShip->hold.money);
+    glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
+
+    glDrawText("Trading", 12, 240 - 10, 0xFFFFFF);
 }
 
 void moveWithRollover(uint8_t* i, uint8_t max, int8_t dir)

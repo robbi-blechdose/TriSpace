@@ -82,106 +82,130 @@ void calcFrame(uint32_t ticks)
         }
     }
     #endif
-    
-    if(state == TRADING)
+
+    switch(state)
     {
-        if(keyUp(U))
+        case SPACE:
+        case STATION:
         {
-            moveTradeCursor(-1);
-        }
-        else if(keyUp(D))
-        {
-            moveTradeCursor(1);
-        }
-        else if(keyUp(L))
-        {
-            transferCargo(&playerShip.hold, &stationHold, getTradeCursor(), &starSystem.info);
-        }
-        else if(keyUp(R))
-        {
-            transferCargo(&stationHold, &playerShip.hold, getTradeCursor(), &starSystem.info);
-        }
-        else if(keyUp(B))
-        {
-            state = STATION;
-        }
-    }
-    else if(state == MAP)
-    {
-        int8_t dirX = 0;
-        int8_t dirY = 0;
-        if(keyUp(U))
-        {
-            dirY = 1;
-        }
-        else if(keyUp(D))
-        {
-            dirY = -1;
-        }
-        if(keyUp(L))
-        {
-            dirX = -1;
-        }
-        else if(keyUp(R))
-        {
-            dirX = 1;
-        }
+            if(keyPressed(X))
+            {
+                accelerateShip(&playerShip, 1, ticks);
+            }
+            else if(keyPressed(Y))
+            {
+                accelerateShip(&playerShip, -1, ticks);
+            }
+            int8_t dirX = 0;
+            int8_t dirY = 0;
+            if(keyPressed(U))
+            {
+                dirX = 1;
+            }
+            else if(keyPressed(D))
+            {
+                dirX = -1;
+            }
+            if(keyPressed(L))
+            {
+                dirY = -1;
+            }
+            else if(keyPressed(R))
+            {
+                dirY = 1;
+            }
+            steerShip(&playerShip, dirX, dirY, ticks);
 
-        moveMapCursor(dirX, dirY);
-        if(keyUp(S))
-        {
-            state = SPACE;
-        }
-        else if(keyUp(A))
-        {
-            switchSystem(getMapCursor(), &starSystem);
-            state = SPACE;
-        }
-    }
-    else
-    {
-        if(keyPressed(X))
-        {
-            accelerateShip(&playerShip, 1, ticks);
-        }
-        else if(keyPressed(Y))
-        {
-            accelerateShip(&playerShip, -1, ticks);
-        }
-        int8_t dirX = 0;
-        int8_t dirY = 0;
-        if(keyPressed(U))
-        {
-            dirX = 1;
-        }
-        else if(keyPressed(D))
-        {
-            dirX = -1;
-        }
-        if(keyPressed(L))
-        {
-            dirY = -1;
-        }
-        else if(keyPressed(R))
-        {
-            dirY = 1;
-        }
-        steerShip(&playerShip, dirX, dirY, ticks);
+            calcShip(&playerShip, &starSystem, ticks);
+            setCameraPos(playerShip.position);
+            setCameraRot(playerShip.rotation);
 
-        calcShip(&playerShip, &starSystem, ticks);
-        setCameraPos(playerShip.position);
-        setCameraRot(playerShip.rotation);
+            if(keyUp(A))
+            {
+                fireWeapons(&playerShip, npcShips, MAX_NPC_SHIPS);
+            }
 
-        if(keyUp(A))
-        {
-            fireWeapons(&playerShip, npcShips, 1);
+            calcUniverse(&state, &targetState, &starSystem, &playerShip, npcShips, ticks);
+
+            if(keyUp(S) && state == SPACE)
+            {
+                state = MAP;
+            }
+            break;
         }
-
-        calcUniverse(&state, &targetState, &starSystem, &playerShip, npcShips, ticks);
-
-        if(keyUp(S) && state == SPACE)
+        case TRADING:
         {
-            state = MAP;
+            if(keyUp(U))
+            {
+                moveTradeCursor(-1);
+            }
+            else if(keyUp(D))
+            {
+                moveTradeCursor(1);
+            }
+            else if(keyUp(L))
+            {
+                transferCargo(&playerShip.hold, &stationHold, getTradeCursor(), &starSystem.info);
+            }
+            else if(keyUp(R))
+            {
+                transferCargo(&stationHold, &playerShip.hold, getTradeCursor(), &starSystem.info);
+            }
+            else if(keyUp(B))
+            {
+                state = STATION;
+            }
+            else if(keyUp(N))
+            {
+                state = EQUIP;
+            }
+            break;
+        }
+        case EQUIP:
+        {
+            if(keyUp(B))
+            {
+                state = STATION;
+            }
+            else if(keyUp(M))
+            {
+                state = TRADING;
+            }
+            //TODO
+            break;
+        }
+        case MAP:
+        {
+            int8_t dirX = 0;
+            int8_t dirY = 0;
+            if(keyUp(U))
+            {
+                dirY = 1;
+            }
+            else if(keyUp(D))
+            {
+                dirY = -1;
+            }
+            if(keyUp(L))
+            {
+                dirX = -1;
+            }
+            else if(keyUp(R))
+            {
+                dirX = 1;
+            }
+
+            moveMapCursor(dirX, dirY);
+            if(keyUp(S))
+            {
+                state = SPACE;
+            }
+            else if(keyUp(A))
+            {
+                switchSystem(getMapCursor(), &starSystem, npcShips, &test, &testWeapon);
+                state = SPACE;
+            }
+            break;
         }
     }
 }
@@ -209,6 +233,11 @@ void drawFrame()
         case TRADING:
         {
             drawTradingUI(&playerShip.hold, &stationHold, &starSystem.info);
+            break;
+        }
+        case EQUIP:
+        {
+            drawEquipUI(&playerShip);
             break;
         }
         case MAP:
@@ -273,10 +302,6 @@ int main(int argc, char **argv)
     playerShip.hold.money = 1000;
     playerShip.hold.size = 25;
     playerShip.weapon.type = &testWeapon;
-    npcShips[0].type = &test;
-    npcShips[0].position.x = 120;
-    npcShips[0].position.z = 80;
-    npcShips[0].weapon.type = &testWeapon;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

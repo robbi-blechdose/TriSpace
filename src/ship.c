@@ -187,6 +187,10 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
 
     for(uint8_t i = 0; i < numTargets; i++)
     {
+        if(targetShips[i].type == NULL)
+        {
+            continue;
+        }
         //OC = ray origin to sphere center
         vec3 oc = subv3(ship->position, targetShips[i].position);
 

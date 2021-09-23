@@ -3,6 +3,7 @@
 
 #include <SDL.h>
 #include "starsystem.h"
+#include "../ship.h"
 
 typedef struct {
     uint8_t r;
@@ -22,5 +23,6 @@ uint8_t getNumStarsForSystem(uint32_t seed);
 void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed);
 void generateStarSystem(StarSystem* system, uint32_t seed);
 void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed);
+void generateNPCShips(Ship npcShips[], uint8_t maxShips, ShipType* type, WeaponType* weaponType, StarSystem* system);
 
 #endif

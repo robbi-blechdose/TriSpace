@@ -11,7 +11,7 @@ typedef enum {
     //PLANET,
     //GUI states
     TRADING,
-    //EQUIPPING,
+    EQUIP,
     MAP
 } State;
 
@@ -20,7 +20,7 @@ typedef enum {
 void initUniverse(StarSystem* starSystem);
 void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
-void switchSystem(uint16_t newSystem, StarSystem* starSystem);
+void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[], ShipType* type, WeaponType* weaponType);
 uint32_t* getSystemSeeds();
 
 #endif

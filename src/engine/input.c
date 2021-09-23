@@ -71,6 +71,16 @@ uint8_t handleInput()
                 keys[Y] = state;
                 break;
             }
+            case SDLK_m:
+            {
+                keys[M] = state;
+                break;
+            }
+            case SDLK_n:
+            {
+                keys[N] = state;
+                break;
+            }
             case SDLK_q:
             {
                 running = 0;
