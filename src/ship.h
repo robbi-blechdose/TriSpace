@@ -29,6 +29,12 @@ typedef struct {
 
 typedef struct {
     ShipType* type;
+    CargoHold hold;
+    Weapon weapon;
+
+    float shields;
+    float energy;
+    uint8_t fuel;
 
     vec3 position;
     vec3 rotation;
@@ -36,18 +42,14 @@ typedef struct {
     float turnSpeedX;
     float turnSpeedY;
 
-    float shields;
-    float energy;
-
-    CargoHold hold;
-    Weapon weapon;
-
     uint8_t aiState;
     float aiRotX;
     float aiRotY;
 } Ship;
 
 #define SHIP_SPHERE_RADIUS 1.5f
+
+#define MAX_FUEL 70
 
 void initShip();
 void drawShip(Ship* ship);

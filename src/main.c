@@ -163,7 +163,43 @@ void calcFrame(uint32_t ticks)
         }
         case EQUIP:
         {
-            if(keyUp(B))
+            if(keyUp(U))
+            {
+                moveEquipCursor(-1);
+            }
+            else if(keyUp(D))
+            {
+                moveEquipCursor(1);
+            }
+            else if(keyUp(A))
+            {
+                switch(getEquipCursor())
+                {
+                    case EQUIP_FUEL:
+                    {
+                        if(playerShip.fuel < MAX_FUEL && playerShip.hold.money >= 2)
+                        {
+                            playerShip.fuel += 5;
+                            playerShip.hold.money -= 2;
+                            if(playerShip.fuel > MAX_FUEL)
+                            {
+                                playerShip.fuel = MAX_FUEL;
+                            }
+                        }
+                        break;
+                    }
+                    case EQUIP_HOLD30:
+                    {
+                        if(playerShip.hold.money >= 1000)
+                        {
+                            playerShip.hold.size = 30;
+                            playerShip.hold.money-= 1000;
+                        }
+                        break;
+                    }
+                }
+            }
+            else if(keyUp(B))
             {
                 state = STATION;
             }

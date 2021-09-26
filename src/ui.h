@@ -11,6 +11,11 @@
 //X * 8 / 2 = X * 4
 #define CENTER(X) (120 - (X) * 4)
 
+#define EQUIP_FUEL 0
+#define EQUIP_HOLD30 1
+
+#define NUM_EQUIPMENT 2
+
 void initUI();
 
 void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos);
@@ -20,6 +25,8 @@ void moveTradeCursor(int8_t dir);
 uint8_t getTradeCursor();
 
 void drawEquipUI(Ship* playerShip);
+void moveEquipCursor(int8_t dir);
+uint8_t getEquipCursor();
 
 void drawMap(uint32_t systemSeeds[]);
 void moveMapCursor(int8_t x, int8_t y);

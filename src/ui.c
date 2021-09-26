@@ -17,6 +17,8 @@ uint8_t cursorY;
 
 //Trading
 uint8_t tradeCursor;
+//Equip
+uint8_t equipCursor;
 //Map
 float mapScrollX;
 float mapScrollY;
@@ -35,6 +37,7 @@ void initUI()
     cursorY = 0;
 
     tradeCursor = 0;
+    equipCursor = 0;
     mapCursorX = 0;
     mapCursorY = 0;
 }
@@ -158,7 +161,7 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
 
     char buffer[29];
 
-    glDrawText("ITEM       UNIT PRICE     QTY", 8, 16, 0xFFFFFF);
+    glDrawText("ITEM       UNIT PRICE     QTY", 4, 16, 0xFFFFFF);
     for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
     {
         printNameForCargo(buffer, i);
@@ -166,11 +169,11 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
         sprintf(&buffer[15], " %5d  %2d|%2d", getPriceForCargo(i, info), stationHold->cargo[i], playerHold->cargo[i]);
         if(i == tradeCursor)
         {
-            glDrawText(buffer, 8, 24 + i * 8, 0x00FFFF);
+            glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
         }
         else
         {
-            glDrawText(buffer, 8, 24 + i * 8, 0xFFFFFF);
+            glDrawText(buffer, 4, 24 + i * 8, 0xFFFFFF);
         }
     }
 
@@ -179,6 +182,11 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
 
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
+
+uint16_t equipmentPrices[2] = {
+    2,
+    1000
+};
 
 void drawEquipUI(Ship* playerShip)
 {
@@ -191,10 +199,47 @@ void drawEquipUI(Ship* playerShip)
 
     char buffer[29];
 
+    glDrawText("ITEM                PRICE QTY", 4, 16, 0xFFFFFF);
+    for(uint8_t i = 0; i < NUM_EQUIPMENT; i++)
+    {
+        switch(i)
+        {
+            case EQUIP_FUEL:
+            {
+                sprintf(buffer, "Fuel (0.5)           %4d %.1f", equipmentPrices[i], playerShip->fuel / 10.0f);
+                break;
+            }
+            case EQUIP_HOLD30:
+            {
+                char* own = " / ";
+                char* own2 = "OWN";
+                if(playerShip->hold.size >= 30)
+                {
+                    own = own2;
+                }
+                sprintf(buffer, "30 unit Cargo Hold   %4d %s", equipmentPrices[i], own);
+                break;
+            }
+        }
+        if(i == equipCursor)
+        {
+            glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
+        }
+        else
+        {
+            glDrawText(buffer, 4, 24 + i * 8, 0xFFFFFF);
+        }
+    }
+    
     sprintf(buffer, "%d credits", playerShip->hold.money);
     glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
 
     glDrawText("Trading", 12, 240 - 10, 0xFFFFFF);
+}
+
+uint8_t getEquipCursor()
+{
+    return equipCursor;
 }
 
 void moveWithRollover(uint8_t* i, uint8_t max, int8_t dir)
@@ -231,6 +276,11 @@ void moveTradeCursor(int8_t dir)
 uint8_t getTradeCursor()
 {
     return tradeCursor;
+}
+
+void moveEquipCursor(int8_t dir)
+{
+    moveWithRollover(&equipCursor, NUM_EQUIPMENT - 1, dir);
 }
 
 void drawMap(uint32_t systemSeeds[])
