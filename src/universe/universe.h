@@ -9,10 +9,14 @@ typedef enum {
     SPACE,
     STATION,
     //PLANET,
+    HYPERSPACE,
     //GUI states
     TRADING,
     EQUIP,
-    MAP
+    MAP,
+    //Special states
+    TITLE,
+    GAME_OVER
 } State;
 
 #define MAX_NPC_SHIPS 8
@@ -22,5 +26,6 @@ void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
 void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[], ShipType* type, WeaponType* weaponType);
 uint32_t* getSystemSeeds();
+uint32_t getCurrentSystem();
 
 #endif

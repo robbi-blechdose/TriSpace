@@ -44,7 +44,8 @@ void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uin
         if(npcShips[i].type != NULL)
         {
             calcNPCAi(playerShip, &npcShips[i], ticks);
-            calcShip(&npcShips[i], starSystem, ticks);
+            //TODO: Collisions?
+            calcShip(&npcShips[i], 0, ticks);
             if(shipIsDestroyed(&npcShips[i]))
             {
                 createEffect(npcShips[i].position, EXPLOSION);
@@ -116,6 +117,7 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
     switch(*state)
     {
         case SPACE:
+        case HYPERSPACE:
         {
             drawStarSystem(starSystem);
             for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
@@ -139,4 +141,9 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
 uint32_t* getSystemSeeds()
 {
     return systemSeeds;
+}
+
+uint32_t getCurrentSystem()
+{
+    return currentSystem;
 }

@@ -5,9 +5,11 @@
 #include "engine/input.h"
 #include "engine/camera.h"
 #include "engine/view.h"
+#include "engine/effects.h"
 
 #include "ui.h"
 #include "ship.h"
+#include "ship_collisions.h"
 #include "universe/universe.h"
 #include "universe/starsystem.h"
 
@@ -38,7 +40,7 @@ State state;
 State targetState;
 
 StarSystem starSystem;
-uint8_t targetSystem = 0;
+vec3 jumpStart;
 
 CargoHold stationHold;
 
@@ -116,7 +118,17 @@ void calcFrame(uint32_t ticks)
             }
             steerShip(&playerShip, dirX, dirY, ticks);
 
-            calcShip(&playerShip, &starSystem, ticks);
+            uint8_t collided = 0;
+            if(state == SPACE)
+            {
+                collided = checkStarSystemCollision(&playerShip, &starSystem);
+            }
+            else
+            {
+                collided = checkStationCollision(&playerShip);
+            }
+
+            calcShip(&playerShip, collided, ticks);
             setCameraPos(playerShip.position);
             setCameraRot(playerShip.rotation);
 
@@ -131,6 +143,31 @@ void calcFrame(uint32_t ticks)
             {
                 state = MAP;
             }
+            break;
+        }
+        case HYPERSPACE:
+        {
+            if(getCurrentSystem() != getMapCursor())
+            {
+                playerShip.speed += 7.0f / ticks;
+                if(playerShip.speed > 500)
+                {
+                    switchSystem(getMapCursor(), &starSystem, npcShips, &test, &testWeapon);
+                    playerShip.position = jumpStart;
+                }
+            }
+            else
+            {
+                playerShip.speed -= 7.0f / ticks;
+                if(playerShip.speed <= 0)
+                {
+                    playerShip.speed = 0;
+                    state = SPACE;
+                }
+            }
+            calcShip(&playerShip, 0, ticks);
+            setCameraPos(playerShip.position);
+            setCameraRot(playerShip.rotation);
             break;
         }
         case TRADING:
@@ -207,7 +244,6 @@ void calcFrame(uint32_t ticks)
             {
                 state = TRADING;
             }
-            //TODO
             break;
         }
         case MAP:
@@ -238,8 +274,8 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(A))
             {
-                switchSystem(getMapCursor(), &starSystem, npcShips, &test, &testWeapon);
-                state = SPACE;
+                jumpStart = playerShip.position;
+                state = HYPERSPACE;
             }
             break;
         }
@@ -253,7 +289,15 @@ void drawFrame()
 
     drawCamera();
 
+    if(state == HYPERSPACE)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
     drawUniverse(&state, &starSystem, npcShips);
+    if(state == HYPERSPACE)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
 
     drawFPS(fps);
 
@@ -262,6 +306,7 @@ void drawFrame()
     {
         case SPACE:
         case STATION:
+        case HYPERSPACE:
         {
             drawUI(state, &playerShip, npcShips, starSystem.station.position);
             break;
