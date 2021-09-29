@@ -31,6 +31,7 @@ uint16_t fps;
 uint8_t counterEnabled = 0;
 uint32_t counterFrames = 0;
 uint32_t counterTime = 0;
+uint16_t counterResult = 0;
 #endif
 
 uint8_t running = 1;
@@ -57,7 +58,9 @@ void drawFPS(uint16_t fps)
 {
     char buffer[12];
 	sprintf(buffer, "FPS: %i", fps);
-	glDrawText(buffer, 3, 3, 0xFFFFFF);
+	glDrawText(buffer, 2, 2, 0xFFFFFF);
+	sprintf(buffer, "FPS: %i", counterResult);
+	glDrawText(buffer, 2, 10, 0xFFFFFF);
 }
 
 void calcFrame(uint32_t ticks)
@@ -71,13 +74,14 @@ void calcFrame(uint32_t ticks)
     #endif
 
     #ifdef DEBUG
-    if(keyUp(Z))
+    if(keyUp(K))
     {
         counterEnabled = !counterEnabled;
         if(!counterEnabled)
         {
-            printf("%d frames in %d ms. %f fps. %f ms/frame.\n", counterFrames, counterTime,
-                                                        ((float) counterFrames / counterTime) * 1000.0f,
+            counterResult = ((float) counterFrames / counterTime) * 1000.0f;
+            printf("%d frames in %d ms. %d fps. %f ms/frame.\n", counterFrames, counterTime,
+                                                        counterResult,
                                                         (float) counterTime / counterFrames);
             counterTime = 0;
             counterFrames = 0;
@@ -274,8 +278,13 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(A))
             {
-                jumpStart = playerShip.position;
-                state = HYPERSPACE;
+                //TODO: replace with logic using the actual distance between systems
+                if(playerShip.fuel >= 2)
+                {
+                    jumpStart = playerShip.position;
+                    state = HYPERSPACE;
+                    playerShip.fuel -= 2;
+                }
             }
             break;
         }
@@ -383,6 +392,7 @@ int main(int argc, char **argv)
     playerShip.hold.money = 1000;
     playerShip.hold.size = 25;
     playerShip.weapon.type = &testWeapon;
+    playerShip.fuel = 35;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

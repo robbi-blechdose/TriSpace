@@ -1,6 +1,6 @@
 CC          	= gcc
 
-CFLAGS			= -O3
+CFLAGS			= -O3 -flto
 LDFLAGS     	= -lSDL -lSDL_image -lm
 
 PNAME			= main.elf

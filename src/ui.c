@@ -121,6 +121,12 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
         drawTexQuad(7, 42, energyTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * energyTemp, 1);
     }
 
+    uint8_t fuelTemp = ((float) playerShip->fuel / MAX_FUEL) * 16;
+    if(fuelTemp > 0)
+    {
+        drawTexQuad(7, 27, fuelTemp * 4, 4, UITH, 0, PTC(246), PTC(4) * fuelTemp, PTC(248));
+    }
+
     //Radar
     if(state != STATION)
     {

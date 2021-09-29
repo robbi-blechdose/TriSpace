@@ -17,8 +17,8 @@ void drawShip(Ship* ship)
     glBindTexture(GL_TEXTURE_2D, shipTexture);
     glPushMatrix();
     glTranslatef(ship->position.x, ship->position.y, ship->position.z);
-    glRotatef(RAD_TO_DEG(-ship->rotation.y), 0, 1, 0);
-    glRotatef(RAD_TO_DEG(M_PI - ship->rotation.x), 1, 0, 0);
+    glRotatef(RAD_TO_DEG(M_PI - ship->rotation.y), 0, 1, 0);
+    glRotatef(RAD_TO_DEG(ship->rotation.x), 1, 0, 0);
     glCallList(shipMesh);
     if(ship->weapon.timer > (ship->weapon.type->cooldown / 2))
     {

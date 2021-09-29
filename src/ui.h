@@ -11,10 +11,10 @@
 //X * 8 / 2 = X * 4
 #define CENTER(X) (120 - (X) * 4)
 
+#define NUM_EQUIPMENT 2
+
 #define EQUIP_FUEL 0
 #define EQUIP_HOLD30 1
-
-#define NUM_EQUIPMENT 2
 
 void initUI();
 
