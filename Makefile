@@ -1,6 +1,6 @@
 CC          	= gcc
 
-CFLAGS			= -O3 -flto -fno-common
+CFLAGS			= -O3
 LDFLAGS     	= -lSDL -lSDL_image -lm
 
 PNAME			= main.elf
@@ -27,9 +27,6 @@ $(PNAME): $(OBJS)
 
 $(OBJS): %.o : %.c
 	$(CC) $(CFLAGS) $(INCLUDES) -c -o $@ $<
-
-clean:
-	rm -r build/*
 
 oclean:
 	rm *.o

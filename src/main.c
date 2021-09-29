@@ -149,7 +149,7 @@ void calcFrame(uint32_t ticks)
         {
             if(getCurrentSystem() != getMapCursor())
             {
-                playerShip.speed += 7.0f / ticks;
+                playerShip.speed += (500.0f * ticks) / 1000.0f;
                 if(playerShip.speed > 500)
                 {
                     switchSystem(getMapCursor(), &starSystem, npcShips, &test, &testWeapon);
@@ -158,7 +158,7 @@ void calcFrame(uint32_t ticks)
             }
             else
             {
-                playerShip.speed -= 7.0f / ticks;
+                playerShip.speed -= (500.0f * ticks) / 1000.0f;
                 if(playerShip.speed <= 0)
                 {
                     playerShip.speed = 0;

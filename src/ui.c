@@ -9,7 +9,6 @@
 GLuint mainTexture;
 GLuint firingTexture;
 GLuint stationUITexture;
-GLuint tradeTexture;
 GLuint mapTexture;
 
 uint8_t cursorX;
@@ -31,7 +30,6 @@ void initUI()
     mainTexture = loadRGBTexture("res/UI/main.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
-    tradeTexture = loadRGBTexture("res/UI/trading.png");
     mapTexture = loadRGBTexture("res/UI/map.png");
     cursorX = 0;
     cursorY = 0;
