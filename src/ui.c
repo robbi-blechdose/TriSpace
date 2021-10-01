@@ -14,6 +14,8 @@ GLuint mapTexture;
 uint8_t cursorX;
 uint8_t cursorY;
 
+//Save/Load
+uint8_t saveLoadCursor;
 //Trading
 uint8_t tradeCursor;
 //Equip
@@ -34,6 +36,7 @@ void initUI()
     cursorX = 0;
     cursorY = 0;
 
+    saveLoadCursor = 0;
     tradeCursor = 0;
     equipCursor = 0;
     mapCursorX = 0;
@@ -154,6 +157,51 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
     glEnd();
 }
 
+void drawSaveLoadUI()
+{
+    glLoadIdentity();
+    glBindTexture(GL_TEXTURE_2D, stationUITexture);
+    glBegin(GL_QUADS);
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+    //Save/Load icons
+    drawTexQuad(CENTER(13), 200, 8, 8, UITH, PTC(241), 0, PTC(249), PTC(8));
+    drawTexQuad(CENTER(13), 184, 8, 8, UITH, PTC(249), 0, PTC(256), PTC(8));
+    glEnd();
+    glDrawText("Save & Load", CENTER(11), 2, 0xFFFFFF);
+
+    char buffer[29];
+
+    if(saveLoadCursor == 0)
+    {
+        glDrawText("Save game", CENTER(9), 32, 0x00FFFF);
+        glDrawText("Load game", CENTER(9), 48, 0xFFFFFF);
+    }
+    else
+    {
+        glDrawText("Save game", CENTER(9), 32, 0xFFFFFF);
+        glDrawText("Load game", CENTER(9), 48, 0x00FFFF);
+    }
+
+    glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, 0xFFFFFF);
+}
+
+void toggleSaveLoadCursor()
+{
+    if(saveLoadCursor == 0)
+    {
+        saveLoadCursor = 1;
+    }
+    else
+    {
+        saveLoadCursor = 0;
+    }
+}
+
+uint8_t getSaveLoadCursor()
+{
+    return saveLoadCursor;
+}
+
 void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
 {
     glLoadIdentity();
@@ -184,12 +232,14 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
     sprintf(buffer, "%d credits", playerHold->money);
     glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
 
+    glDrawText("Save & Load", 12, 240 - 10, 0xFFFFFF);
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
 
-uint16_t equipmentPrices[2] = {
+uint16_t equipmentPrices[3] = {
     2,
-    1000
+    1500,
+    2000
 };
 
 void drawEquipUI(Ship* playerShip)
@@ -222,6 +272,17 @@ void drawEquipUI(Ship* playerShip)
                     own = own2;
                 }
                 sprintf(buffer, "30 unit Cargo Hold   %4d %s", equipmentPrices[i], own);
+                break;
+            }
+            case EQUIP_MK2LASER:
+            {
+                char* own = " / ";
+                char* own2 = "OWN";
+                if(0) //TODO: Check weapon type
+                {
+                    own = own2;
+                }
+                sprintf(buffer, "MkII laser           %4d %s", equipmentPrices[i], own);
                 break;
             }
         }
@@ -340,3 +401,7 @@ uint16_t getMapCursor()
     uint16_t ret = mapCursorY * 16 + mapCursorX;
     return ret;
 }
+
+void drawTitleScreen();
+void toggleTitleCursor();
+uint8_t getTitleCursor();

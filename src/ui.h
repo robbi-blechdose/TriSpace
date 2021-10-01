@@ -15,10 +15,15 @@
 
 #define EQUIP_FUEL 0
 #define EQUIP_HOLD30 1
+#define EQUIP_MK2LASER 2
 
 void initUI();
 
 void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos);
+
+void drawSaveLoadUI();
+void toggleSaveLoadCursor();
+uint8_t getSaveLoadCursor();
 
 void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info);
 void moveTradeCursor(int8_t dir);
@@ -31,5 +36,9 @@ uint8_t getEquipCursor();
 void drawMap(uint32_t systemSeeds[]);
 void moveMapCursor(int8_t x, int8_t y);
 uint16_t getMapCursor();
+
+void drawTitleScreen();
+void toggleTitleCursor();
+uint8_t getTitleCursor();
 
 #endif

@@ -6,6 +6,7 @@
 #include "engine/camera.h"
 #include "engine/view.h"
 #include "engine/effects.h"
+#include "engine/savegame.h"
 
 #include "ui.h"
 #include "ship.h"
@@ -21,6 +22,8 @@
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
 //#define LIMIT_FPS
+
+#define SAVE_VERSION 100
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
@@ -50,7 +53,11 @@ Ship npcShips[MAX_NPC_SHIPS];
 
 //Temporary (TODO: REMOVE)
 ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1};
-WeaponType testWeapon = {.cooldown = 400, .damage = 2, .energyUsage = 1};
+WeaponType weaponTypes[] = {
+    {.cooldown = 400, .damage = 2, .energyUsage = 1}, //MkI kaser
+    {.cooldown = 350, .damage = 2, .energyUsage = 1}, //MkII laser
+    {.cooldown = 300, .damage = 4, .energyUsage = 2}  //MkIII military laser
+};
 
 //-------------------------------------//
 
@@ -156,7 +163,7 @@ void calcFrame(uint32_t ticks)
                 playerShip.speed += (500.0f * ticks) / 1000.0f;
                 if(playerShip.speed > 500)
                 {
-                    switchSystem(getMapCursor(), &starSystem, npcShips, &test, &testWeapon);
+                    switchSystem(getMapCursor(), &starSystem, npcShips, &test, &weaponTypes[0]);
                     playerShip.position = jumpStart;
                 }
             }
@@ -172,6 +179,55 @@ void calcFrame(uint32_t ticks)
             calcShip(&playerShip, 0, ticks);
             setCameraPos(playerShip.position);
             setCameraRot(playerShip.rotation);
+            break;
+        }
+        case SAVELOAD:
+        {
+            if(keyUp(U) || keyUp(D))
+            {
+                toggleSaveLoadCursor();
+            }
+            else if(keyUp(A))
+            {
+                if(getSaveLoadCursor() == 0)
+                {
+                    openSave("/.trispace/game.sav", 1);
+                    uint8_t version = SAVE_VERSION;
+                    writeElement(&version, sizeof(version));
+                    writeElement(&playerShip, sizeof(playerShip));
+                    uint32_t currentSystem = getCurrentSystem();
+                    writeElement(&currentSystem, sizeof(uint32_t));
+                    //TODO: show that we're done
+                    closeSave();
+                }
+                else
+                {
+                    openSave("/.trispace/game.sav", 0);
+                    uint8_t version = 0;
+                    readElement(&version, sizeof(version));
+                    if((version / 100) == (SAVE_VERSION / 100)) //Check major version for save compatability
+                    {
+                        readElement(&playerShip, sizeof(playerShip));
+                        uint32_t savedSystem;
+                        readElement(&savedSystem, sizeof(uint32_t));
+                        switchSystem(savedSystem, &starSystem, npcShips, &test, &weaponTypes[0]);
+                        //TODO: show that we're done
+                    }
+                    else
+                    {
+                        //TODO: Show error message!
+                    }
+                    closeSave();
+                }
+            }
+            else if(keyUp(B))
+            {
+                state = STATION;
+            }
+            else if(keyUp(N))
+            {
+                state = TRADING;
+            }
             break;
         }
         case TRADING:
@@ -195,6 +251,10 @@ void calcFrame(uint32_t ticks)
             else if(keyUp(B))
             {
                 state = STATION;
+            }
+            else if(keyUp(M))
+            {
+                state = SAVELOAD;
             }
             else if(keyUp(N))
             {
@@ -279,11 +339,11 @@ void calcFrame(uint32_t ticks)
             else if(keyUp(A))
             {
                 //TODO: replace with logic using the actual distance between systems
-                if(playerShip.fuel >= 2)
+                if(playerShip.fuel >= 20)
                 {
                     jumpStart = playerShip.position;
                     state = HYPERSPACE;
-                    playerShip.fuel -= 2;
+                    playerShip.fuel -= 20;
                 }
             }
             break;
@@ -318,6 +378,11 @@ void drawFrame()
         case HYPERSPACE:
         {
             drawUI(state, &playerShip, npcShips, starSystem.station.position);
+            break;
+        }
+        case SAVELOAD:
+        {
+            drawSaveLoadUI();
             break;
         }
         case TRADING:
@@ -391,7 +456,7 @@ int main(int argc, char **argv)
     playerShip.position.z = 100;
     playerShip.hold.money = 1000;
     playerShip.hold.size = 25;
-    playerShip.weapon.type = &testWeapon;
+    playerShip.weapon.type = &weaponTypes[0];
     playerShip.fuel = 35;
 
     //Run main loop

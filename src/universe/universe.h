@@ -11,6 +11,7 @@ typedef enum {
     //PLANET,
     HYPERSPACE,
     //GUI states
+    SAVELOAD,
     TRADING,
     EQUIP,
     MAP,
