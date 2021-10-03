@@ -41,7 +41,6 @@ uint8_t running = 1;
 
 //---------- Main game stuff ----------//
 State state;
-State targetState;
 
 StarSystem starSystem;
 vec3 jumpStart;
@@ -50,14 +49,6 @@ CargoHold stationHold;
 
 Ship playerShip;
 Ship npcShips[MAX_NPC_SHIPS];
-
-//Temporary (TODO: REMOVE)
-ShipType test = {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1};
-WeaponType weaponTypes[] = {
-    {.cooldown = 400, .damage = 2, .energyUsage = 1}, //MkI kaser
-    {.cooldown = 350, .damage = 2, .energyUsage = 1}, //MkII laser
-    {.cooldown = 300, .damage = 4, .energyUsage = 2}  //MkIII military laser
-};
 
 //-------------------------------------//
 
@@ -70,6 +61,42 @@ void drawFPS(uint16_t fps)
 	glDrawText(buffer, 2, 10, 0xFFFFFF);
 }
 
+uint8_t saveGame()
+{
+    openSave(".trispace", "game.sav", 1);
+    uint8_t version = SAVE_VERSION;
+    writeElement(&version, sizeof(version));
+    writeElement(&playerShip.type, sizeof(playerShip.type));
+    writeElement(&playerShip.hold, sizeof(playerShip.hold));
+    writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
+    uint32_t currentSystem = getCurrentSystem();
+    writeElement(&currentSystem, sizeof(uint32_t));
+    closeSave();
+    return 1;
+}
+
+uint8_t loadGame()
+{
+    openSave(".trispace", "game.sav", 0);
+    uint8_t version = 0;
+    readElement(&version, sizeof(version));
+    if((version / 100) == (SAVE_VERSION / 100)) //Check major version for save compatability
+    {
+        readElement(&playerShip.type, sizeof(playerShip.type));
+        readElement(&playerShip.hold, sizeof(playerShip.hold));
+        readElement(&playerShip.fuel, sizeof(playerShip.fuel));
+        uint32_t savedSystem;
+        readElement(&savedSystem, sizeof(uint32_t));
+        switchSystem(savedSystem, &starSystem, npcShips);
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+    closeSave();
+}
+
 void calcFrame(uint32_t ticks)
 {
     #ifdef DEBUG
@@ -78,9 +105,7 @@ void calcFrame(uint32_t ticks)
         counterTime += ticks;
         counterFrames++;
     }
-    #endif
 
-    #ifdef DEBUG
     if(keyUp(K))
     {
         counterEnabled = !counterEnabled;
@@ -148,7 +173,7 @@ void calcFrame(uint32_t ticks)
                 fireWeapons(&playerShip, npcShips, MAX_NPC_SHIPS);
             }
 
-            calcUniverse(&state, &targetState, &starSystem, &playerShip, npcShips, ticks);
+            calcUniverse(&state, &starSystem, &playerShip, npcShips, ticks);
 
             if(keyUp(S) && state == SPACE)
             {
@@ -163,7 +188,7 @@ void calcFrame(uint32_t ticks)
                 playerShip.speed += (500.0f * ticks) / 1000.0f;
                 if(playerShip.speed > 500)
                 {
-                    switchSystem(getMapCursor(), &starSystem, npcShips, &test, &weaponTypes[0]);
+                    switchSystem(getMapCursor(), &starSystem, npcShips);
                     playerShip.position = jumpStart;
                 }
             }
@@ -191,33 +216,13 @@ void calcFrame(uint32_t ticks)
             {
                 if(getSaveLoadCursor() == 0)
                 {
-                    openSave("/.trispace/game.sav", 1);
-                    uint8_t version = SAVE_VERSION;
-                    writeElement(&version, sizeof(version));
-                    writeElement(&playerShip, sizeof(playerShip));
-                    uint32_t currentSystem = getCurrentSystem();
-                    writeElement(&currentSystem, sizeof(uint32_t));
-                    //TODO: show that we're done
-                    closeSave();
+                    saveGame();
+                    //TODO: Read return value and display success or error message
                 }
                 else
                 {
-                    openSave("/.trispace/game.sav", 0);
-                    uint8_t version = 0;
-                    readElement(&version, sizeof(version));
-                    if((version / 100) == (SAVE_VERSION / 100)) //Check major version for save compatability
-                    {
-                        readElement(&playerShip, sizeof(playerShip));
-                        uint32_t savedSystem;
-                        readElement(&savedSystem, sizeof(uint32_t));
-                        switchSystem(savedSystem, &starSystem, npcShips, &test, &weaponTypes[0]);
-                        //TODO: show that we're done
-                    }
-                    else
-                    {
-                        //TODO: Show error message!
-                    }
-                    closeSave();
+                    loadGame();
+                    //TODO: Read return value and display success or error message
                 }
             }
             else if(keyUp(B))
@@ -348,6 +353,36 @@ void calcFrame(uint32_t ticks)
             }
             break;
         }
+        case TITLE:
+        {
+            if(keyUp(U) || keyUp(D))
+            {
+                toggleTitleCursor();
+            }
+            else if(keyUp(A) || keyUp(S))
+            {
+                if(getTitleCursor() == 0)
+                {
+                    //Init new game
+                    //Temporary (TODO: REMOVE)
+                    playerShip.type = 0;
+                    playerShip.position.x = 150;
+                    playerShip.position.z = 100;
+                    playerShip.hold.money = 1000;
+                    playerShip.hold.size = 25;
+                    playerShip.weapon.type = 0;
+                    playerShip.fuel = 35;
+                    state = SPACE;
+                }
+                else
+                {
+                    //Load game
+                    loadGame();
+                    state = STATION;
+                }
+            }
+            break;
+        }
     }
 }
 
@@ -400,6 +435,11 @@ void drawFrame()
             drawMap(getSystemSeeds());
             break;
         }
+        case TITLE:
+        {
+            drawTitleScreen();
+            break;
+        }
     }
     setPerspective();
 
@@ -442,22 +482,12 @@ int main(int argc, char **argv)
     initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
     setPerspective();
 
-    //Initialize game
-    state = SPACE;
-    targetState = NONE;
+    //Initialize main systems
     initUI();
     initUniverse(&starSystem);
     initShip();
     createStationHold(&stationHold);
-
-    //Temporary (TODO: REMOVE)
-    playerShip.type = &test;
-    playerShip.position.x = 150;
-    playerShip.position.z = 100;
-    playerShip.hold.money = 1000;
-    playerShip.hold.size = 25;
-    playerShip.weapon.type = &weaponTypes[0];
-    playerShip.fuel = 35;
+    state = TITLE;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

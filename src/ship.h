@@ -22,13 +22,13 @@ typedef struct {
 } WeaponType;
 
 typedef struct {
-    WeaponType* type;
+    uint8_t type;
     int16_t timer;
     float distanceToHit;
 } Weapon;
 
 typedef struct {
-    ShipType* type;
+    uint8_t type;
     CargoHold hold;
     Weapon weapon;
 
@@ -50,6 +50,10 @@ typedef struct {
 #define SHIP_SPHERE_RADIUS 1.5f
 
 #define MAX_FUEL 70
+
+#define TYPE_NULL 255
+extern const ShipType shipTypes[];
+extern const WeaponType weaponTypes[];
 
 void initShip();
 void drawShip(Ship* ship);

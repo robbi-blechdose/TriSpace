@@ -21,7 +21,7 @@ void initUniverse(StarSystem* starSystem)
     generateStarSystem(starSystem, systemSeeds[currentSystem]);
 }
 
-void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[], ShipType* type, WeaponType* weaponType)
+void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[])
 {
     if(newSystem == currentSystem)
     {
@@ -32,16 +32,16 @@ void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[], S
     generateStarSystem(starSystem, systemSeeds[currentSystem]);
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
-        npcShips[i].type = NULL;
+        npcShips[i].type = TYPE_NULL;
     }
-    generateNPCShips(npcShips, MAX_NPC_SHIPS, type, weaponType, starSystem);
+    generateNPCShips(npcShips, MAX_NPC_SHIPS, starSystem);
 }
 
 void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uint32_t ticks)
 {
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
-        if(npcShips[i].type != NULL)
+        if(npcShips[i].type != TYPE_NULL)
         {
             calcNPCAi(playerShip, &npcShips[i], ticks);
             //TODO: Collisions?
@@ -49,49 +49,25 @@ void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uin
             if(shipIsDestroyed(&npcShips[i]))
             {
                 createEffect(npcShips[i].position, EXPLOSION);
-                npcShips[i].type = NULL;
+                npcShips[i].type = TYPE_NULL;
             }
         }
     }
 }
 
-void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
+void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
 {
-    if(*targetState != NONE)
-    {
-        switch(*targetState)
-        {
-            case SPACE:
-            {
-                playerShip->position = starSystem->station.exitPosition;
-                break;
-            }
-            case STATION:
-            {
-                playerShip->position.x = 0;
-                playerShip->position.y = 0;
-                playerShip->position.z = 0;
-                playerShip->speed = 0;
-                break;
-            }
-            case TRADING:
-            {
-                playerShip->position.y = 0;
-                playerShip->speed = 0;
-                break;
-            }
-        }
-        *state = *targetState;
-        *targetState = NONE;
-    }
-
     switch(*state)
     {
         case SPACE:
         {
             if(hasDockingDistance(&playerShip->position, &starSystem->station.dockingPosition))
             {
-                *targetState = STATION;
+                *state = STATION;
+                playerShip->position.x = 0;
+                playerShip->position.y = 0;
+                playerShip->position.z = 0;
+                playerShip->speed = 0;
             }
             calcNPCShips(playerShip, npcShips, starSystem, ticks);
             calcEffects(ticks);
@@ -101,11 +77,14 @@ void calcUniverse(State* state, State* targetState, StarSystem* starSystem, Ship
         {
             if(hasLeavingDistance(playerShip->position))
             {
-                *targetState = SPACE;
+                *state = SPACE;
+                playerShip->position = starSystem->station.exitPosition;
             }
             else if(hasLandingDistance(playerShip->position))
             {
-                *targetState = TRADING;
+                *state = TRADING;
+                playerShip->position.y = 0;
+                playerShip->speed = 0;
             }
             break;
         }
@@ -122,7 +101,7 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
             drawStarSystem(starSystem);
             for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
             {
-                if(npcShips[i].type != NULL)
+                if(npcShips[i].type != TYPE_NULL)
                 {
                     drawShip(&npcShips[i]);
                 }

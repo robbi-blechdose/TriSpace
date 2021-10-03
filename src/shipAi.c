@@ -70,7 +70,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
                 npcShip->aiRotY = AI_ROT_NONE;
             }
             //Maintain 3/4 speed
-            if(npcShip->speed < npcShip->type->maxSpeed * 0.75f)
+            if(npcShip->speed < shipTypes[npcShip->type].maxSpeed * 0.75f)
             {
                 accelerateShip(npcShip, 1, ticks);
             }

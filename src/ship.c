@@ -6,6 +6,16 @@
 GLuint shipMesh;
 GLuint shipTexture;
 
+const ShipType shipTypes[] = {
+    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1}
+};
+
+const WeaponType weaponTypes[] = {
+    {.cooldown = 400, .damage = 2, .energyUsage = 1}, //MkI kaser
+    {.cooldown = 350, .damage = 2, .energyUsage = 1}, //MkII laser
+    {.cooldown = 300, .damage = 4, .energyUsage = 2}  //MkIII military laser
+};
+
 void initShip()
 {
     shipMesh = loadModelList("res/obj/Ship.obj");
@@ -20,7 +30,7 @@ void drawShip(Ship* ship)
     glRotatef(RAD_TO_DEG(M_PI - ship->rotation.y), 0, 1, 0);
     glRotatef(RAD_TO_DEG(ship->rotation.x), 1, 0, 0);
     glCallList(shipMesh);
-    if(ship->weapon.timer > (ship->weapon.type->cooldown / 2))
+    if(ship->weapon.timer > (weaponTypes[ship->weapon.type].cooldown / 2))
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glColor3f(0, 0.9f, 1.0f);
@@ -70,20 +80,20 @@ void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
         //TODO: Move ship away
     }
 
-    if(ship->shields < ship->type->maxShields)
+    if(ship->shields < shipTypes[ship->type].maxShields)
     {
-        ship->shields += ship->type->shieldRegen * ticks / 1000.0f;
-        if(ship->shields > ship->type->maxShields)
+        ship->shields += shipTypes[ship->type].shieldRegen * ticks / 1000.0f;
+        if(ship->shields > shipTypes[ship->type].maxShields)
         {
-            ship->shields = ship->type->maxShields;
+            ship->shields = shipTypes[ship->type].maxShields;
         }
     }
-    if(ship->energy < ship->type->maxEnergy)
+    if(ship->energy < shipTypes[ship->type].maxEnergy)
     {
-        ship->energy += ship->type->energyRegen * ticks / 1000.0f;
-        if(ship->energy > ship->type->maxEnergy)
+        ship->energy += shipTypes[ship->type].energyRegen * ticks / 1000.0f;
+        if(ship->energy > shipTypes[ship->type].maxEnergy)
         {
-            ship->energy = ship->type->maxEnergy;
+            ship->energy = shipTypes[ship->type].maxEnergy;
         }
     }
 
@@ -137,22 +147,14 @@ void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks)
             ship->turnSpeedY = 0;
         }
     }
-    ship->turnSpeedX = clampf(ship->turnSpeedX, -ship->type->maxTurnSpeed, ship->type->maxTurnSpeed);
-    ship->turnSpeedY = clampf(ship->turnSpeedY, -ship->type->maxTurnSpeed, ship->type->maxTurnSpeed);
+    ship->turnSpeedX = clampf(ship->turnSpeedX, -shipTypes[ship->type].maxTurnSpeed, shipTypes[ship->type].maxTurnSpeed);
+    ship->turnSpeedY = clampf(ship->turnSpeedY, -shipTypes[ship->type].maxTurnSpeed, shipTypes[ship->type].maxTurnSpeed);
 }
 
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
 {
     ship->speed += (dir * (float) ticks) / 125.0f; //8 units per second
-    if(ship->speed < 0)
-    {
-        ship->speed = 0;
-    }
-    else if(ship->speed > ship->type->maxSpeed)
-    {
-        ship->speed = ship->type->maxSpeed;
-    }
-    ship->speed = clampf(ship->speed, 0, ship->type->maxSpeed);
+    ship->speed = clampf(ship->speed, 0, shipTypes[ship->type].maxSpeed);
 }
 
 uint8_t damageShip(Ship* ship, uint8_t damage)
@@ -172,17 +174,17 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
     {
         return;
     }
-    if(ship->energy - ship->weapon.type->energyUsage < 0)
+    if(ship->energy - weaponTypes[ship->weapon.type].energyUsage < 0)
     {
         return;
     }
 
-    ship->energy -= ship->weapon.type->energyUsage;
-    ship->weapon.timer = ship->weapon.type->cooldown;
+    ship->energy -= weaponTypes[ship->weapon.type].energyUsage;
+    ship->weapon.timer = weaponTypes[ship->weapon.type].cooldown;
 
     for(uint8_t i = 0; i < numTargets; i++)
     {
-        if(targetShips[i].type == NULL)
+        if(targetShips[i].type == TYPE_NULL)
         {
             continue;
         }
@@ -208,7 +210,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
                 printf("HIT %f %f\n", b, distance3d(&ship->position, &targetShips[i].position));
 
                 ship->weapon.distanceToHit = -b;
-                uint8_t destroyed = damageShip(&targetShips[i], ship->weapon.type->damage);
+                uint8_t destroyed = damageShip(&targetShips[i], weaponTypes[ship->weapon.type].damage);
                 if(!destroyed)
                 {
                     createEffect(targetShips[i].position, SPARKS);

@@ -25,6 +25,8 @@ float mapScrollX;
 float mapScrollY;
 uint8_t mapCursorX;
 uint8_t mapCursorY;
+//Title
+uint8_t titleCursor;
 
 void initUI()
 {
@@ -41,6 +43,7 @@ void initUI()
     equipCursor = 0;
     mapCursorX = 0;
     mapCursorY = 0;
+    titleCursor = 0;
 }
 
 void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
@@ -100,25 +103,25 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
     glBegin(GL_QUADS);
     //Draw main UI background
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-    uint8_t speedTemp = (playerShip->speed / playerShip->type->maxSpeed) * 16;
+    uint8_t speedTemp = (playerShip->speed / shipTypes[playerShip->type].maxSpeed) * 16;
     if(speedTemp > 0)
     {
         drawTexQuad(171, 26, speedTemp * 4, 4, UITH, 0, PTC(249), PTC(4) * speedTemp, PTC(251));
     }
 
-    int8_t turnXTemp = (playerShip->turnSpeedX / playerShip->type->maxTurnSpeed) * 30 + 30;
+    int8_t turnXTemp = (playerShip->turnSpeedX / shipTypes[playerShip->type].maxTurnSpeed) * 30 + 30;
     drawTexQuad(170 + turnXTemp, 56, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
-    int8_t turnYTemp = (playerShip->turnSpeedY / playerShip->type->maxTurnSpeed) * 30 + 30;
+    int8_t turnYTemp = (playerShip->turnSpeedY / shipTypes[playerShip->type].maxTurnSpeed) * 30 + 30;
     drawTexQuad(170 + turnYTemp, 41, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
-    uint8_t shieldsTemp = (playerShip->shields / playerShip->type->maxShields) * 16;
+    uint8_t shieldsTemp = (playerShip->shields / shipTypes[playerShip->type].maxShields) * 16;
     if(shieldsTemp > 0)
     {
         drawTexQuad(7, 57, shieldsTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * shieldsTemp, 1);
     }
 
-    uint8_t energyTemp = (playerShip->energy / playerShip->type->maxEnergy) * 16;
+    uint8_t energyTemp = (playerShip->energy / shipTypes[playerShip->type].maxEnergy) * 16;
     if(energyTemp > 0)
     {
         drawTexQuad(7, 42, energyTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * energyTemp, 1);
@@ -137,7 +140,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
 
         for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
         {
-            if(npcShips[i].type != NULL)
+            if(npcShips[i].type != TYPE_NULL)
             {
                 if(distance3d(&playerShip->position, &npcShips[i].position) < RADAR_RANGE)
                 {
@@ -311,14 +314,8 @@ void moveWithRollover(uint8_t* i, uint8_t max, int8_t dir)
 {
     if(dir > 0)
     {
-        if(*i < max)
-        {
-            (*i)++;
-        }
-        else
-        {
-            (*i) = 0;
-        }
+        (*i)++;
+        (*i) %= (max + 1);
     }
     else
     {
@@ -402,6 +399,41 @@ uint16_t getMapCursor()
     return ret;
 }
 
-void drawTitleScreen();
-void toggleTitleCursor();
-uint8_t getTitleCursor();
+//TODO: Title screen texture
+void drawTitleScreen()
+{
+    glLoadIdentity();
+    glBindTexture(GL_TEXTURE_2D, stationUITexture);
+    glBegin(GL_QUADS);
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+    glEnd();
+    glDrawText("TriSpace", CENTER(8), 2, 0xFFFFFF);
+
+    if(titleCursor == 0)
+    {
+        glDrawText("New game", CENTER(8), 32, 0x00FFFF);
+        glDrawText("Load game", CENTER(9), 48, 0xFFFFFF);
+    }
+    else
+    {
+        glDrawText("New game", CENTER(8), 32, 0xFFFFFF);
+        glDrawText("Load game", CENTER(9), 48, 0x00FFFF);
+    }
+}
+
+void toggleTitleCursor()
+{
+    if(titleCursor != 0)
+    {
+        titleCursor = 0;
+    }
+    else
+    {
+        titleCursor = 1;
+    }
+}
+
+uint8_t getTitleCursor()
+{
+    return titleCursor;
+}
