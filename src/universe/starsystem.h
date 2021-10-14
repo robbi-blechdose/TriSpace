@@ -8,6 +8,7 @@
 #define MAX_PLANETS 6
 #define MAX_TECH_LEVEL 15
 #define MAX_GOVERNMENT 5
+#define MAX_NAME_LENGTH 28
 
 typedef struct {
     uint8_t techLevel;
@@ -16,6 +17,7 @@ typedef struct {
     int8_t treeDiff;
     int8_t rockDiff;
     int8_t waterDiff;
+    char name[MAX_NAME_LENGTH];
 } SystemInfo;
 
 typedef struct {

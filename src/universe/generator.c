@@ -4,8 +4,8 @@
 #define FNL_IMPL
 #include "FastNoiseLite.h"
 
-#define NUM_PALETTES 4
-Color palettes[NUM_PALETTES][8] = {
+#define NUM_PALETTES 5
+const Color palettes[NUM_PALETTES][8] = {
     //Earth-type planet
     {
         //Ocean
@@ -47,6 +47,20 @@ Color palettes[NUM_PALETTES][8] = {
     },
     //Ocean-type planet
     //Forest-type planet
+    {
+        //Ground
+        {.r = 110, .g = 46, .b = 1},
+        {.r = 79, .g = 110, .b = 1},
+        //Trees (low)
+        {.r = 97, .g = 158, .b = 17},
+        {.r = 84, .g = 125, .b = 30},
+        //Trees (high)
+        {.r = 142, .g = 191, .b = 8},
+        {.r = 185, .g = 222, .b = 82},
+        //Trees (very high, snow tips)
+        {.r = 175, .g = 252, .b = 73},
+        {.r = 247, .g = 247, .b = 247}
+    },
     //Ice-type planet
     {
         //Frozen oceans
@@ -64,7 +78,7 @@ Color palettes[NUM_PALETTES][8] = {
 };
 
 //Diffs are: Tree, Rock, Water
-int8_t planetTradeDiffs[NUM_PALETTES][3] = {
+const int8_t planetTradeDiffs[NUM_PALETTES][3] = {
     //Earth-type planet
     {1, -1, 0},
     //Mars-type planet
@@ -73,6 +87,7 @@ int8_t planetTradeDiffs[NUM_PALETTES][3] = {
     {-2, 2, -2},
     //Ocean-type planet
     //Forest-type planet
+    {2, -1, 0},
     //Ice-type planet
     {-2, 2, 2}
 };
@@ -87,11 +102,6 @@ Color getColorForValue(Color* palette, float value)
     ret.g = a.g + (b.g - a.g) * ((value / 32) - index);
     ret.b = a.b + (b.b - a.b) * ((value / 32) - index);
     return ret;
-}
-
-uint32_t randr(uint32_t max)
-{
-    return rand() / (RAND_MAX / max + 1);
 }
 
 float randf(float max)
@@ -156,6 +166,7 @@ void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
     info->treeDiff = planetTradeDiffs[paletteIndex][0];
     info->rockDiff = planetTradeDiffs[paletteIndex][1];
     info->waterDiff = planetTradeDiffs[paletteIndex][2];
+    generateSystemName(&info->name);
 }
 
 uint8_t getNumStarsForSystem(uint32_t seed)
@@ -272,4 +283,119 @@ void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* system)
         npcShips[i].position.z = randf(500) - 250;
         npcShips[i].position.y = randf(50) - 25;
     }
+}
+
+const char* greekLetters[] = {
+    "Alpha ",
+    "Beta ",
+    "Gamma ",
+    "Delta ",
+    "Epsilon ",
+    "Zeta ",
+    "Eta ",
+    "Theta ",
+    "Iota ",
+    "Kappa ",
+    "Lambda ",
+    "Mu ",
+    "Nu ",
+    "Xi ",
+    "Omicron "
+    "Pi ",
+    "Rho ",
+    "Sigma ",
+    "Tau ",
+    "Upsilon ",
+    "Phi ",
+    "Chi ",
+    "Psi ",
+    "Omega "
+};
+
+const char* romanNumerals[] = {
+    " I",
+    " II",
+    " III",
+    " IV",
+    " V",
+    " VI",
+    " VII",
+    " VIII",
+    " IX"
+};
+
+#define NUM_ONSETS 21
+const char* onsets[NUM_ONSETS] = {
+    "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z"
+};
+
+#define NUM_VOWELS_SINGLE 5
+#define NUM_VOWELS 14
+const char* vowels[NUM_VOWELS] = {
+    "a", "e", "i", "o", "u",
+    "ai",
+    "ea", "ee", "eu",
+    "ie",
+    "oa", "oi", "oo", "ou"
+};
+
+#define NUM_CODAS 21
+const char* codas[NUM_CODAS] = {
+    "b", "c", "d", "f", "g", "h", "j", "k", "l", "m", "n", "p", "q", "r", "s", "t", "v", "w", "x", "y", "z"
+};
+
+void generateSystemName(char* buffer)
+{
+    //Generate prefix (optional)
+    uint8_t prefix = randr(50);
+    if(prefix < 23)
+    {
+        strcpy(buffer, greekLetters[prefix]);
+    }
+
+    char name[20];
+    uint8_t nameIndex = 0;
+    //Generate name
+    uint8_t syllables = 1 + randr(3);
+    uint8_t doubleVowelOccurred = 0;
+    //Syllable (x1 - x4)
+    for(uint8_t i = 0; i < syllables; i++)
+    {
+        //Onset (optional)
+        uint8_t oIndex = randr(NUM_ONSETS - 1);
+        strcpy(&name[nameIndex], onsets[oIndex]);
+        nameIndex += strlen(onsets[oIndex]);
+        //Nucleus
+        uint8_t vIndex = randr(NUM_VOWELS - 1);
+        if(doubleVowelOccurred)
+        {
+            vIndex = randr(NUM_VOWELS_SINGLE - 1);
+        }
+        strcpy(&name[nameIndex], vowels[vIndex]);
+        nameIndex += strlen(vowels[vIndex]);
+        if(vIndex > 4)
+        {
+            doubleVowelOccurred = 1;
+        }
+        //Coda (optional)
+        uint8_t cIndex = randr(NUM_CODAS * 4);
+        if(cIndex < NUM_CODAS)
+        {
+            strcpy(&name[nameIndex], codas[cIndex]);
+            nameIndex += strlen(codas[cIndex]);
+        }
+
+        //printf("Onset: %d Nucleus: %d DVO: %d\n", oIndex, vIndex, doubleVowelOccurred);
+    }
+    //Make the first letter uppercase
+    name[0] &= ~0x20;
+    strcat(buffer, name);
+
+    //Generate number (optional)
+    uint8_t num = randr(9 * 3);
+    if(num < 9)
+    {
+        strcat(buffer, romanNumerals[num]);
+    }
+    //printf("Prefix: %d Syllables: %d Number: %d\n", prefix, syllables, num);
 }

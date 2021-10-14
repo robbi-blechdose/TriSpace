@@ -20,6 +20,8 @@ uint8_t saveLoadCursor;
 uint8_t tradeCursor;
 //Equip
 uint8_t equipCursor;
+//Contracts
+uint8_t contractCursor;
 //Map
 float mapScrollX;
 float mapScrollY;
@@ -41,6 +43,7 @@ void initUI()
     saveLoadCursor = 0;
     tradeCursor = 0;
     equipCursor = 0;
+    contractCursor = 0;
     mapCursorX = 0;
     mapCursorY = 0;
     titleCursor = 0;
@@ -59,12 +62,32 @@ void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
     glVertex3f(posX, posY + sizeY - 1, z);
 }
 
+void moveWithRollover(uint8_t* i, uint8_t max, int8_t dir)
+{
+    if(dir > 0)
+    {
+        (*i)++;
+        (*i) %= (max + 1);
+    }
+    else
+    {
+        if(*i > 0)
+        {
+            (*i)--;
+        }
+        else
+        {
+            (*i) = max;
+        }
+    }
+}
+
 //UI Base Height
 #define UIBH 10
 //UI Top Height
 #define UITH 11
 
-void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t isEnemy)
+void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
 {
     vec3 diff = subv3(playerPos, target);
     vec3 axis = {.d = {0, 1, 0}};
@@ -86,17 +109,12 @@ void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t isEnemy)
         rot.y = 32 * sinf(angle);
     }
 
-    float texY1 = PTC(4);
-    float texY2 = PTC(7);
-    if(!isEnemy)
-    {
-        texY1 = PTC(8);
-        texY2 = PTC(11);
-    }
+    float texY1 = PTC(4 + color * 4);
+    float texY2 = PTC(7 + color * 4);
     drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
 }
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
+void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t displayContract, vec3 contractPos)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
@@ -136,7 +154,12 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
     //Radar
     if(state != STATION)
     {
-        drawRadarDot(playerShip->position, playerShip->rotation, stationPos, 0);
+        drawRadarDot(playerShip->position, playerShip->rotation, stationPos, 1);
+
+        if(displayContract)
+        {
+            drawRadarDot(playerShip->position, playerShip->rotation, contractPos, 2);
+        }
 
         for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
         {
@@ -144,7 +167,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
             {
                 if(distance3d(&playerShip->position, &npcShips[i].position) < RADAR_RANGE)
                 {
-                    drawRadarDot(playerShip->position, playerShip->rotation, npcShips[i].position, 1);
+                    drawRadarDot(playerShip->position, playerShip->rotation, npcShips[i].position, 0);
                 }
             }
         }
@@ -215,13 +238,16 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
     glDrawText("Trading", CENTER(7), 2, 0xFFFFFF);
 
     char buffer[29];
+    char name[15];
+    char type[4];
 
-    glDrawText("ITEM       UNIT PRICE     QTY", 4, 16, 0xFFFFFF);
+    glDrawText("ITEM        UNIT PRICE    QTY", 4, 16, 0xFFFFFF);
     for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
     {
-        printNameForCargo(buffer, i);
-        printUnitForCargo(&buffer[12], i);
-        sprintf(&buffer[15], " %5d  %2d|%2d", getPriceForCargo(i, info), stationHold->cargo[i], playerHold->cargo[i]);
+        printNameForCargo(name, i);
+        printUnitForCargo(type, i);
+        sprintf(buffer, "%-13s%3s %5d  %2d|%2d", name, type, getPriceForCargo(i, info),
+                                                    stationHold->cargo[i], playerHold->cargo[i]);
         if(i == tradeCursor)
         {
             glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
@@ -237,6 +263,16 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
 
     glDrawText("Save & Load", 12, 240 - 10, 0xFFFFFF);
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
+}
+
+void moveTradeCursor(int8_t dir)
+{
+    moveWithRollover(&tradeCursor, NUM_CARGO_TYPES - 1, dir);
+}
+
+uint8_t getTradeCursor()
+{
+    return tradeCursor;
 }
 
 uint16_t equipmentPrices[3] = {
@@ -303,6 +339,7 @@ void drawEquipUI(Ship* playerShip)
     glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
 
     glDrawText("Trading", 12, 240 - 10, 0xFFFFFF);
+    glDrawText("Contracts", 240 - 9 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
 
 uint8_t getEquipCursor()
@@ -310,39 +347,46 @@ uint8_t getEquipCursor()
     return equipCursor;
 }
 
-void moveWithRollover(uint8_t* i, uint8_t max, int8_t dir)
-{
-    if(dir > 0)
-    {
-        (*i)++;
-        (*i) %= (max + 1);
-    }
-    else
-    {
-        if(*i > 0)
-        {
-            (*i)--;
-        }
-        else
-        {
-            (*i) = max;
-        }
-    }
-}
-
-void moveTradeCursor(int8_t dir)
-{
-    moveWithRollover(&tradeCursor, NUM_CARGO_TYPES - 1, dir);
-}
-
-uint8_t getTradeCursor()
-{
-    return tradeCursor;
-}
-
 void moveEquipCursor(int8_t dir)
 {
     moveWithRollover(&equipCursor, NUM_EQUIPMENT - 1, dir);
+}
+
+void drawContractUI(Contract* contracts)
+{
+    glLoadIdentity();
+    glBindTexture(GL_TEXTURE_2D, stationUITexture);
+    glBegin(GL_QUADS);
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+    drawTexQuad(4, 194, 32, 32, UITH, PTC(240), PTC(16 + contracts[contractCursor].type * 16),
+                                        1, PTC(31 + contracts[contractCursor].type * 16));
+    glEnd();
+    glDrawText("Contracts", CENTER(9), 2, 0xFFFFFF);
+
+    char buffer[29];
+    glDrawText(contractTypes[contracts[contractCursor].type], 40, 16, 0xFFFFFF);
+    sprintf(buffer, "Employer: %s %s", contractFirstnames[contracts[contractCursor].employerFirstname],
+                                        contractLastnames[contracts[contractCursor].employerLastname]);
+    glDrawText(buffer, 40, 32, 0xFFFFFF);
+    sprintf(buffer, "Pay: %d credits", contracts[contractCursor].pay);
+    glDrawText(buffer, 40, 48, 0xFFFFFF);
+    glDrawText("Destination system:", 40, 64, 0xFFFFFF);
+    glDrawText("Alpha Beriax", 40, 72, 0xFFFFFF);
+    glDrawText("Objective:", 40, 88, 0xFFFFFF);
+    printObjective(buffer, &contracts[contractCursor]);
+    glDrawText(buffer, 40, 96, 0xFFFFFF);
+
+    glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
+}
+
+void moveContractCursor()
+{
+    //TODO
+}
+
+uint8_t getContractCursor()
+{
+    return contractCursor;
 }
 
 void drawMap(uint32_t systemSeeds[])
@@ -367,15 +411,16 @@ void drawMap(uint32_t systemSeeds[])
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, systemSeeds[getMapCursor()]);
     char buffer[29];
-    glDrawText("System information", 48, 196, 0xFFFFFF);
+    glDrawText("System information", 48, 195, 0xFFFFFF);
+    glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 204, 0xFFFFFF);
     sprintf(buffer, "Tech level: %d", sbd.info.techLevel);
-    glDrawText(buffer, 8, 207, 0xFFFFFF);
+    glDrawText(buffer, 8, 213, 0xFFFFFF);
     sprintf(buffer, "Government level: %d", sbd.info.government);
-    glDrawText(buffer, 8, 218, 0xFFFFFF);
-    glDrawText("Planets:", 8, 229, 0xFFFFFF);
+    glDrawText(buffer, 8, 222, 0xFFFFFF);
+    glDrawText("Planets:", 8, 231, 0xFFFFFF);
     for(uint8_t i = 0; i < sbd.numPlanets; i++)
     {
-        drawTexQuad(80 + i * 12, 3, 7, 8, UITH,
+        drawTexQuad(80 + i * 12, 1, 7, 8, UITH,
                     PTC(241), PTC(80 + sbd.paletteIndices[i] * 8), PTC(248), PTC(87 + sbd.paletteIndices[i] * 8));
     }
     glEnd();

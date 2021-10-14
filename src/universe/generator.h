@@ -24,5 +24,6 @@ void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed);
 void generateStarSystem(StarSystem* system, uint32_t seed);
 void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed);
 void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* system);
+void generateSystemName(char* buffer);
 
 #endif

@@ -69,22 +69,22 @@ void printNameForCargo(char* str, CargoType type)
     {
         case Food:
         {
-            strcpy(str, "Food        ");
+            strcpy(str, "Food");
             break;
         }
         case Textiles:
         {
-            strcpy(str, "Textiles    ");
+            strcpy(str, "Textiles");
             break;
         }
         case Liquor:
         {
-            strcpy(str, "Liquor      ");
+            strcpy(str, "Liquor");
             break;
         }
         case Furs:
         {
-            strcpy(str, "Furs        ");
+            strcpy(str, "Furs");
             break;
         }
         case Radioactives:
@@ -94,47 +94,47 @@ void printNameForCargo(char* str, CargoType type)
         }
         case Luxuries:
         {
-            strcpy(str, "Luxuries    ");
+            strcpy(str, "Luxuries");
             break;
         }
         case Computers:
         {
-            strcpy(str, "Computers   ");
+            strcpy(str, "Computers");
             break;
         }
         case Machinery:
         {
-            strcpy(str, "Machinery   ");
+            strcpy(str, "Machinery");
             break;
         }
         case Gold:
         {
-            strcpy(str, "Gold        ");
+            strcpy(str, "Gold");
             break;
         }
         case Platinum:
         {
-            strcpy(str, "Platinum    ");
+            strcpy(str, "Platinum");
             break;
         }
         case Dilithium:
         {
-            strcpy(str, "Dilithium   ");
+            strcpy(str, "Dilithium");
             break;
         }
         case Slaves:
         {
-            strcpy(str, "Slaves      ");
+            strcpy(str, "Slaves");
             break;
         }
         case Firearms:
         {
-            strcpy(str, "Firearms    ");
+            strcpy(str, "Firearms");
             break;
         }
         case Narcotics:
         {
-            strcpy(str, "Narcotics   ");
+            strcpy(str, "Narcotics");
             break;
         }
     }
@@ -155,19 +155,19 @@ void printUnitForCargo(char* str, CargoType type)
         case Narcotics:
         case Slaves:
         {
-            strcpy(str, "  t");
+            strcpy(str, "t");
             break;
         }
         case Liquor:
         {
-            strcpy(str, "  l");
+            strcpy(str, "l");
             break;
         }
         case Gold:
         case Platinum:
         case Dilithium:
         {
-            strcpy(str, " kg");
+            strcpy(str, "kg");
         }
     }
 }

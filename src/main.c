@@ -13,6 +13,7 @@
 #include "ship_collisions.h"
 #include "universe/universe.h"
 #include "universe/starsystem.h"
+#include "contracts.h"
 
 //Compile with debug functionality
 #define DEBUG
@@ -23,7 +24,7 @@
 #define MAX_FPS 50
 //#define LIMIT_FPS
 
-#define SAVE_VERSION 100
+#define SAVE_VERSION 101
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
@@ -46,9 +47,13 @@ StarSystem starSystem;
 vec3 jumpStart;
 
 CargoHold stationHold;
+Contract stationContracts[4];
+uint8_t numStationContracts;
 
 Ship playerShip;
 Ship npcShips[MAX_NPC_SHIPS];
+
+Contract currentContract;
 
 //-------------------------------------//
 
@@ -71,6 +76,7 @@ uint8_t saveGame()
     writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
     uint32_t currentSystem = getCurrentSystem();
     writeElement(&currentSystem, sizeof(uint32_t));
+    writeElement(&currentContract, sizeof(currentContract));
     closeSave();
     return 1;
 }
@@ -88,6 +94,7 @@ uint8_t loadGame()
         uint32_t savedSystem;
         readElement(&savedSystem, sizeof(uint32_t));
         switchSystem(savedSystem, &starSystem, npcShips);
+        readElement(&currentContract, sizeof(currentContract));
         return 1;
     }
     else
@@ -313,6 +320,29 @@ void calcFrame(uint32_t ticks)
             {
                 state = TRADING;
             }
+            else if(keyUp(N))
+            {
+                state = CONTRACTS;
+            }
+            break;
+        }
+        case CONTRACTS:
+        {
+            if(keyUp(A))
+            {
+                if(currentContract.type == CONTRACT_TYPE_NULL)
+                {
+                    //TODO
+                }
+            }
+            else if(keyUp(B))
+            {
+                state = STATION;
+            }
+            else if(keyUp(M))
+            {
+                state = EQUIP;
+            }
             break;
         }
         case MAP:
@@ -412,7 +442,7 @@ void drawFrame()
         case STATION:
         case HYPERSPACE:
         {
-            drawUI(state, &playerShip, npcShips, starSystem.station.position);
+            drawUI(state, &playerShip, npcShips, starSystem.station.position, 0, playerShip.position);
             break;
         }
         case SAVELOAD:
@@ -428,6 +458,12 @@ void drawFrame()
         case EQUIP:
         {
             drawEquipUI(&playerShip);
+            break;
+        }
+        case CONTRACTS:
+        {
+            //TODO: remove test
+            drawContractUI(&currentContract);
             break;
         }
         case MAP:
@@ -488,6 +524,9 @@ int main(int argc, char **argv)
     initShip();
     createStationHold(&stationHold);
     state = TITLE;
+
+    //TODO: Remove test
+    currentContract = generateContract(0, &starSystem.info);
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

@@ -3,6 +3,7 @@
 
 #include "ship.h"
 #include "universe/universe.h"
+#include "contracts.h"
 
 #define RADAR_RANGE 100
 
@@ -19,7 +20,7 @@
 
 void initUI();
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos);
+void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t displayContract, vec3 contractPos);
 
 void drawSaveLoadUI();
 void toggleSaveLoadCursor();
@@ -32,6 +33,10 @@ uint8_t getTradeCursor();
 void drawEquipUI(Ship* playerShip);
 void moveEquipCursor(int8_t dir);
 uint8_t getEquipCursor();
+
+void drawContractUI(Contract* contracts);
+void moveContractCursor();
+uint8_t getContractCursor();
 
 void drawMap(uint32_t systemSeeds[]);
 void moveMapCursor(int8_t x, int8_t y);

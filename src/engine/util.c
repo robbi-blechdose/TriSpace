@@ -1,4 +1,5 @@
 #include "util.h"
+#include <stdlib.h>
 
 float squaref(float a)
 {
@@ -20,6 +21,11 @@ void clampAngle(float* angle)
     {
         *angle -= 2 * M_PI;
     }
+}
+
+uint32_t randr(uint32_t max)
+{
+    return rand() / (RAND_MAX / max + 1);
 }
 
 //Möller-Trumbore algorithm

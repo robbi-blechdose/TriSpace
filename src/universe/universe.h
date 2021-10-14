@@ -14,6 +14,7 @@ typedef enum {
     SAVELOAD,
     TRADING,
     EQUIP,
+    CONTRACTS,
     MAP,
     //Special states
     TITLE,
