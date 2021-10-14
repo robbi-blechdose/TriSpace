@@ -463,7 +463,7 @@ void drawFrame()
         case CONTRACTS:
         {
             //TODO: remove test
-            drawContractUI(&currentContract);
+            drawContractUI(&currentContract, getSystemSeeds());
             break;
         }
         case MAP:

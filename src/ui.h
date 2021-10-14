@@ -34,7 +34,7 @@ void drawEquipUI(Ship* playerShip);
 void moveEquipCursor(int8_t dir);
 uint8_t getEquipCursor();
 
-void drawContractUI(Contract* contracts);
+void drawContractUI(Contract* contracts, uint32_t systemSeeds[]);
 void moveContractCursor();
 uint8_t getContractCursor();
 

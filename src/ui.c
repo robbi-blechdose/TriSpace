@@ -352,7 +352,7 @@ void moveEquipCursor(int8_t dir)
     moveWithRollover(&equipCursor, NUM_EQUIPMENT - 1, dir);
 }
 
-void drawContractUI(Contract* contracts)
+void drawContractUI(Contract* contracts, uint32_t systemSeeds[])
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -371,7 +371,11 @@ void drawContractUI(Contract* contracts)
     sprintf(buffer, "Pay: %d credits", contracts[contractCursor].pay);
     glDrawText(buffer, 40, 48, 0xFFFFFF);
     glDrawText("Destination system:", 40, 64, 0xFFFFFF);
-    glDrawText("Alpha Beriax", 40, 72, 0xFFFFFF);
+
+    SystemBaseData sbd;
+    generateSystemBaseData(&sbd, systemSeeds[contracts[contractCursor].targetSystem]);
+    glDrawText(sbd.info.name, 40, 72, 0xFFFFFF);
+
     glDrawText("Objective:", 40, 88, 0xFFFFFF);
     printObjective(buffer, &contracts[contractCursor]);
     glDrawText(buffer, 40, 96, 0xFFFFFF);
