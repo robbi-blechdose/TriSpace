@@ -383,9 +383,9 @@ void drawContractUI(Contract* contracts, uint32_t systemSeeds[])
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
 }
 
-void moveContractCursor()
+void moveContractCursor(int8_t dir, uint8_t numContracts)
 {
-    //TODO
+    moveWithRollover(&contractCursor, numContracts - 1, dir);
 }
 
 uint8_t getContractCursor()

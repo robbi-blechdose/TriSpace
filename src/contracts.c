@@ -59,8 +59,13 @@ Contract generateContract(uint32_t currentStarSystem, SystemInfo* info)
     return c;
 }
 
-uint8_t checkContract(Contract* contract, CargoHold* playerHold)
+uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t currentSystem)
 {
+    if(currentSystem != contract->targetSystem)
+    {
+        return 0;
+    }
+
     switch(contract->type)
     {
         case CONTRACT_GET_ITEM:
@@ -91,7 +96,7 @@ void printObjective(char* str, Contract* contract)
             char unit[4];
             printNameForCargo(name, contract->cargo);
             printUnitForCargo(unit, contract->cargo);
-            sprintf(str, "Deliver %2d %s %s.", contract->cargoAmount, unit, name);
+            sprintf(str, "Deliver %d%s %s.", contract->cargoAmount, unit, name);
             break;
         }
         case CONTRACT_DESTROY_SHIP:

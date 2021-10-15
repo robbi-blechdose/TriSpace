@@ -31,7 +31,7 @@ extern const char* contractFirstnames[NUM_FIRSTNAMES];
 extern const char* contractLastnames[NUM_LASTNAMES];
 
 Contract generateContract(uint32_t currentStarSystem, SystemInfo* info);
-uint8_t checkContract(Contract* contract, CargoHold* playerHold);
+uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t currentSystem);
 void printObjective(char* str, Contract* contract);
 
 #endif

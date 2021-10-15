@@ -328,11 +328,25 @@ void calcFrame(uint32_t ticks)
         }
         case CONTRACTS:
         {
-            if(keyUp(A))
+            if(keyUp(U))
+            {
+                moveContractCursor(-1, numStationContracts);
+            }
+            else if(keyUp(D))
+            {
+                moveContractCursor(1, numStationContracts);
+            }
+            else if(keyUp(A))
             {
                 if(currentContract.type == CONTRACT_TYPE_NULL)
                 {
-                    //TODO
+                    currentContract = stationContracts[getContractCursor()];
+                    //Remove first contract and shift the rest
+                    for(uint8_t i = 0; i < numStationContracts - 1; i++)
+                    {
+                        stationContracts[i] = stationContracts[i + 1];
+                    }
+                    //TODO: Mark as active somehow?
                 }
             }
             else if(keyUp(B))
@@ -462,8 +476,7 @@ void drawFrame()
         }
         case CONTRACTS:
         {
-            //TODO: remove test
-            drawContractUI(&currentContract, getSystemSeeds());
+            drawContractUI(stationContracts, getSystemSeeds());
             break;
         }
         case MAP:
@@ -524,9 +537,12 @@ int main(int argc, char **argv)
     initShip();
     createStationHold(&stationHold);
     state = TITLE;
+    currentContract.type = CONTRACT_TYPE_NULL;
 
     //TODO: Remove test
-    currentContract = generateContract(0, &starSystem.info);
+    stationContracts[0] = generateContract(0, &starSystem.info);
+    stationContracts[1] = generateContract(0, &starSystem.info);
+    numStationContracts = 2;
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();
