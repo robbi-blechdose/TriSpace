@@ -172,6 +172,19 @@ void printUnitForCargo(char* str, CargoType type)
     }
 }
 
+uint8_t isCargoIllegal(CargoType type)
+{
+    switch(type)
+    {
+        case Narcotics:
+        case Slaves:
+        {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 uint8_t getCargoHoldSize(CargoHold* hold)
 {
     uint8_t size = 0;

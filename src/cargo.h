@@ -38,6 +38,7 @@ typedef struct {
 uint8_t getPriceForCargo(CargoType type, SystemInfo* info);
 void printNameForCargo(char* str, CargoType type);
 void printUnitForCargo(char* str, CargoType type);
+uint8_t isCargoIllegal(CargoType type);
 uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info);
 void createStationHold(CargoHold* hold);
 

@@ -476,7 +476,7 @@ void drawFrame()
         }
         case CONTRACTS:
         {
-            drawContractUI(stationContracts, getSystemSeeds());
+            drawContractUI(stationContracts, getSystemSeeds(), numStationContracts);
             break;
         }
         case MAP:
@@ -540,9 +540,11 @@ int main(int argc, char **argv)
     currentContract.type = CONTRACT_TYPE_NULL;
 
     //TODO: Remove test
-    stationContracts[0] = generateContract(0, &starSystem.info);
-    stationContracts[1] = generateContract(0, &starSystem.info);
-    numStationContracts = 2;
+    numStationContracts = 4;
+    for(uint8_t i = 0; i < numStationContracts; i++)
+    {
+        stationContracts[i] = generateContract(0, &starSystem.info);
+    }
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

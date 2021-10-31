@@ -352,7 +352,7 @@ void moveEquipCursor(int8_t dir)
     moveWithRollover(&equipCursor, NUM_EQUIPMENT - 1, dir);
 }
 
-void drawContractUI(Contract* contracts, uint32_t systemSeeds[])
+void drawContractUI(Contract* contracts, uint32_t systemSeeds[], uint8_t numContracts)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -364,6 +364,9 @@ void drawContractUI(Contract* contracts, uint32_t systemSeeds[])
     glDrawText("Contracts", CENTER(9), 2, 0xFFFFFF);
 
     char buffer[29];
+    sprintf(buffer, "%d/%d", contractCursor + 1, numContracts);
+    glDrawText(buffer, 8, 48, 0xFFFFFF);
+
     glDrawText(contractTypes[contracts[contractCursor].type], 40, 16, 0xFFFFFF);
     sprintf(buffer, "Employer: %s %s", contractFirstnames[contracts[contractCursor].employerFirstname],
                                         contractLastnames[contracts[contractCursor].employerLastname]);

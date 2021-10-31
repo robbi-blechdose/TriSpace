@@ -92,11 +92,12 @@ const int8_t planetTradeDiffs[NUM_PALETTES][3] = {
     {-2, 2, 2}
 };
 
-Color getColorForValue(Color* palette, float value)
+Color getColorForValue(uint8_t paletteIndex, float value)
 {
+    //Get an index between 0 and 8
     uint8_t index = value / 32;
-    Color a = palette[index];
-    Color b = palette[index + 1];
+    Color a = palettes[paletteIndex][index];
+    Color b = palettes[paletteIndex][index + 1];
     Color ret;
     ret.r = a.r + (b.r - a.r) * ((value / 32) - index);
     ret.g = a.g + (b.g - a.g) * ((value / 32) - index);
@@ -123,8 +124,9 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
     {
         for(uint16_t j = 0; j < 256; j++)
         {
+            //Noise value (-1 to 1) is scaled to be within 0 to 256
             float temp = (fnlGetNoise2D(&noise, i * size, j * size) + 1.0f) * 128;
-            Color c = getColorForValue(palettes[paletteIndex], temp);
+            Color c = getColorForValue(paletteIndex, temp);
             uint32_t index = i * 256 * 3 + j * 3;
             data[index] = c.r;
             data[index + 1] = c.g;
@@ -137,8 +139,9 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
     {
         for(uint16_t j = 0; j < 16; j++)
         {
+            //Noise value (-1 to 1) is scaled to be within 0 to 256
             float temp = (fnlGetNoise2D(&noise, i * size, 255 * size + j * size) + 1.0f) * 128;
-            Color c = getColorForValue(palettes[paletteIndex], temp);
+            Color c = getColorForValue(paletteIndex, temp);
             uint32_t index = i * 256 * 3 + j * 3;
             float multA = j / 16.0f;
             float multB = (16 - j) / 16.0f;
@@ -166,7 +169,7 @@ void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
     info->treeDiff = planetTradeDiffs[paletteIndex][0];
     info->rockDiff = planetTradeDiffs[paletteIndex][1];
     info->waterDiff = planetTradeDiffs[paletteIndex][2];
-    generateSystemName(&info->name);
+    generateSystemName((char*) &info->name);
 }
 
 uint8_t getNumStarsForSystem(uint32_t seed)
