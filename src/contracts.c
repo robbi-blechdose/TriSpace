@@ -14,10 +14,14 @@ const char* contractFirstnames[NUM_FIRSTNAMES] = {
     "Dave",
     "Jason",
     "Robert",
+    "John",
+
     "Kate",
     "Jill",
     "Susan",
-    "Heather"
+    "Heather",
+    "Danielle",
+    "Riley"
 };
 
 const char* contractLastnames[NUM_LASTNAMES] = {
@@ -28,7 +32,8 @@ const char* contractLastnames[NUM_LASTNAMES] = {
     "McCree",
     "Smith",
     "Davies",
-    "Brown"
+    "Brown",
+    "Hathaway"
 };
 
 Contract generateContract(uint32_t currentStarSystem, SystemInfo* info)
@@ -61,7 +66,7 @@ Contract generateContract(uint32_t currentStarSystem, SystemInfo* info)
             {
                 c.cargo = randr(NUM_CARGO_TYPES -1);
             }
-            c.cargoAmount = 5 + randr(10) * 5;
+            c.cargoAmount = 5 + randr(5) * 4;
             //Base pay + cargo price / 2 + pay on top + pay for illegal cargo
             c.pay = 200 + (getPriceForCargo(c.cargo, info) * c.cargoAmount) / 2 + randr(200) * 10
                         + isCargoIllegal(c.cargo) * 500;
@@ -80,6 +85,24 @@ Contract generateContract(uint32_t currentStarSystem, SystemInfo* info)
     return c;
 }
 
+uint8_t activateContract(Contract* contract, CargoHold* playerHold)
+{
+    switch(contract->type)
+    {
+        case CONTRACT_SMUGGLE:
+        {
+            //Check if there's space for the cargo
+            if(playerHold->size >= (getCargoHoldSize(playerHold) + contract->cargoAmount))
+            {
+                playerHold->cargo[contract->cargo] += contract->cargoAmount;
+                return 1;
+            }
+            break;
+        }
+    }
+    return 0;
+}
+
 uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t currentSystem)
 {
     if(currentSystem != contract->targetSystem)
@@ -91,9 +114,9 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t curren
     {
         case CONTRACT_GET_ITEM:
         {
-            if(playerHold->cargo[contract->type] >= contract->cargoAmount)
+            if(playerHold->cargo[contract->cargo] >= contract->cargoAmount)
             {
-                playerHold->cargo[contract->type] -= contract->cargoAmount;
+                playerHold->cargo[contract->cargo] -= contract->cargoAmount;
                 playerHold->money += contract->pay;
                 return 1;
             }
@@ -103,9 +126,9 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t curren
         {
             if(currentSystem == contract->targetSystem)
             {
-                if(playerHold->cargo[contract->type] >= contract->cargoAmount)
+                if(playerHold->cargo[contract->cargo] >= contract->cargoAmount)
                 {
-                    playerHold->cargo[contract->type] -= contract->cargoAmount;
+                    playerHold->cargo[contract->cargo] -= contract->cargoAmount;
                     playerHold->money += contract->pay;
                     return 1;
                 }

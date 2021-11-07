@@ -26,12 +26,13 @@ typedef struct {
     uint8_t employerLastname;
 } Contract;
 
-#define NUM_FIRSTNAMES 10
+#define NUM_FIRSTNAMES 13
 extern const char* contractFirstnames[NUM_FIRSTNAMES];
-#define NUM_LASTNAMES 8
+#define NUM_LASTNAMES 9
 extern const char* contractLastnames[NUM_LASTNAMES];
 
 Contract generateContract(uint32_t currentStarSystem, SystemInfo* info);
+uint8_t activateContract(Contract* contract, CargoHold* playerHold);
 uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t currentSystem);
 void printObjective(char* str, Contract* contract);
 

@@ -196,7 +196,6 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     //This takes care of the srand() call for us
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, seed);
-    //TODO: We could prolly skip this by passing a direct pointer above
     system->info.techLevel = sbd.info.techLevel;
     system->info.government = sbd.info.government;
     system->info.treeDiff = sbd.info.treeDiff;

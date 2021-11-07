@@ -340,13 +340,28 @@ void calcFrame(uint32_t ticks)
             {
                 if(currentContract.type == CONTRACT_TYPE_NULL)
                 {
-                    currentContract = stationContracts[getContractCursor()];
-                    //Remove first contract and shift the rest
-                    for(uint8_t i = 0; i < numStationContracts - 1; i++)
+                    if(activateContract(&stationContracts[getContractCursor()], &playerShip.hold))
                     {
-                        stationContracts[i] = stationContracts[i + 1];
+                        currentContract = stationContracts[getContractCursor()];
+
+                        //Remove first contract and shift the rest
+                        for(uint8_t i = 0; i < numStationContracts - 1; i++)
+                        {
+                            stationContracts[i] = stationContracts[i + 1];
+                        }
                     }
-                    //TODO: Mark as active somehow?
+                    else
+                    {
+                        //TODO: Error message?
+                    }
+                }
+                else
+                {
+                    if(checkContract(&currentContract, &playerShip.hold, getCurrentSystem()))
+                    {
+                        currentContract.type = CONTRACT_TYPE_NULL;
+                        //TODO: Display completion screen
+                    }
                 }
             }
             else if(keyUp(B))
@@ -476,7 +491,7 @@ void drawFrame()
         }
         case CONTRACTS:
         {
-            drawContractUI(stationContracts, getSystemSeeds(), numStationContracts);
+            drawContractUI(&currentContract, stationContracts, getSystemSeeds(), numStationContracts);
             break;
         }
         case MAP:

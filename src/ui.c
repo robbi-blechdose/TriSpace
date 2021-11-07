@@ -352,36 +352,57 @@ void moveEquipCursor(int8_t dir)
     moveWithRollover(&equipCursor, NUM_EQUIPMENT - 1, dir);
 }
 
-void drawContractUI(Contract* contracts, uint32_t systemSeeds[], uint8_t numContracts)
+void drawContract(Contract* contract, uint8_t cursor, uint32_t systemSeeds[], uint8_t numContracts)
+{
+    glBegin(GL_QUADS);
+    drawTexQuad(4, 194, 32, 32, UITH, PTC(240), PTC(16 + contract->type * 16),
+                                        1, PTC(31 + contract->type * 16));
+    glEnd();
+    char buffer[29];
+    if(cursor)
+    {
+        sprintf(buffer, "%d/%d", cursor, numContracts);
+        glDrawText(buffer, 8, 48, 0xFFFFFF);
+    }
+    else
+    {
+        glDrawText("ACT", 8, 48, 0x00FF00);
+    }
+
+    glDrawText(contractTypes[contract->type], 40, 16, 0xFFFFFF);
+    sprintf(buffer, "Employer: %s %s", contractFirstnames[contract->employerFirstname],
+                                        contractLastnames[contract->employerLastname]);
+    glDrawText(buffer, 40, 32, 0xFFFFFF);
+    sprintf(buffer, "Pay: %d credits", contract->pay);
+    glDrawText(buffer, 40, 48, 0xFFFFFF);
+    glDrawText("Destination system:", 40, 64, 0xFFFFFF);
+
+    SystemBaseData sbd;
+    generateSystemBaseData(&sbd, systemSeeds[contract->targetSystem]);
+    glDrawText(sbd.info.name, 40, 72, 0xFFFFFF);
+
+    glDrawText("Objective:", 40, 88, 0xFFFFFF);
+    printObjective(buffer, contract);
+    glDrawText(buffer, 40, 96, 0xFFFFFF);
+}
+
+void drawContractUI(Contract* activeContract, Contract* contracts, uint32_t systemSeeds[], uint8_t numContracts)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
     glBegin(GL_QUADS);
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-    drawTexQuad(4, 194, 32, 32, UITH, PTC(240), PTC(16 + contracts[contractCursor].type * 16),
-                                        1, PTC(31 + contracts[contractCursor].type * 16));
     glEnd();
     glDrawText("Contracts", CENTER(9), 2, 0xFFFFFF);
 
-    char buffer[29];
-    sprintf(buffer, "%d/%d", contractCursor + 1, numContracts);
-    glDrawText(buffer, 8, 48, 0xFFFFFF);
-
-    glDrawText(contractTypes[contracts[contractCursor].type], 40, 16, 0xFFFFFF);
-    sprintf(buffer, "Employer: %s %s", contractFirstnames[contracts[contractCursor].employerFirstname],
-                                        contractLastnames[contracts[contractCursor].employerLastname]);
-    glDrawText(buffer, 40, 32, 0xFFFFFF);
-    sprintf(buffer, "Pay: %d credits", contracts[contractCursor].pay);
-    glDrawText(buffer, 40, 48, 0xFFFFFF);
-    glDrawText("Destination system:", 40, 64, 0xFFFFFF);
-
-    SystemBaseData sbd;
-    generateSystemBaseData(&sbd, systemSeeds[contracts[contractCursor].targetSystem]);
-    glDrawText(sbd.info.name, 40, 72, 0xFFFFFF);
-
-    glDrawText("Objective:", 40, 88, 0xFFFFFF);
-    printObjective(buffer, &contracts[contractCursor]);
-    glDrawText(buffer, 40, 96, 0xFFFFFF);
+    if(activeContract->type != CONTRACT_TYPE_NULL)
+    {
+        drawContract(activeContract, 0, systemSeeds, numContracts);
+    }
+    else
+    {
+        drawContract(&contracts[contractCursor], contractCursor + 1, systemSeeds, numContracts);
+    }
 
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
 }

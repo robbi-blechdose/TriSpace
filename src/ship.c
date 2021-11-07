@@ -207,7 +207,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
             if(discr >= 0)
             {
                 //TODO: Fine detection?
-                printf("HIT %f %f\n", b, distance3d(&ship->position, &targetShips[i].position));
+                //printf("HIT %f %f\n", b, distance3d(&ship->position, &targetShips[i].position));
 
                 ship->weapon.distanceToHit = -b;
                 uint8_t destroyed = damageShip(&targetShips[i], weaponTypes[ship->weapon.type].damage);
