@@ -35,6 +35,7 @@ void moveEquipCursor(int8_t dir);
 uint8_t getEquipCursor();
 
 void drawContractUI(Contract* activeContract, Contract* contracts, uint32_t systemSeeds[], uint8_t numContracts);
+void resetContractCursor();
 void moveContractCursor(int8_t dir, uint8_t numContracts);
 uint8_t getContractCursor();
 

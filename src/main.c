@@ -24,7 +24,7 @@
 #define MAX_FPS 50
 //#define LIMIT_FPS
 
-#define SAVE_VERSION 101
+#define SAVE_VERSION 201
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
@@ -74,8 +74,8 @@ uint8_t saveGame()
     writeElement(&playerShip.type, sizeof(playerShip.type));
     writeElement(&playerShip.hold, sizeof(playerShip.hold));
     writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
-    uint32_t currentSystem = getCurrentSystem();
-    writeElement(&currentSystem, sizeof(uint32_t));
+    uint16_t currentSystem = getCurrentSystem();
+    writeElement(&currentSystem, sizeof(uint16_t));
     writeElement(&currentContract, sizeof(currentContract));
     closeSave();
     return 1;
@@ -91,8 +91,8 @@ uint8_t loadGame()
         readElement(&playerShip.type, sizeof(playerShip.type));
         readElement(&playerShip.hold, sizeof(playerShip.hold));
         readElement(&playerShip.fuel, sizeof(playerShip.fuel));
-        uint32_t savedSystem;
-        readElement(&savedSystem, sizeof(uint32_t));
+        uint16_t savedSystem;
+        readElement(&savedSystem, sizeof(uint16_t));
         switchSystem(savedSystem, &starSystem, npcShips);
         readElement(&currentContract, sizeof(currentContract));
         return 1;
@@ -340,15 +340,18 @@ void calcFrame(uint32_t ticks)
             {
                 if(currentContract.type == CONTRACT_TYPE_NULL)
                 {
-                    if(activateContract(&stationContracts[getContractCursor()], &playerShip.hold))
+                    uint8_t contractCursor = getContractCursor();
+                    if(activateContract(&stationContracts[contractCursor], &playerShip.hold))
                     {
-                        currentContract = stationContracts[getContractCursor()];
+                        currentContract = stationContracts[contractCursor];
 
-                        //Remove first contract and shift the rest
-                        for(uint8_t i = 0; i < numStationContracts - 1; i++)
+                        //Shift contracts forward
+                        for(uint8_t i = contractCursor; i < numStationContracts - 1; i++)
                         {
                             stationContracts[i] = stationContracts[i + 1];
                         }
+                        stationContracts[numStationContracts - 1].type = CONTRACT_TYPE_NULL;
+                        numStationContracts--;
                     }
                     else
                     {
@@ -360,6 +363,7 @@ void calcFrame(uint32_t ticks)
                     if(checkContract(&currentContract, &playerShip.hold, getCurrentSystem()))
                     {
                         currentContract.type = CONTRACT_TYPE_NULL;
+                        resetContractCursor();
                         //TODO: Display completion screen
                     }
                 }

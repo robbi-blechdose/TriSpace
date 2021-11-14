@@ -36,7 +36,7 @@ const char* contractLastnames[NUM_LASTNAMES] = {
     "Hathaway"
 };
 
-Contract generateContract(uint32_t currentStarSystem, SystemInfo* info)
+Contract generateContract(uint16_t currentStarSystem, SystemInfo* info)
 {
     Contract c;
     c.type = randr(NUM_CONTRACT_TYPES);
@@ -89,6 +89,10 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
 {
     switch(contract->type)
     {
+        case CONTRACT_GET_ITEM:
+        {
+            return 1;
+        }
         case CONTRACT_SMUGGLE:
         {
             //Check if there's space for the cargo
@@ -99,11 +103,15 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
             }
             break;
         }
+        case CONTRACT_DESTROY_SHIP:
+        {
+            return 1;
+        }
     }
     return 0;
 }
 
-uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t currentSystem)
+uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint16_t currentSystem)
 {
     if(currentSystem != contract->targetSystem)
     {
@@ -113,15 +121,6 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint32_t curren
     switch(contract->type)
     {
         case CONTRACT_GET_ITEM:
-        {
-            if(playerHold->cargo[contract->cargo] >= contract->cargoAmount)
-            {
-                playerHold->cargo[contract->cargo] -= contract->cargoAmount;
-                playerHold->money += contract->pay;
-                return 1;
-            }
-            break;
-        }
         case CONTRACT_SMUGGLE:
         {
             if(currentSystem == contract->targetSystem)

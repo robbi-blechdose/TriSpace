@@ -273,6 +273,13 @@ void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed)
     }
 }
 
+void generateSystemPos(float* systemPos, uint32_t seed, uint8_t i, uint8_t j)
+{
+    srand(seed);
+    systemPos[0] = (float) i * 64 + (randf(48) - 24);
+    systemPos[1] = (float) j * 64 + (randf(48) - 24);
+}
+
 void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* system)
 {
     uint8_t numShips = randr(maxShips);
@@ -391,7 +398,15 @@ void generateSystemName(char* buffer)
     }
     //Make the first letter uppercase
     name[0] &= ~0x20;
-    strcat(buffer, name);
+    //Append if we have a prefix, otherwise overwrite the buffer
+    if(prefix < 23)
+    {
+        strcat(buffer, name);
+    }
+    else
+    {
+        strcpy(buffer, name);
+    }
 
     //Generate number (optional)
     uint8_t num = randr(9 * 3);

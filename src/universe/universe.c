@@ -15,7 +15,7 @@ void initUniverse(StarSystem* starSystem)
     initStarSystem();
     initSpaceStation();
     //Generate system seeds
-    generateSystemSeeds(systemSeeds, 1);
+    generateSystemSeeds(systemSeeds, BASE_SEED);
     //Init starting star system
     currentSystem = 0;
     generateStarSystem(starSystem, systemSeeds[currentSystem]);
@@ -122,7 +122,7 @@ uint32_t* getSystemSeeds()
     return systemSeeds;
 }
 
-uint32_t getCurrentSystem()
+uint16_t getCurrentSystem()
 {
     return currentSystem;
 }

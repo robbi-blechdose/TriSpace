@@ -23,8 +23,8 @@ uint8_t equipCursor;
 //Contracts
 uint8_t contractCursor;
 //Map
-float mapScrollX;
-float mapScrollY;
+uint8_t mapScrollX;
+uint8_t mapScrollY;
 uint8_t mapCursorX;
 uint8_t mapCursorY;
 //Title
@@ -407,6 +407,11 @@ void drawContractUI(Contract* activeContract, Contract* contracts, uint32_t syst
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
 }
 
+void resetContractCursor()
+{
+    contractCursor = 0;
+}
+
 void moveContractCursor(int8_t dir, uint8_t numContracts)
 {
     moveWithRollover(&contractCursor, numContracts - 1, dir);
@@ -425,15 +430,21 @@ void drawMap(uint32_t systemSeeds[])
     //Draw background
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
 
-    for(uint8_t i = 0; i < 16; i++)
+    float systemPos[2];
+    for(uint8_t i = mapScrollX; i < mapScrollX + 4; i++)
     {
-        for(uint8_t j = 0; j < 16; j++)
+        for(uint8_t j = mapScrollY; j < mapScrollY + 3; j++)
         {
             uint8_t numStars = getNumStarsForSystem(systemSeeds[i + j * 16]) - 1;
-            drawTexQuad(8 + i * 48, 56 + j * 48, 16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
+            generateSystemPos(systemPos, systemSeeds[i + j * 16], i, j);
+            drawTexQuad(8 + systemPos[0] - (mapScrollX * 64),
+                        80 + systemPos[1] - (mapScrollY * 64),
+                        16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
         }
     }
-    drawTexQuad(8 + mapCursorX * 48, 56 + mapCursorY * 48, 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
+    generateSystemPos(systemPos, systemSeeds[mapCursorX + mapCursorY * 16], mapCursorX, mapCursorY);
+    drawTexQuad(8 + systemPos[0] - (mapScrollX * 64),
+                80 + systemPos[1] - (mapScrollY * 64), 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
 
     //System info box
     SystemBaseData sbd;
@@ -456,6 +467,7 @@ void drawMap(uint32_t systemSeeds[])
 
 void moveMapCursor(int8_t x, int8_t y)
 {
+    //TODO: Remove rollover, cap in interval 0 - 15
     if(x != 0)
     {
         moveWithRollover(&mapCursorX, 16, x);
@@ -463,6 +475,15 @@ void moveMapCursor(int8_t x, int8_t y)
     if(y != 0)
     {
         moveWithRollover(&mapCursorY, 16, y);
+    }
+
+    if(mapCursorX >= 2)
+    {
+        mapScrollX = mapCursorX - 2;
+    }
+    if(mapCursorY >= 2)
+    {
+        mapScrollY = mapCursorY - 2;
     }
 }
 

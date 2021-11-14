@@ -21,6 +21,8 @@ typedef enum {
     GAME_OVER
 } State;
 
+#define BASE_SEED 1
+
 #define MAX_NPC_SHIPS 8
 
 void initUniverse(StarSystem* starSystem);
@@ -28,6 +30,6 @@ void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship n
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
 void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[]);
 uint32_t* getSystemSeeds();
-uint32_t getCurrentSystem();
+uint16_t getCurrentSystem();
 
 #endif
