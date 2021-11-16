@@ -31,5 +31,6 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
 void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[]);
 uint32_t* getSystemSeeds();
 uint16_t getCurrentSystem();
+float getDistanceToSystem(uint16_t targetSystem);
 
 #endif

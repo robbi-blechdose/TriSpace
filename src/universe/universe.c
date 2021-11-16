@@ -4,6 +4,7 @@
 #include "spacestation.h"
 #include "generator.h"
 #include "../engine/effects.h"
+#include "../engine/util.h"
 #include "../shipAi.h"
 
 uint16_t currentSystem;
@@ -125,4 +126,20 @@ uint32_t* getSystemSeeds()
 uint16_t getCurrentSystem()
 {
     return currentSystem;
+}
+
+//Converts from menu distances (64 units between systems on average) to light years
+#define MENU_TO_LIGHTYEARS(X) ((X) / (64.0f / 3.0f))
+
+float getDistanceToSystem(uint16_t targetSystem)
+{
+    uint8_t x1 = currentSystem % 16;
+    uint8_t y1 = currentSystem == 0 ? 0 : currentSystem / 16;
+    uint8_t x2 = targetSystem % 16;
+    uint8_t y2 = targetSystem == 0 ? 0 : targetSystem / 16;
+    vec2 currentPos;
+    vec2 targetPos;
+    generateSystemPos(&currentPos, systemSeeds[currentSystem], x1, y1);
+    generateSystemPos(&targetPos, systemSeeds[targetSystem], x2, y2);
+    return MENU_TO_LIGHTYEARS(distance2d(&currentPos, &targetPos));
 }

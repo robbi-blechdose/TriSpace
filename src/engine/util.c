@@ -11,6 +11,11 @@ float distance3d(vec3* a, vec3* b)
     return sqrtf(squaref(b->x - a->x) + squaref(b->y - a->y) + squaref(b->z - a->z));
 }
 
+float distance2d(vec2* a, vec2* b)
+{
+    return sqrtf(squaref(b->x - a->x) + squaref(b->y - a->y));
+}
+
 void clampAngle(float* angle)
 {
     if(*angle < 0)
@@ -26,6 +31,11 @@ void clampAngle(float* angle)
 uint32_t randr(uint32_t max)
 {
     return rand() / (RAND_MAX / max + 1);
+}
+
+float randf(float max)
+{
+    return ((float)rand() / (float)(RAND_MAX)) * max;
 }
 
 //Möller-Trumbore algorithm

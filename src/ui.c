@@ -422,7 +422,7 @@ uint8_t getContractCursor()
     return contractCursor;
 }
 
-void drawMap(uint32_t systemSeeds[])
+void drawMap(uint32_t systemSeeds[], float fuel)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mapTexture);
@@ -430,21 +430,31 @@ void drawMap(uint32_t systemSeeds[])
     //Draw background
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
 
-    float systemPos[2];
+    vec2 systemPos;
     for(uint8_t i = mapScrollX; i < mapScrollX + 4; i++)
     {
         for(uint8_t j = mapScrollY; j < mapScrollY + 3; j++)
         {
             uint8_t numStars = getNumStarsForSystem(systemSeeds[i + j * 16]) - 1;
-            generateSystemPos(systemPos, systemSeeds[i + j * 16], i, j);
-            drawTexQuad(8 + systemPos[0] - (mapScrollX * 64),
-                        80 + systemPos[1] - (mapScrollY * 64),
+            generateSystemPos(&systemPos, systemSeeds[i + j * 16], i, j);
+            drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
+                        80 + systemPos.y - (mapScrollY * 64),
                         16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
         }
     }
-    generateSystemPos(systemPos, systemSeeds[mapCursorX + mapCursorY * 16], mapCursorX, mapCursorY);
-    drawTexQuad(8 + systemPos[0] - (mapScrollX * 64),
-                80 + systemPos[1] - (mapScrollY * 64), 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
+    generateSystemPos(&systemPos, systemSeeds[mapCursorX + mapCursorY * 16], mapCursorX, mapCursorY);
+    if(getDistanceToSystem(mapCursorX + mapCursorY * 16) <= fuel)
+    {
+        //Green, we can go there
+        drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
+                    80 + systemPos.y - (mapScrollY * 64), 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
+    }
+    else
+    {
+        //Red, too far away
+        drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
+                    80 + systemPos.y - (mapScrollY * 64), 16, 16, UITH, PTC(241), PTC(64), 1, PTC(80));
+    }
 
     //System info box
     SystemBaseData sbd;

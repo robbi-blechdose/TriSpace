@@ -105,11 +105,6 @@ Color getColorForValue(uint8_t paletteIndex, float value)
     return ret;
 }
 
-float randf(float max)
-{
-    return ((float)rand() / (float)(RAND_MAX)) * max;
-}
-
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
@@ -273,11 +268,11 @@ void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed)
     }
 }
 
-void generateSystemPos(float* systemPos, uint32_t seed, uint8_t i, uint8_t j)
+void generateSystemPos(vec2* systemPos, uint32_t seed, uint8_t i, uint8_t j)
 {
     srand(seed);
-    systemPos[0] = (float) i * 64 + (randf(48) - 24);
-    systemPos[1] = (float) j * 64 + (randf(48) - 24);
+    systemPos->x = (float) i * 64 + (randf(48) - 24);
+    systemPos->y = (float) j * 64 + (randf(48) - 24);
 }
 
 void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* system)

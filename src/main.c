@@ -406,12 +406,12 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(A))
             {
-                //TODO: replace with logic using the actual distance between systems
-                if(playerShip.fuel >= 20)
+                float distance = getDistanceToSystem(getMapCursor());
+                if(playerShip.fuel >= distance)
                 {
                     jumpStart = playerShip.position;
                     state = HYPERSPACE;
-                    playerShip.fuel -= 20;
+                    playerShip.fuel -= distance * 10;
                 }
             }
             break;
@@ -500,7 +500,7 @@ void drawFrame()
         }
         case MAP:
         {
-            drawMap(getSystemSeeds());
+            drawMap(getSystemSeeds(), playerShip.fuel / 10.0f);
             break;
         }
         case TITLE:

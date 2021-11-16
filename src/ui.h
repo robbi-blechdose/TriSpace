@@ -39,7 +39,7 @@ void resetContractCursor();
 void moveContractCursor(int8_t dir, uint8_t numContracts);
 uint8_t getContractCursor();
 
-void drawMap(uint32_t systemSeeds[]);
+void drawMap(uint32_t systemSeeds[], float fuel);
 void moveMapCursor(int8_t x, int8_t y);
 uint16_t getMapCursor();
 

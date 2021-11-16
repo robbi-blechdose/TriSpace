@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include "starsystem.h"
 #include "../ship.h"
+#include "../engine/util.h"
 
 typedef struct {
     uint8_t r;
@@ -23,7 +24,7 @@ uint8_t getNumStarsForSystem(uint32_t seed);
 void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed);
 void generateStarSystem(StarSystem* system, uint32_t seed);
 void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed);
-void generateSystemPos(float* systemPos, uint32_t seed, uint8_t i, uint8_t j);
+void generateSystemPos(vec2* systemPos, uint32_t seed, uint8_t i, uint8_t j);
 void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* system);
 void generateSystemName(char* buffer);
 
