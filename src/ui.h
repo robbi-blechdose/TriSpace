@@ -22,9 +22,7 @@ void initUI();
 
 void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t displayContract, vec3 contractPos);
 
-void drawSaveLoadUI();
-void toggleSaveLoadCursor();
-uint8_t getSaveLoadCursor();
+void drawSaveLoadUI(uint8_t cursor);
 
 void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info);
 void moveTradeCursor(int8_t dir);
@@ -34,14 +32,14 @@ void drawEquipUI(Ship* playerShip);
 void moveEquipCursor(int8_t dir);
 uint8_t getEquipCursor();
 
-void drawContractUI(Contract* activeContract, Contract* contracts, uint32_t systemSeeds[], uint8_t numContracts);
+void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numContracts);
 void resetContractCursor();
 void moveContractCursor(int8_t dir, uint8_t numContracts);
 uint8_t getContractCursor();
 
-void drawMap(uint32_t systemSeeds[], float fuel);
+void drawMap(uint8_t currentSystem[2], float fuel);
 void moveMapCursor(int8_t x, int8_t y);
-uint16_t getMapCursor();
+void getMapCursor(uint8_t mapCursor[2]);
 
 void drawTitleScreen();
 void toggleTitleCursor();

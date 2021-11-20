@@ -24,7 +24,7 @@
 #define MAX_FPS 50
 //#define LIMIT_FPS
 
-#define SAVE_VERSION 201
+#define SAVE_VERSION 300
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
@@ -43,11 +43,12 @@ uint8_t running = 1;
 //---------- Main game stuff ----------//
 State state;
 
+uint8_t currentSystem[2];
 StarSystem starSystem;
 vec3 jumpStart;
 
 CargoHold stationHold;
-Contract stationContracts[4];
+Contract stationContracts[MAX_STATION_CONTRACTS];
 uint8_t numStationContracts;
 
 Ship playerShip;
@@ -55,8 +56,11 @@ Ship npcShips[MAX_NPC_SHIPS];
 
 Contract currentContract;
 
+uint8_t uiSaveLoadCursor;
+
 //-------------------------------------//
 
+#ifdef DEBUG
 void drawFPS(uint16_t fps)
 {
     char buffer[12];
@@ -65,17 +69,18 @@ void drawFPS(uint16_t fps)
 	sprintf(buffer, "FPS: %i", counterResult);
 	glDrawText(buffer, 2, 10, 0xFFFFFF);
 }
+#endif
 
 uint8_t saveGame()
 {
     openSave(".trispace", "game.sav", 1);
-    uint8_t version = SAVE_VERSION;
+    uint16_t version = SAVE_VERSION;
     writeElement(&version, sizeof(version));
     writeElement(&playerShip.type, sizeof(playerShip.type));
     writeElement(&playerShip.hold, sizeof(playerShip.hold));
     writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
-    uint16_t currentSystem = getCurrentSystem();
-    writeElement(&currentSystem, sizeof(uint16_t));
+    writeElement(&currentSystem[0], sizeof(uint8_t));
+    writeElement(&currentSystem[1], sizeof(uint8_t));
     writeElement(&currentContract, sizeof(currentContract));
     closeSave();
     return 1;
@@ -84,16 +89,17 @@ uint8_t saveGame()
 uint8_t loadGame()
 {
     openSave(".trispace", "game.sav", 0);
-    uint8_t version = 0;
+    uint16_t version = 0;
     readElement(&version, sizeof(version));
     if((version / 100) == (SAVE_VERSION / 100)) //Check major version for save compatability
     {
         readElement(&playerShip.type, sizeof(playerShip.type));
         readElement(&playerShip.hold, sizeof(playerShip.hold));
         readElement(&playerShip.fuel, sizeof(playerShip.fuel));
-        uint16_t savedSystem;
-        readElement(&savedSystem, sizeof(uint16_t));
-        switchSystem(savedSystem, &starSystem, npcShips);
+        uint8_t savedSystem[2];
+        readElement(&savedSystem[0], sizeof(uint8_t));
+        readElement(&savedSystem[1], sizeof(uint8_t));
+        switchSystem(currentSystem, savedSystem, &starSystem, npcShips);
         readElement(&currentContract, sizeof(currentContract));
         return 1;
     }
@@ -190,13 +196,17 @@ void calcFrame(uint32_t ticks)
         }
         case HYPERSPACE:
         {
-            if(getCurrentSystem() != getMapCursor())
+            uint8_t mapCursorTemp[2];
+            getMapCursor(mapCursorTemp);
+            if(currentSystem[0] != mapCursorTemp[0] || currentSystem[1] != mapCursorTemp[1])
             {
                 playerShip.speed += (500.0f * ticks) / 1000.0f;
                 if(playerShip.speed > 500)
                 {
-                    switchSystem(getMapCursor(), &starSystem, npcShips);
+                    switchSystem(currentSystem, mapCursorTemp, &starSystem, npcShips);
                     playerShip.position = jumpStart;
+                    //Generate contracts for this system
+                    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem);
                 }
             }
             else
@@ -217,11 +227,18 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(U) || keyUp(D))
             {
-                toggleSaveLoadCursor();
+                if(uiSaveLoadCursor)
+                {
+                    uiSaveLoadCursor = 0;
+                }
+                else
+                {
+                    uiSaveLoadCursor = 1;
+                }
             }
             else if(keyUp(A))
             {
-                if(getSaveLoadCursor() == 0)
+                if(uiSaveLoadCursor == 0)
                 {
                     saveGame();
                     //TODO: Read return value and display success or error message
@@ -360,7 +377,7 @@ void calcFrame(uint32_t ticks)
                 }
                 else
                 {
-                    if(checkContract(&currentContract, &playerShip.hold, getCurrentSystem()))
+                    if(checkContract(&currentContract, &playerShip.hold, currentSystem))
                     {
                         currentContract.type = CONTRACT_TYPE_NULL;
                         resetContractCursor();
@@ -406,7 +423,9 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(A))
             {
-                float distance = getDistanceToSystem(getMapCursor());
+                uint8_t mapCursorTemp[2];
+                getMapCursor(mapCursorTemp);
+                float distance = getDistanceToSystem(currentSystem, mapCursorTemp);
                 if(playerShip.fuel >= distance)
                 {
                     jumpStart = playerShip.position;
@@ -466,7 +485,9 @@ void drawFrame()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
 
+    #ifdef DEBUG
     drawFPS(fps);
+    #endif
 
     setOrtho();
     switch(state)
@@ -480,7 +501,7 @@ void drawFrame()
         }
         case SAVELOAD:
         {
-            drawSaveLoadUI();
+            drawSaveLoadUI(uiSaveLoadCursor);
             break;
         }
         case TRADING:
@@ -495,12 +516,12 @@ void drawFrame()
         }
         case CONTRACTS:
         {
-            drawContractUI(&currentContract, stationContracts, getSystemSeeds(), numStationContracts);
+            drawContractUI(&currentContract, stationContracts, numStationContracts);
             break;
         }
         case MAP:
         {
-            drawMap(getSystemSeeds(), playerShip.fuel / 10.0f);
+            drawMap(currentSystem, playerShip.fuel / 10.0f);
             break;
         }
         case TITLE:
@@ -552,18 +573,12 @@ int main(int argc, char **argv)
 
     //Initialize main systems
     initUI();
-    initUniverse(&starSystem);
+    initUniverse(currentSystem, &starSystem);
     initShip();
     createStationHold(&stationHold);
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;
-
-    //TODO: Remove test
-    numStationContracts = 4;
-    for(uint8_t i = 0; i < numStationContracts; i++)
-    {
-        stationContracts[i] = generateContract(0, &starSystem.info);
-    }
+    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem);
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

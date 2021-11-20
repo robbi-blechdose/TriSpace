@@ -7,10 +7,9 @@
 #include "../engine/util.h"
 #include "../shipAi.h"
 
-uint16_t currentSystem;
-uint32_t systemSeeds[256]; //16x16
+uint32_t systemSeeds[UNIVERSE_SIZE][UNIVERSE_SIZE];
 
-void initUniverse(StarSystem* starSystem)
+void initUniverse(uint8_t* currentSystem, StarSystem* starSystem)
 {
     initEffects();
     initStarSystem();
@@ -18,19 +17,21 @@ void initUniverse(StarSystem* starSystem)
     //Generate system seeds
     generateSystemSeeds(systemSeeds, BASE_SEED);
     //Init starting star system
-    currentSystem = 0;
-    generateStarSystem(starSystem, systemSeeds[currentSystem]);
+    currentSystem[0] = 0;
+    currentSystem[1] = 0;
+    generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
 }
 
-void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[])
+void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[])
 {
-    if(newSystem == currentSystem)
+    if(newSystem[0] == currentSystem[0] && newSystem[1] == currentSystem[1])
     {
         return;
     }
-    currentSystem = newSystem;
+    currentSystem[0] = newSystem[0];
+    currentSystem[1] = newSystem[1];
     deleteStarSystem(starSystem);
-    generateStarSystem(starSystem, systemSeeds[currentSystem]);
+    generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
         npcShips[i].type = TYPE_NULL;
@@ -118,28 +119,19 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
     }
 }
 
-uint32_t* getSystemSeeds()
+uint32_t getSeedForSystem(uint8_t x, uint8_t y)
 {
-    return systemSeeds;
-}
-
-uint16_t getCurrentSystem()
-{
-    return currentSystem;
+    return systemSeeds[x][y];
 }
 
 //Converts from menu distances (64 units between systems on average) to light years
 #define MENU_TO_LIGHTYEARS(X) ((X) / (64.0f / 3.0f))
 
-float getDistanceToSystem(uint16_t targetSystem)
+float getDistanceToSystem(uint8_t currentSystem[2], uint8_t targetSystem[2])
 {
-    uint8_t x1 = currentSystem % 16;
-    uint8_t y1 = currentSystem == 0 ? 0 : currentSystem / 16;
-    uint8_t x2 = targetSystem % 16;
-    uint8_t y2 = targetSystem == 0 ? 0 : targetSystem / 16;
     vec2 currentPos;
     vec2 targetPos;
-    generateSystemPos(&currentPos, systemSeeds[currentSystem], x1, y1);
-    generateSystemPos(&targetPos, systemSeeds[targetSystem], x2, y2);
+    generateSystemPos(&currentPos, systemSeeds[currentSystem[0]][currentSystem[1]], currentSystem[0], currentSystem[1]);
+    generateSystemPos(&targetPos, systemSeeds[targetSystem[0]][targetSystem[1]], targetSystem[0], targetSystem[1]);
     return MENU_TO_LIGHTYEARS(distance2d(&currentPos, &targetPos));
 }

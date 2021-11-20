@@ -14,8 +14,6 @@ GLuint mapTexture;
 uint8_t cursorX;
 uint8_t cursorY;
 
-//Save/Load
-uint8_t saveLoadCursor;
 //Trading
 uint8_t tradeCursor;
 //Equip
@@ -25,8 +23,7 @@ uint8_t contractCursor;
 //Map
 uint8_t mapScrollX;
 uint8_t mapScrollY;
-uint8_t mapCursorX;
-uint8_t mapCursorY;
+uint8_t mapCursor[2];
 //Title
 uint8_t titleCursor;
 
@@ -40,12 +37,11 @@ void initUI()
     cursorX = 0;
     cursorY = 0;
 
-    saveLoadCursor = 0;
     tradeCursor = 0;
     equipCursor = 0;
     contractCursor = 0;
-    mapCursorX = 0;
-    mapCursorY = 0;
+    mapCursor[0] = 0;
+    mapCursor[1] = 0;
     titleCursor = 0;
 }
 
@@ -183,7 +179,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
     glEnd();
 }
 
-void drawSaveLoadUI()
+void drawSaveLoadUI(uint8_t cursor)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -195,9 +191,7 @@ void drawSaveLoadUI()
     glEnd();
     glDrawText("Save & Load", CENTER(11), 2, 0xFFFFFF);
 
-    char buffer[29];
-
-    if(saveLoadCursor == 0)
+    if(cursor == 0)
     {
         glDrawText("Save game", CENTER(9), 32, 0x00FFFF);
         glDrawText("Load game", CENTER(9), 48, 0xFFFFFF);
@@ -209,23 +203,6 @@ void drawSaveLoadUI()
     }
 
     glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, 0xFFFFFF);
-}
-
-void toggleSaveLoadCursor()
-{
-    if(saveLoadCursor == 0)
-    {
-        saveLoadCursor = 1;
-    }
-    else
-    {
-        saveLoadCursor = 0;
-    }
-}
-
-uint8_t getSaveLoadCursor()
-{
-    return saveLoadCursor;
 }
 
 void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
@@ -352,7 +329,7 @@ void moveEquipCursor(int8_t dir)
     moveWithRollover(&equipCursor, NUM_EQUIPMENT - 1, dir);
 }
 
-void drawContract(Contract* contract, uint8_t cursor, uint32_t systemSeeds[], uint8_t numContracts)
+void drawContract(Contract* contract, uint8_t cursor, uint8_t numContracts)
 {
     glBegin(GL_QUADS);
     drawTexQuad(4, 194, 32, 32, UITH, PTC(240), PTC(16 + contract->type * 16),
@@ -378,7 +355,7 @@ void drawContract(Contract* contract, uint8_t cursor, uint32_t systemSeeds[], ui
     glDrawText("Destination system:", 40, 64, 0xFFFFFF);
 
     SystemBaseData sbd;
-    generateSystemBaseData(&sbd, systemSeeds[contract->targetSystem]);
+    generateSystemBaseData(&sbd, getSeedForSystem(contract->targetSystem[0], contract->targetSystem[1]));
     glDrawText(sbd.info.name, 40, 72, 0xFFFFFF);
 
     glDrawText("Objective:", 40, 88, 0xFFFFFF);
@@ -386,7 +363,7 @@ void drawContract(Contract* contract, uint8_t cursor, uint32_t systemSeeds[], ui
     glDrawText(buffer, 40, 96, 0xFFFFFF);
 }
 
-void drawContractUI(Contract* activeContract, Contract* contracts, uint32_t systemSeeds[], uint8_t numContracts)
+void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numContracts)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -397,11 +374,11 @@ void drawContractUI(Contract* activeContract, Contract* contracts, uint32_t syst
 
     if(activeContract->type != CONTRACT_TYPE_NULL)
     {
-        drawContract(activeContract, 0, systemSeeds, numContracts);
+        drawContract(activeContract, 0, numContracts);
     }
     else
     {
-        drawContract(&contracts[contractCursor], contractCursor + 1, systemSeeds, numContracts);
+        drawContract(&contracts[contractCursor], contractCursor + 1, numContracts);
     }
 
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
@@ -422,7 +399,7 @@ uint8_t getContractCursor()
     return contractCursor;
 }
 
-void drawMap(uint32_t systemSeeds[], float fuel)
+void drawMap(uint8_t currentSystem[2], float fuel)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mapTexture);
@@ -435,15 +412,15 @@ void drawMap(uint32_t systemSeeds[], float fuel)
     {
         for(uint8_t j = mapScrollY; j < mapScrollY + 3; j++)
         {
-            uint8_t numStars = getNumStarsForSystem(systemSeeds[i + j * 16]) - 1;
-            generateSystemPos(&systemPos, systemSeeds[i + j * 16], i, j);
+            uint8_t numStars = getNumStarsForSystem(getSeedForSystem(i, j)) - 1;
+            generateSystemPos(&systemPos, getSeedForSystem(i, j), i, j);
             drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
                         80 + systemPos.y - (mapScrollY * 64),
                         16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
         }
     }
-    generateSystemPos(&systemPos, systemSeeds[mapCursorX + mapCursorY * 16], mapCursorX, mapCursorY);
-    if(getDistanceToSystem(mapCursorX + mapCursorY * 16) <= fuel)
+    generateSystemPos(&systemPos, getSeedForSystem(mapCursor[0], mapCursor[1]), mapCursor[0], mapCursor[1]);
+    if(getDistanceToSystem(currentSystem, mapCursor) <= fuel)
     {
         //Green, we can go there
         drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
@@ -458,7 +435,7 @@ void drawMap(uint32_t systemSeeds[], float fuel)
 
     //System info box
     SystemBaseData sbd;
-    generateSystemBaseData(&sbd, systemSeeds[getMapCursor()]);
+    generateSystemBaseData(&sbd, getSeedForSystem(mapCursor[0], mapCursor[1]));
     char buffer[29];
     glDrawText("System information", 48, 195, 0xFFFFFF);
     glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 204, 0xFFFFFF);
@@ -480,27 +457,27 @@ void moveMapCursor(int8_t x, int8_t y)
     //TODO: Remove rollover, cap in interval 0 - 15
     if(x != 0)
     {
-        moveWithRollover(&mapCursorX, 16, x);
+        moveWithRollover(&mapCursor[0], 16, x);
     }
     if(y != 0)
     {
-        moveWithRollover(&mapCursorY, 16, y);
+        moveWithRollover(&mapCursor[1], 16, y);
     }
 
-    if(mapCursorX >= 2)
+    if(mapCursor[0] >= 2)
     {
-        mapScrollX = mapCursorX - 2;
+        mapScrollX = mapCursor[0] - 2;
     }
-    if(mapCursorY >= 2)
+    if(mapCursor[1] >= 2)
     {
-        mapScrollY = mapCursorY - 2;
+        mapScrollY = mapCursor[1] - 2;
     }
 }
 
-uint16_t getMapCursor()
+void getMapCursor(uint8_t ret[2])
 {
-    uint16_t ret = mapCursorY * 16 + mapCursorX;
-    return ret;
+    ret[0] = mapCursor[0];
+    ret[1] = mapCursor[1];
 }
 
 //TODO: Title screen texture

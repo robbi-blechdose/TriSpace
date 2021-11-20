@@ -1,5 +1,6 @@
 #include "contracts.h"
 #include "engine/util.h"
+#include "universe/universe.h"
 
 const char* contractTypes[NUM_CONTRACT_TYPES] = {
     "Obtain cargo",
@@ -33,10 +34,34 @@ const char* contractLastnames[NUM_LASTNAMES] = {
     "Smith",
     "Davies",
     "Brown",
-    "Hathaway"
+    "Hathaway",
+    "Shelby",
+    "Fox"
 };
 
-Contract generateContract(uint16_t currentStarSystem, SystemInfo* info)
+uint16_t selectTargetSystem(uint8_t currentStarSystem[2], uint8_t contractDifficulty)
+{
+    uint16_t possibleSystems[16];
+    uint8_t possibleSystemsIndex = 0;
+
+    float maxDistance = 7.0f * contractDifficulty;
+
+    for(uint8_t i = 0; i < 16; i++)
+    {
+        for(uint8_t j = 0; j < 16; j++)
+        {
+            uint8_t targetSystem[2] = {i, j};
+            if(getDistanceToSystem(currentStarSystem, targetSystem) <= maxDistance)
+            {
+                possibleSystems[possibleSystemsIndex++] = i + j * 16;
+            }
+        }
+    }
+
+    return possibleSystems[randr(possibleSystemsIndex - 1)];
+}
+
+Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info)
 {
     Contract c;
     c.type = randr(NUM_CONTRACT_TYPES);
@@ -47,7 +72,8 @@ Contract generateContract(uint16_t currentStarSystem, SystemInfo* info)
     {
         case CONTRACT_GET_ITEM:
         {
-            c.targetSystem = currentStarSystem;
+            c.targetSystem[0] = currentStarSystem[0];
+            c.targetSystem[1] = currentStarSystem[1];
             c.cargo = randr(NUM_CARGO_TYPES);
             c.cargoAmount = 1 + randr(20);
             c.pay = getPriceForCargo(c.cargo, info) * c.cargoAmount + 50 + randr(400);
@@ -55,7 +81,9 @@ Contract generateContract(uint16_t currentStarSystem, SystemInfo* info)
         }
         case CONTRACT_SMUGGLE:
         {
-            c.targetSystem = currentStarSystem + randr(3); //TODO: Improve this once we have a proper system map going
+            //TODO: Improve
+            c.targetSystem[0] = currentStarSystem[0];
+            c.targetSystem[1] = currentStarSystem[1];
             c.targetPosition = (vec3){0, 0, 0}; //TODO: Get position of space station in target system!
             if(randr(100) > 40)
             {
@@ -75,7 +103,9 @@ Contract generateContract(uint16_t currentStarSystem, SystemInfo* info)
         }
         case CONTRACT_DESTROY_SHIP:
         {
-            c.targetSystem = currentStarSystem + randr(3); //TODO: Improve this once we have a proper system map going
+            //TODO: Improve
+            c.targetSystem[0] = currentStarSystem[0];
+            c.targetSystem[1] = currentStarSystem[1];
             //TODO
             c.targetPosition.x = 0;
             c.targetPosition.y = 0;
@@ -83,6 +113,16 @@ Contract generateContract(uint16_t currentStarSystem, SystemInfo* info)
         }
     }
     return c;
+}
+
+void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2])
+{
+    *numStationContracts = MIN_STATION_CONTRACTS + randr(MAX_STATION_CONTRACTS - MIN_STATION_CONTRACTS);
+
+    for(uint8_t i = 0; i < *numStationContracts; i++)
+    {
+        stationContracts[i] = generateContract(currentSystem, info);
+    }
 }
 
 uint8_t activateContract(Contract* contract, CargoHold* playerHold)
@@ -111,9 +151,9 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
     return 0;
 }
 
-uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint16_t currentSystem)
+uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2])
 {
-    if(currentSystem != contract->targetSystem)
+    if(currentSystem[0] != contract->targetSystem[0] || currentSystem[1] != contract->targetSystem[1])
     {
         return 0;
     }

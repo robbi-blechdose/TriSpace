@@ -17,7 +17,7 @@ typedef struct {
 
     uint16_t pay;
 
-    uint16_t targetSystem;
+    uint8_t targetSystem[2];
     vec3 targetPosition;
     CargoType cargo;
     uint8_t cargoAmount;
@@ -28,12 +28,17 @@ typedef struct {
 
 #define NUM_FIRSTNAMES 13
 extern const char* contractFirstnames[NUM_FIRSTNAMES];
-#define NUM_LASTNAMES 9
+#define NUM_LASTNAMES 11
 extern const char* contractLastnames[NUM_LASTNAMES];
 
-Contract generateContract(uint16_t currentStarSystem, SystemInfo* info);
+#define MIN_STATION_CONTRACTS 2
+#define MAX_STATION_CONTRACTS 5
+
+Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info);
+void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2]);
+
 uint8_t activateContract(Contract* contract, CargoHold* playerHold);
-uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint16_t currentSystem);
+uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2]);
 void printObjective(char* str, Contract* contract);
 
 #endif

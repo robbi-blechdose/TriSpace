@@ -22,15 +22,15 @@ typedef enum {
 } State;
 
 #define BASE_SEED 1
+#define UNIVERSE_SIZE 16
 
 #define MAX_NPC_SHIPS 8
 
-void initUniverse(StarSystem* starSystem);
+void initUniverse(uint8_t* currentSystem, StarSystem* starSystem);
 void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
-void switchSystem(uint16_t newSystem, StarSystem* starSystem, Ship npcShips[]);
-uint32_t* getSystemSeeds();
-uint16_t getCurrentSystem();
-float getDistanceToSystem(uint16_t targetSystem);
+void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[]);
+uint32_t getSeedForSystem(uint8_t x, uint8_t y);
+float getDistanceToSystem(uint8_t currentSystem[2], uint8_t targetSystem[2]);
 
 #endif
