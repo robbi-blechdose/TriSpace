@@ -57,6 +57,11 @@ Ship npcShips[MAX_NPC_SHIPS];
 Contract currentContract;
 
 uint8_t uiSaveLoadCursor;
+uint8_t uiTradeCursor;
+uint8_t uiEquipCursor;
+uint8_t uiContractCursor;
+uint8_t uiMapCursor[2];
+uint8_t uiTitleCursor;
 
 //-------------------------------------//
 
@@ -196,14 +201,12 @@ void calcFrame(uint32_t ticks)
         }
         case HYPERSPACE:
         {
-            uint8_t mapCursorTemp[2];
-            getMapCursor(mapCursorTemp);
-            if(currentSystem[0] != mapCursorTemp[0] || currentSystem[1] != mapCursorTemp[1])
+            if(currentSystem[0] != uiMapCursor[0] || currentSystem[1] != uiMapCursor[1])
             {
                 playerShip.speed += (500.0f * ticks) / 1000.0f;
                 if(playerShip.speed > 500)
                 {
-                    switchSystem(currentSystem, mapCursorTemp, &starSystem, npcShips);
+                    switchSystem(currentSystem, uiMapCursor, &starSystem, npcShips);
                     playerShip.position = jumpStart;
                     //Generate contracts for this system
                     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem);
@@ -263,19 +266,26 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(U))
             {
-                moveTradeCursor(-1);
+                if(uiTradeCursor > 0)
+                {
+                    uiTradeCursor--;
+                }
+                else
+                {
+                    uiTradeCursor = NUM_CARGO_TYPES - 1;
+                }
             }
             else if(keyUp(D))
             {
-                moveTradeCursor(1);
+                uiTradeCursor = (uiTradeCursor + 1) % NUM_CARGO_TYPES;
             }
             else if(keyUp(L))
             {
-                transferCargo(&playerShip.hold, &stationHold, getTradeCursor(), &starSystem.info);
+                transferCargo(&playerShip.hold, &stationHold, uiTradeCursor, &starSystem.info);
             }
             else if(keyUp(R))
             {
-                transferCargo(&stationHold, &playerShip.hold, getTradeCursor(), &starSystem.info);
+                transferCargo(&stationHold, &playerShip.hold, uiTradeCursor, &starSystem.info);
             }
             else if(keyUp(B))
             {
@@ -295,15 +305,22 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(U))
             {
-                moveEquipCursor(-1);
+                if(uiEquipCursor > 0)
+                {
+                    uiEquipCursor--;
+                }
+                else
+                {
+                    uiEquipCursor = NUM_EQUIPMENT - 1;
+                }
             }
             else if(keyUp(D))
             {
-                moveEquipCursor(1);
+                uiEquipCursor = (uiEquipCursor + 1) % NUM_EQUIPMENT;
             }
             else if(keyUp(A))
             {
-                switch(getEquipCursor())
+                switch(uiEquipCursor)
                 {
                     case EQUIP_FUEL:
                     {
@@ -347,17 +364,17 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(U))
             {
-                moveContractCursor(-1, numStationContracts);
+                moveCursorUp(&uiContractCursor, numStationContracts - 1);
             }
             else if(keyUp(D))
             {
-                moveContractCursor(1, numStationContracts);
+                moveCursorDown(&uiContractCursor, numStationContracts - 1);
             }
             else if(keyUp(A))
             {
                 if(currentContract.type == CONTRACT_TYPE_NULL)
                 {
-                    uint8_t contractCursor = getContractCursor();
+                    uint8_t contractCursor = uiContractCursor;
                     if(activateContract(&stationContracts[contractCursor], &playerShip.hold))
                     {
                         currentContract = stationContracts[contractCursor];
@@ -380,7 +397,7 @@ void calcFrame(uint32_t ticks)
                     if(checkContract(&currentContract, &playerShip.hold, currentSystem))
                     {
                         currentContract.type = CONTRACT_TYPE_NULL;
-                        resetContractCursor();
+                        uiContractCursor = 0;
                         //TODO: Display completion screen
                     }
                 }
@@ -397,35 +414,42 @@ void calcFrame(uint32_t ticks)
         }
         case MAP:
         {
-            int8_t dirX = 0;
-            int8_t dirY = 0;
             if(keyUp(U))
             {
-                dirY = 1;
+                if(uiMapCursor[1] < UNIVERSE_SIZE - 1)
+                {
+                    uiMapCursor[1]++;
+                }
             }
             else if(keyUp(D))
             {
-                dirY = -1;
+                if(uiMapCursor[1] > 0)
+                {
+                    uiMapCursor[1]--;
+                }
             }
             if(keyUp(L))
             {
-                dirX = -1;
+                if(uiMapCursor[0] > 0)
+                {
+                    uiMapCursor[0]--;
+                }
             }
             else if(keyUp(R))
             {
-                dirX = 1;
+                if(uiMapCursor[0] < UNIVERSE_SIZE - 1)
+                {
+                    uiMapCursor[0]++;
+                }
             }
 
-            moveMapCursor(dirX, dirY);
             if(keyUp(S))
             {
                 state = SPACE;
             }
             else if(keyUp(A))
             {
-                uint8_t mapCursorTemp[2];
-                getMapCursor(mapCursorTemp);
-                float distance = getDistanceToSystem(currentSystem, mapCursorTemp);
+                float distance = getDistanceToSystem(currentSystem, uiMapCursor);
                 if(playerShip.fuel >= distance)
                 {
                     jumpStart = playerShip.position;
@@ -439,11 +463,18 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(U) || keyUp(D))
             {
-                toggleTitleCursor();
+                if(uiTitleCursor)
+                {
+                    uiTitleCursor = 0;
+                }
+                else
+                {
+                    uiTitleCursor = 1;
+                }
             }
             else if(keyUp(A) || keyUp(S))
             {
-                if(getTitleCursor() == 0)
+                if(uiTitleCursor == 0)
                 {
                     //Init new game
                     //Temporary (TODO: REMOVE)
@@ -506,27 +537,27 @@ void drawFrame()
         }
         case TRADING:
         {
-            drawTradingUI(&playerShip.hold, &stationHold, &starSystem.info);
+            drawTradingUI(uiTradeCursor, &playerShip.hold, &stationHold, &starSystem.info);
             break;
         }
         case EQUIP:
         {
-            drawEquipUI(&playerShip);
+            drawEquipUI(uiEquipCursor, &playerShip);
             break;
         }
         case CONTRACTS:
         {
-            drawContractUI(&currentContract, stationContracts, numStationContracts);
+            drawContractUI(uiContractCursor, &currentContract, stationContracts, numStationContracts);
             break;
         }
         case MAP:
         {
-            drawMap(currentSystem, playerShip.fuel / 10.0f);
+            drawMap(uiMapCursor, currentSystem, playerShip.fuel / 10.0f);
             break;
         }
         case TITLE:
         {
-            drawTitleScreen();
+            drawTitleScreen(uiTitleCursor);
             break;
         }
     }
@@ -570,6 +601,15 @@ int main(int argc, char **argv)
     float clipOrtho[] = {-15, 0};
     initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
     setPerspective();
+
+    //Init UI variables to zero
+    uiSaveLoadCursor = 0;
+    uiTradeCursor = 0;
+    uiEquipCursor = 0;
+    uiContractCursor = 0;
+    uiMapCursor[0] = 0;
+    uiMapCursor[1] = 0;
+    uiTitleCursor = 0;
 
     //Initialize main systems
     initUI();

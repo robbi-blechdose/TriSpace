@@ -11,21 +11,9 @@ GLuint firingTexture;
 GLuint stationUITexture;
 GLuint mapTexture;
 
-uint8_t cursorX;
-uint8_t cursorY;
-
-//Trading
-uint8_t tradeCursor;
-//Equip
-uint8_t equipCursor;
-//Contracts
-uint8_t contractCursor;
 //Map
 uint8_t mapScrollX;
 uint8_t mapScrollY;
-uint8_t mapCursor[2];
-//Title
-uint8_t titleCursor;
 
 void initUI()
 {
@@ -34,15 +22,6 @@ void initUI()
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
     mapTexture = loadRGBTexture("res/UI/map.png");
-    cursorX = 0;
-    cursorY = 0;
-
-    tradeCursor = 0;
-    equipCursor = 0;
-    contractCursor = 0;
-    mapCursor[0] = 0;
-    mapCursor[1] = 0;
-    titleCursor = 0;
 }
 
 void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
@@ -56,26 +35,6 @@ void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
     glVertex3f(posX + sizeX, posY + sizeY - 1, z);
     glTexCoord2f(texX1, texY1);
     glVertex3f(posX, posY + sizeY - 1, z);
-}
-
-void moveWithRollover(uint8_t* i, uint8_t max, int8_t dir)
-{
-    if(dir > 0)
-    {
-        (*i)++;
-        (*i) %= (max + 1);
-    }
-    else
-    {
-        if(*i > 0)
-        {
-            (*i)--;
-        }
-        else
-        {
-            (*i) = max;
-        }
-    }
 }
 
 //UI Base Height
@@ -205,7 +164,7 @@ void drawSaveLoadUI(uint8_t cursor)
     glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
 
-void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
+void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -225,7 +184,7 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
         printUnitForCargo(type, i);
         sprintf(buffer, "%-13s%3s %5d  %2d|%2d", name, type, getPriceForCargo(i, info),
                                                     stationHold->cargo[i], playerHold->cargo[i]);
-        if(i == tradeCursor)
+        if(i == cursor)
         {
             glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
         }
@@ -242,23 +201,13 @@ void drawTradingUI(CargoHold* playerHold, CargoHold* stationHold, SystemInfo* in
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
 
-void moveTradeCursor(int8_t dir)
-{
-    moveWithRollover(&tradeCursor, NUM_CARGO_TYPES - 1, dir);
-}
-
-uint8_t getTradeCursor()
-{
-    return tradeCursor;
-}
-
 uint16_t equipmentPrices[3] = {
     2,
     1500,
     2000
 };
 
-void drawEquipUI(Ship* playerShip)
+void drawEquipUI(uint8_t cursor, Ship* playerShip)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -302,7 +251,7 @@ void drawEquipUI(Ship* playerShip)
                 break;
             }
         }
-        if(i == equipCursor)
+        if(i == cursor)
         {
             glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
         }
@@ -317,16 +266,6 @@ void drawEquipUI(Ship* playerShip)
 
     glDrawText("Trading", 12, 240 - 10, 0xFFFFFF);
     glDrawText("Contracts", 240 - 9 * 8 - 12, 240 - 10, 0xFFFFFF);
-}
-
-uint8_t getEquipCursor()
-{
-    return equipCursor;
-}
-
-void moveEquipCursor(int8_t dir)
-{
-    moveWithRollover(&equipCursor, NUM_EQUIPMENT - 1, dir);
 }
 
 void drawContract(Contract* contract, uint8_t cursor, uint8_t numContracts)
@@ -363,7 +302,7 @@ void drawContract(Contract* contract, uint8_t cursor, uint8_t numContracts)
     glDrawText(buffer, 40, 96, 0xFFFFFF);
 }
 
-void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numContracts)
+void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contracts, uint8_t numContracts)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -378,29 +317,24 @@ void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numCo
     }
     else
     {
-        drawContract(&contracts[contractCursor], contractCursor + 1, numContracts);
+        drawContract(&contracts[cursor], cursor + 1, numContracts);
     }
 
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
 }
 
-void resetContractCursor()
+void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
 {
-    contractCursor = 0;
-}
+    //Recalculate scroll values
+    if(cursor[0] >= 2)
+    {
+        mapScrollX = cursor[0] - 2;
+    }
+    if(cursor[1] >= 2)
+    {
+        mapScrollY = cursor[1] - 2;
+    }
 
-void moveContractCursor(int8_t dir, uint8_t numContracts)
-{
-    moveWithRollover(&contractCursor, numContracts - 1, dir);
-}
-
-uint8_t getContractCursor()
-{
-    return contractCursor;
-}
-
-void drawMap(uint8_t currentSystem[2], float fuel)
-{
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mapTexture);
     glBegin(GL_QUADS);
@@ -419,8 +353,8 @@ void drawMap(uint8_t currentSystem[2], float fuel)
                         16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
         }
     }
-    generateSystemPos(&systemPos, getSeedForSystem(mapCursor[0], mapCursor[1]), mapCursor[0], mapCursor[1]);
-    if(getDistanceToSystem(currentSystem, mapCursor) <= fuel)
+    generateSystemPos(&systemPos, getSeedForSystem(cursor[0], cursor[1]), cursor[0], cursor[1]);
+    if(getDistanceToSystem(currentSystem, cursor) <= fuel)
     {
         //Green, we can go there
         drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
@@ -435,7 +369,7 @@ void drawMap(uint8_t currentSystem[2], float fuel)
 
     //System info box
     SystemBaseData sbd;
-    generateSystemBaseData(&sbd, getSeedForSystem(mapCursor[0], mapCursor[1]));
+    generateSystemBaseData(&sbd, getSeedForSystem(cursor[0], cursor[1]));
     char buffer[29];
     glDrawText("System information", 48, 195, 0xFFFFFF);
     glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 204, 0xFFFFFF);
@@ -452,36 +386,8 @@ void drawMap(uint8_t currentSystem[2], float fuel)
     glEnd();
 }
 
-void moveMapCursor(int8_t x, int8_t y)
-{
-    //TODO: Remove rollover, cap in interval 0 - 15
-    if(x != 0)
-    {
-        moveWithRollover(&mapCursor[0], 16, x);
-    }
-    if(y != 0)
-    {
-        moveWithRollover(&mapCursor[1], 16, y);
-    }
-
-    if(mapCursor[0] >= 2)
-    {
-        mapScrollX = mapCursor[0] - 2;
-    }
-    if(mapCursor[1] >= 2)
-    {
-        mapScrollY = mapCursor[1] - 2;
-    }
-}
-
-void getMapCursor(uint8_t ret[2])
-{
-    ret[0] = mapCursor[0];
-    ret[1] = mapCursor[1];
-}
-
 //TODO: Title screen texture
-void drawTitleScreen()
+void drawTitleScreen(uint8_t cursor)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -490,7 +396,7 @@ void drawTitleScreen()
     glEnd();
     glDrawText("TriSpace", CENTER(8), 2, 0xFFFFFF);
 
-    if(titleCursor == 0)
+    if(cursor == 0)
     {
         glDrawText("New game", CENTER(8), 32, 0x00FFFF);
         glDrawText("Load game", CENTER(9), 48, 0xFFFFFF);
@@ -502,19 +408,20 @@ void drawTitleScreen()
     }
 }
 
-void toggleTitleCursor()
+void moveCursorDown(uint8_t* i, uint8_t max)
 {
-    if(titleCursor != 0)
+    (*i)++;
+    (*i) %= (max + 1); 
+}
+
+void moveCursorUp(uint8_t* i, uint8_t max)
+{
+    if(*i > 0)
     {
-        titleCursor = 0;
+        (*i)--;
     }
     else
     {
-        titleCursor = 1;
+        (*i) = max;
     }
-}
-
-uint8_t getTitleCursor()
-{
-    return titleCursor;
 }
