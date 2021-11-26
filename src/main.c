@@ -14,6 +14,7 @@
 #include "universe/universe.h"
 #include "universe/starsystem.h"
 #include "contracts.h"
+#include "spacedust.h"
 
 //Compile with debug functionality
 #define DEBUG
@@ -115,6 +116,17 @@ uint8_t loadGame()
     closeSave();
 }
 
+void newGame()
+{
+    playerShip.type = 0;
+    playerShip.position.x = 150;
+    playerShip.position.z = 100;
+    playerShip.hold.money = 1000;
+    playerShip.hold.size = 25;
+    playerShip.weapon.type = 0;
+    playerShip.fuel = 35;
+}
+
 void calcFrame(uint32_t ticks)
 {
     #ifdef DEBUG
@@ -185,6 +197,7 @@ void calcFrame(uint32_t ticks)
             calcShip(&playerShip, collided, ticks);
             setCameraPos(playerShip.position);
             setCameraRot(playerShip.rotation);
+            calcSpacedust(&playerShip, ticks);
 
             if(keyUp(A))
             {
@@ -224,6 +237,7 @@ void calcFrame(uint32_t ticks)
             calcShip(&playerShip, 0, ticks);
             setCameraPos(playerShip.position);
             setCameraRot(playerShip.rotation);
+            calcSpacedust(&playerShip, ticks);
             break;
         }
         case SAVELOAD:
@@ -476,15 +490,7 @@ void calcFrame(uint32_t ticks)
             {
                 if(uiTitleCursor == 0)
                 {
-                    //Init new game
-                    //Temporary (TODO: REMOVE)
-                    playerShip.type = 0;
-                    playerShip.position.x = 150;
-                    playerShip.position.z = 100;
-                    playerShip.hold.money = 1000;
-                    playerShip.hold.size = 25;
-                    playerShip.weapon.type = 0;
-                    playerShip.fuel = 35;
+                    newGame();
                     state = SPACE;
                 }
                 else
@@ -514,6 +520,10 @@ void drawFrame()
     if(state == HYPERSPACE)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    if(state == SPACE || state == HYPERSPACE)
+    {
+        drawSpacedust();
     }
 
     #ifdef DEBUG
@@ -615,6 +625,7 @@ int main(int argc, char **argv)
     initUI();
     initUniverse(currentSystem, &starSystem);
     initShip();
+    initSpacedust();
     createStationHold(&stationHold);
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;
