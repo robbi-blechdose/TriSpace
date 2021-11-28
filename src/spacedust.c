@@ -1,5 +1,6 @@
 #include "spacedust.h"
 #include "engine/util.h"
+#include <math.h>
 
 //Fields:
 //X, Y position
@@ -25,15 +26,22 @@ void calcSpacedust(Ship* playerShip, uint32_t ticks)
     {
         if(spacedust[i][0] < 0 || spacedust[i][1] < 0 || spacedust[i][0] > 239 || spacedust[i][1] > 239 - 70)
         {
-            spacedust[i][0] = WINX / 4 + randf(WINX / 2);
-            spacedust[i][1] = WINY_3D / 4 + randf(WINY_3D / 2);
-            spacedust[i][2] = spacedust[i][0] > (WINX / 2) ? randf(1) : -randf(1);
-            spacedust[i][3] = spacedust[i][1] > (WINY_3D / 2) ? randf(1) : -randf(1);
+            //Generate angle
+            float angle = randf(M_PI * 2);
+            spacedust[i][2] = cosf(angle);
+            spacedust[i][3] = sinf(angle);
+            //Generate position from angle
+            spacedust[i][0] = WINX / 2 + spacedust[i][2] * randf(WINX / 2);
+            spacedust[i][1] = WINY_3D / 2 + spacedust[i][3] * randf(WINY_3D / 2);
+            //Generate speed (which basically represents distance to the player)
+            float speed = (0.5f + randf(1.5f)) * 16;
+            spacedust[i][2] *= speed;
+            spacedust[i][3] *= speed;
         }
         else
         {
-            spacedust[i][0] += spacedust[i][2] * 16 * playerShip->speed * ticks / 1000.0f;
-            spacedust[i][1] += spacedust[i][3] * 16 * playerShip->speed * ticks / 1000.0f;
+            spacedust[i][0] += spacedust[i][2] * playerShip->speed * ticks / 1000.0f;
+            spacedust[i][1] += spacedust[i][3] * playerShip->speed * ticks / 1000.0f;
             //TODO: Adjust directions (e.g. a point that was going down should go up if the ship turns downwards)
             if(playerShip->turnSpeedY != 0)
             {
