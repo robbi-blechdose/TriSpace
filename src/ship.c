@@ -3,11 +3,14 @@
 #include "engine/image.h"
 #include "engine/effects.h"
 
-GLuint shipMesh;
-GLuint shipTexture;
+GLuint shipMeshes[];
+GLuint shipTextures[2];
 
 const ShipType shipTypes[] = {
-    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1}
+    //Normal enemy ship
+    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1},
+    //Cruise liner ship
+    {.maxSpeed = 8, .maxTurnSpeed = 3, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1}
 };
 
 const WeaponType weaponTypes[] = {
@@ -18,18 +21,20 @@ const WeaponType weaponTypes[] = {
 
 void initShip()
 {
-    shipMesh = loadModelList("res/obj/Ship.obj");
-    shipTexture = loadRGBTexture("res/tex/Ship.png");
+    shipMeshes[0] = loadModelList("res/obj/Ship.obj");
+    shipTextures[0] = loadRGBTexture("res/tex/Ship.png");
+    shipMeshes[1] = loadModelList("res/obj/CruiseShip.obj");
+    shipTextures[1] = loadRGBTexture("res/tex/CruiseShip.png");
 }
 
 void drawShip(Ship* ship)
 {
-    glBindTexture(GL_TEXTURE_2D, shipTexture);
+    glBindTexture(GL_TEXTURE_2D, shipTextures[ship->type]);
     glPushMatrix();
     glTranslatef(ship->position.x, ship->position.y, ship->position.z);
     glRotatef(RAD_TO_DEG(M_PI - ship->rotation.y), 0, 1, 0);
     glRotatef(RAD_TO_DEG(ship->rotation.x), 1, 0, 0);
-    glCallList(shipMesh);
+    glCallList(shipMeshes[ship->type]);
     if(ship->weapon.timer > (weaponTypes[ship->weapon.type].cooldown / 2))
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
