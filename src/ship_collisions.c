@@ -1,4 +1,5 @@
 #include "ship_collisions.h"
+#include <math.h>
 
 uint8_t checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
 {
@@ -10,6 +11,7 @@ uint8_t checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
             return 1;
         }
     }
+    //Basic collisions for stars
     for(uint8_t i = 0; i < starSystem->numStars; i++)
     {
         if(distance3d(&starSystem->stars[i].position, &ship->position) < starSystem->stars[i].size + 2)
@@ -17,7 +19,11 @@ uint8_t checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
             return 1;
         }
     }
-    //TODO: Check station
+    //Basic collisions with the space station
+    if(distance3d(&starSystem->station.position, &ship->position) < 6.75f && fabs(starSystem->station.position.y - ship->position.y) < 2.4f)
+    {
+        return 1;
+    }
     return 0;
 }
 
