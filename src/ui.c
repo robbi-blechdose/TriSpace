@@ -323,6 +323,14 @@ void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contract
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
 }
 
+const char* governmentLevels[5] = {
+    "Anarchy",
+    "Feudal",
+    "Dictatorship",
+    "Corporate state",
+    "Democracy"
+};
+
 void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
 {
     //Recalculate scroll values
@@ -375,7 +383,7 @@ void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
     glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 204, 0xFFFFFF);
     sprintf(buffer, "Tech level: %d", sbd.info.techLevel);
     glDrawText(buffer, 8, 213, 0xFFFFFF);
-    sprintf(buffer, "Government level: %d", sbd.info.government);
+    sprintf(buffer, "Government: %s", governmentLevels[sbd.info.government]);
     glDrawText(buffer, 8, 222, 0xFFFFFF);
     glDrawText("Planets:", 8, 231, 0xFFFFFF);
     for(uint8_t i = 0; i < sbd.numPlanets; i++)
