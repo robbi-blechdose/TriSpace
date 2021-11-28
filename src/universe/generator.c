@@ -160,7 +160,7 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
 {
     info->techLevel = 1 + randr(MAX_TECH_LEVEL);
-    info->government = 1 + ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 2);
+    info->government = ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 2);
     info->treeDiff = planetTradeDiffs[paletteIndex][0];
     info->rockDiff = planetTradeDiffs[paletteIndex][1];
     info->waterDiff = planetTradeDiffs[paletteIndex][2];

@@ -223,6 +223,8 @@ void calcFrame(uint32_t ticks)
                     playerShip.position = jumpStart;
                     //Generate contracts for this system
                     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem);
+                    //Generate new station cargo hold for this system
+                    createStationHold(&stationHold);
                 }
             }
             else
@@ -495,7 +497,6 @@ void calcFrame(uint32_t ticks)
                 }
                 else
                 {
-                    //Load game
                     loadGame();
                     state = STATION;
                 }
