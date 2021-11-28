@@ -170,13 +170,26 @@ void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
 uint8_t getNumStarsForSystem(uint32_t seed)
 {
     srand(seed);
-    return 1 + randr(3);
+    uint32_t numStarsTemp = randr(100);
+    if(numStarsTemp < 15)
+    {
+        return 3;
+    }
+    else if(numStarsTemp < 40)
+    {
+        return 2;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed)
 {
-    srand(seed);
-    sbd->numStars = 1 + randr(3);
+    //This takes care of the srand() call for us
+    sbd->numStars = getNumStarsForSystem(seed);
+    //sbd->numStars = 1 + randr(3);
     sbd->numPlanets = 1 + randr(MAX_PLANETS);
     sbd->spIndex = randr(sbd->numPlanets);
     for(uint8_t i = 0; i < sbd->numPlanets; i++)
