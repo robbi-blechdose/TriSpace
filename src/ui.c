@@ -118,7 +118,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
 
         for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
         {
-            if(npcShips[i].type != TYPE_NULL)
+            if(npcShips[i].type != SHIP_TYPE_NULL)
             {
                 if(distance3d(&playerShip->position, &npcShips[i].position) < RADAR_RANGE)
                 {

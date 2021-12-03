@@ -34,7 +34,7 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
     generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
-        npcShips[i].type = TYPE_NULL;
+        npcShips[i].type = SHIP_TYPE_NULL;
     }
     generateNPCShips(npcShips, MAX_NPC_SHIPS, starSystem);
 }
@@ -43,7 +43,7 @@ void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uin
 {
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
-        if(npcShips[i].type != TYPE_NULL)
+        if(npcShips[i].type != SHIP_TYPE_NULL)
         {
             calcNPCAi(playerShip, &npcShips[i], ticks);
             //TODO: Collisions?
@@ -51,7 +51,7 @@ void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uin
             if(shipIsDestroyed(&npcShips[i]))
             {
                 createEffect(npcShips[i].position, EXPLOSION);
-                npcShips[i].type = TYPE_NULL;
+                npcShips[i].type = SHIP_TYPE_NULL;
             }
         }
     }
@@ -103,7 +103,7 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
             drawStarSystem(starSystem);
             for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
             {
-                if(npcShips[i].type != TYPE_NULL)
+                if(npcShips[i].type != SHIP_TYPE_NULL)
                 {
                     drawShip(&npcShips[i]);
                 }

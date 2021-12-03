@@ -225,6 +225,8 @@ void calcFrame(uint32_t ticks)
                     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem);
                     //Generate new station cargo hold for this system
                     createStationHold(&stationHold);
+                    //Set up the current contract (if necessary)
+                    contractStarSystemSetup(&currentContract, npcShips, currentSystem);
                 }
             }
             else
@@ -466,7 +468,7 @@ void calcFrame(uint32_t ticks)
             else if(keyUp(A))
             {
                 float distance = getDistanceToSystem(currentSystem, uiMapCursor);
-                if(playerShip.fuel >= distance)
+                if(playerShip.fuel >= distance * 10)
                 {
                     jumpStart = playerShip.position;
                     state = HYPERSPACE;

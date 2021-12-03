@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "engine/includes/3dMath.h"
 #include "cargo.h"
+#include "ship.h"
 
 #define NUM_CONTRACT_TYPES 3
 #define CONTRACT_GET_ITEM       0
@@ -39,6 +40,7 @@ void generateContractsForSystem(Contract stationContracts[], uint8_t* numStation
 
 uint8_t activateContract(Contract* contract, CargoHold* playerHold);
 uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2]);
+void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2]);
 void printObjective(char* str, Contract* contract);
 
 #endif

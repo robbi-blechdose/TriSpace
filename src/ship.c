@@ -3,7 +3,7 @@
 #include "engine/image.h"
 #include "engine/effects.h"
 
-GLuint shipMeshes[];
+GLuint shipMeshes[2];
 GLuint shipTextures[2];
 
 const ShipType shipTypes[] = {
@@ -189,7 +189,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
 
     for(uint8_t i = 0; i < numTargets; i++)
     {
-        if(targetShips[i].type == TYPE_NULL)
+        if(targetShips[i].type == SHIP_TYPE_NULL)
         {
             continue;
         }
