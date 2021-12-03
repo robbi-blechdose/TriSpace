@@ -4,7 +4,7 @@
 #define FNL_IMPL
 #include "FastNoiseLite.h"
 
-#define NUM_PALETTES 5
+#define NUM_PALETTES 6
 const Color palettes[NUM_PALETTES][8] = {
     //Earth-type planet
     {
@@ -74,6 +74,17 @@ const Color palettes[NUM_PALETTES][8] = {
         //Snow caps
         {.r = 224, .g = 224, .b = 224},
         {.r = 230, .g = 240, .b = 245}
+    },
+    //Gas-type planet
+    {
+        {.r = 0, .g = 41, .b = 99},
+        {.r = 19, .g = 83, .b = 173},
+        {.r = 12, .g = 106, .b = 237},
+        {.r = 12, .g = 38, .b = 237},
+        {.r = 68, .b = 29, .b = 224},
+        {.r = 63, .g = 32, .b = 189},
+        {.r = 90, .g = 32, .b = 189},
+        {.r = 97, .g = 19, .b = 232}
     }
 };
 
@@ -89,7 +100,9 @@ const int8_t planetTradeDiffs[NUM_PALETTES][3] = {
     //Forest-type planet
     {2, -1, 0},
     //Ice-type planet
-    {-2, 2, 2}
+    {-2, 2, 2},
+    //Gas-type planet
+    {-2, -2, 0}
 };
 
 Color getColorForValue(uint8_t paletteIndex, float value)
@@ -108,7 +121,7 @@ Color getColorForValue(uint8_t paletteIndex, float value)
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
-    float size = 2 + randf(4);
+    float size = 2 + randf(6);
 
     //Generate texture
     fnl_state noise = fnlCreateState();
@@ -294,7 +307,7 @@ void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* system)
 
     for(uint8_t i = 0; i < numShips; i++)
     {
-        npcShips[i].type = 0; //TODO: Randomize a bit
+        npcShips[i].type = SHIP_TYPE_SMALLPIRATE; //TODO: Randomize a bit
         npcShips[i].weapon.type = 0; //TODO: Randomize a bit
         npcShips[i].position.x = randf(500) - 250;
         npcShips[i].position.z = randf(500) - 250;
