@@ -1,6 +1,5 @@
 #include "contracts.h"
 #include "engine/util.h"
-#include "universe/universe.h"
 
 const char* contractTypes[NUM_CONTRACT_TYPES] = {
     "Obtain cargo",
@@ -41,20 +40,20 @@ const char* contractLastnames[NUM_LASTNAMES] = {
 
 void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contractDifficulty)
 {
-    uint8_t possibleSystems[24][2]; //Contract difficulty must be between 1 - 3
+    uint8_t possibleSystems[64][2];
     uint8_t possibleSystemsIndex = 0;
 
     float maxDistance = 7.0f * contractDifficulty;
 
-    for(uint8_t i = 0; i < 16; i++)
+    for(uint8_t i = 0; i < UNIVERSE_SIZE; i++)
     {
-        for(uint8_t j = 0; j < 16; j++)
+        for(uint8_t j = 0; j < UNIVERSE_SIZE; j++)
         {
             uint8_t targetSystem[2] = {i, j};
             if(getDistanceToSystem(currentStarSystem, targetSystem) <= maxDistance)
             {
                 possibleSystems[possibleSystemsIndex][0] = i;
-                possibleSystems[possibleSystemsIndex++][1] = 0;
+                possibleSystems[possibleSystemsIndex++][1] = j;
             }
         }
     }
@@ -64,18 +63,19 @@ void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contr
     c->targetSystem[1] = possibleSystems[targetIndex][1];
 }
 
-Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info)
+Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex)
 {
+    srand(currentStarSystem[0] + currentStarSystem[1] * UNIVERSE_SIZE + contractIndex * 255);
     Contract c;
-    c.type = randr(NUM_CONTRACT_TYPES);
+    c.type = randr(NUM_CONTRACT_TYPES - 1);
     c.employerFirstname = randr(NUM_FIRSTNAMES - 1);
     c.employerLastname = randr(NUM_LASTNAMES - 1);
+    uint8_t difficulty = 1;
 
     switch(c.type)
     {
         case CONTRACT_GET_ITEM:
         {
-            selectTargetSystem(&c, currentStarSystem, 1);
             c.cargo = randr(NUM_CARGO_TYPES);
             c.cargoAmount = 1 + randr(20);
             c.pay = getPriceForCargo(c.cargo, info) * c.cargoAmount + 50 + randr(400);
@@ -87,14 +87,12 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info)
             {
                 //Select illegal cargo type
                 c.cargo = randr(100) > 50 ? Narcotics : Slaves;
-                selectTargetSystem(&c, currentStarSystem, 2);
+                difficulty = 2;
             }
             else
             {
                 c.cargo = randr(NUM_CARGO_TYPES -1);
-                selectTargetSystem(&c, currentStarSystem, 1);
             }
-            c.targetPosition = (vec3){0, 0, 0}; //TODO: Get position of space station in target system!
             c.cargoAmount = 5 + randr(5) * 4;
             //Base pay + cargo price / 2 + pay on top + pay for illegal cargo
             c.pay = 200 + (getPriceForCargo(c.cargo, info) * c.cargoAmount) / 2 + randr(200) * 10
@@ -104,23 +102,23 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info)
         }
         case CONTRACT_DESTROY_SHIP:
         {
-            selectTargetSystem(&c, currentStarSystem, 1);
+            c.pay = 500 + randr(80) * 5;
             //TODO
-            c.targetPosition.x = 0;
-            c.targetPosition.y = 0;
-            c.targetPosition.z = 0;
+            break;
         }
     }
+    selectTargetSystem(&c, currentStarSystem, difficulty);
     return c;
 }
 
-void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2])
+void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2],
+                                    uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE])
 {
     *numStationContracts = MIN_STATION_CONTRACTS + randr(MAX_STATION_CONTRACTS - MIN_STATION_CONTRACTS);
 
     for(uint8_t i = 0; i < *numStationContracts; i++)
     {
-        stationContracts[i] = generateContract(currentSystem, info);
+        stationContracts[i] = generateContract(currentSystem, info, completedContracts[currentSystem[0]][currentSystem[1]] + i);
     }
 }
 
@@ -150,7 +148,7 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
     return 0;
 }
 
-uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2])
+uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[])
 {
     if(currentSystem[0] != contract->targetSystem[0] || currentSystem[1] != contract->targetSystem[1])
     {
@@ -175,6 +173,11 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
         }
         case CONTRACT_DESTROY_SHIP:
         {
+            if(npcShips[NPC_SHIP_CONTRACT].type == SHIP_TYPE_NULL)
+            {
+                playerHold->money += contract->pay;
+                return 1;
+            }
             break;
         }
     }
@@ -187,28 +190,20 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
     {
         return;
     }
-
-    if(currentSystem[0] == contract->targetSystem[0] && currentSystem[1] == contract->targetSystem[1])
+    if(currentSystem[0] != contract->targetSystem[0] || currentSystem[1] != contract->targetSystem[1])
     {
-        switch(contract->type)
+        return;
+    }
+
+    switch(contract->type)
+    {
+        case CONTRACT_DESTROY_SHIP:
         {
-            case CONTRACT_DESTROY_SHIP:
-            {
-                //TODO: Somehow track if the ship is destroyed
-                for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
-                {
-                    if(npcShips[i].type == SHIP_TYPE_NULL)
-                    {
-                        //Found a spot, create ship
-                        npcShips[i].type = SHIP_TYPE_CRUISELINER;
-                        npcShips[i].position.x = randf(500) - 250;
-                        npcShips[i].position.z = randf(500) - 250;
-                        npcShips[i].position.y = randf(50) - 25;
-                        break;
-                    }
-                }
-                break;
-            }
+            npcShips[NPC_SHIP_CONTRACT].type = SHIP_TYPE_CRUISELINER;
+            npcShips[NPC_SHIP_CONTRACT].position.x = randf(500) - 250;
+            npcShips[NPC_SHIP_CONTRACT].position.z = randf(500) - 250;
+            npcShips[NPC_SHIP_CONTRACT].position.y = randf(50) - 25;
+            break;
         }
     }
 }

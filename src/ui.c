@@ -69,7 +69,7 @@ void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
     drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
 }
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t displayContract, vec3 contractPos)
+void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
@@ -111,12 +111,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
     {
         drawRadarDot(playerShip->position, playerShip->rotation, stationPos, 1);
 
-        if(displayContract)
-        {
-            drawRadarDot(playerShip->position, playerShip->rotation, contractPos, 2);
-        }
-
-        for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
+        for(uint8_t i = 0; i < NUM_NORM_NPC_SHIPS; i++)
         {
             if(npcShips[i].type != SHIP_TYPE_NULL)
             {
@@ -125,6 +120,11 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
                     drawRadarDot(playerShip->position, playerShip->rotation, npcShips[i].position, 0);
                 }
             }
+        }
+        ///Contract ship
+        if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL)
+        {
+            drawRadarDot(playerShip->position, playerShip->rotation, npcShips[NPC_SHIP_CONTRACT].position, 3);
         }
     }
 

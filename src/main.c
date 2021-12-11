@@ -25,7 +25,7 @@
 #define MAX_FPS 50
 //#define LIMIT_FPS
 
-#define SAVE_VERSION 300
+#define SAVE_VERSION 301
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
@@ -47,6 +47,8 @@ State state;
 uint8_t currentSystem[2];
 StarSystem starSystem;
 vec3 jumpStart;
+
+uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE];
 
 CargoHold stationHold;
 Contract stationContracts[MAX_STATION_CONTRACTS];
@@ -88,6 +90,7 @@ uint8_t saveGame()
     writeElement(&currentSystem[0], sizeof(uint8_t));
     writeElement(&currentSystem[1], sizeof(uint8_t));
     writeElement(&currentContract, sizeof(currentContract));
+    writeElement(&completedContracts, sizeof(completedContracts));
     closeSave();
     return 1;
 }
@@ -107,6 +110,7 @@ uint8_t loadGame()
         readElement(&savedSystem[1], sizeof(uint8_t));
         switchSystem(currentSystem, savedSystem, &starSystem, npcShips);
         readElement(&currentContract, sizeof(currentContract));
+        readElement(&completedContracts, sizeof(completedContracts));
         return 1;
     }
     else
@@ -125,6 +129,12 @@ void newGame()
     playerShip.hold.size = 25;
     playerShip.weapon.type = 0;
     playerShip.fuel = 35;
+
+    //TODO: remove test
+    npcShips[0].type = SHIP_TYPE_SMALLPIRATE;
+    npcShips[0].weapon.type = 0;
+    npcShips[0].position.x = 160;
+    npcShips[0].position.z = 100;
 }
 
 void calcFrame(uint32_t ticks)
@@ -222,7 +232,7 @@ void calcFrame(uint32_t ticks)
                     switchSystem(currentSystem, uiMapCursor, &starSystem, npcShips);
                     playerShip.position = jumpStart;
                     //Generate contracts for this system
-                    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem);
+                    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
                     //Generate new station cargo hold for this system
                     createStationHold(&stationHold);
                     //Set up the current contract (if necessary)
@@ -412,8 +422,9 @@ void calcFrame(uint32_t ticks)
                 }
                 else
                 {
-                    if(checkContract(&currentContract, &playerShip.hold, currentSystem))
+                    if(checkContract(&currentContract, &playerShip.hold, currentSystem, npcShips))
                     {
+                        completedContracts[currentSystem[0]][currentSystem[1]]++;
                         currentContract.type = CONTRACT_TYPE_NULL;
                         uiContractCursor = 0;
                         //TODO: Display completion screen
@@ -540,7 +551,7 @@ void drawFrame()
         case STATION:
         case HYPERSPACE:
         {
-            drawUI(state, &playerShip, npcShips, starSystem.station.position, 0, playerShip.position);
+            drawUI(state, &playerShip, npcShips, starSystem.station.position);
             break;
         }
         case SAVELOAD:
@@ -632,7 +643,11 @@ int main(int argc, char **argv)
     createStationHold(&stationHold);
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;
-    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem);
+    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
+    for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
+    {
+        npcShips[i].type = SHIP_TYPE_NULL;
+    }
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

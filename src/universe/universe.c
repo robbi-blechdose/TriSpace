@@ -36,7 +36,7 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
     {
         npcShips[i].type = SHIP_TYPE_NULL;
     }
-    generateNPCShips(npcShips, MAX_NPC_SHIPS, starSystem);
+    generateNPCShips(npcShips, NUM_NORM_NPC_SHIPS, starSystem);
 }
 
 void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uint32_t ticks)

@@ -24,7 +24,9 @@ typedef enum {
 #define BASE_SEED 1
 #define UNIVERSE_SIZE 16
 
-#define MAX_NPC_SHIPS 8
+#define MAX_NPC_SHIPS 9
+#define NUM_NORM_NPC_SHIPS 8
+#define NPC_SHIP_CONTRACT 8
 
 void initUniverse(uint8_t* currentSystem, StarSystem* starSystem);
 void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);

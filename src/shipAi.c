@@ -8,7 +8,7 @@ void calcRotToTarget(vec3* pos, vec3* target, float* yRot, float* xRot)
 
     *yRot = atan2f(diff.z, diff.x) - M_PI_2;
     clampAngle(yRot);
-    *xRot = asinf(diff.y);
+    *xRot = asinf(diff.y); //TODO: Improve x rot
 }
 
 void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
@@ -16,6 +16,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
     float distance = distance3d(&playerShip->position, &npcShip->position);
     float angleY, angleX;
     calcRotToTarget(&npcShip->position, &playerShip->position, &angleY, &angleX);
+    float targetX, targetY, targetSpeed;
 
     switch(npcShip->aiState)
     {
@@ -54,19 +55,19 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
                         }
                     }
                     //Keep circling
-                    npcShip->rotation.y = angleY + npcShip->aiRotY;
+                    targetY = angleY + npcShip->aiRotY;
                 }
                 else
                 {
                     //Too far out, move closer
-                    npcShip->rotation.y = angleY;
+                    targetY = angleY;
                     npcShip->aiRotY = AI_ROT_NONE;
                 }
             }
             else
             {
                 //Too close, move away
-                npcShip->rotation.y = angleY + M_PI;
+                targetY = (angleY + M_PI);
                 npcShip->aiRotY = AI_ROT_NONE;
             }
             //Maintain 3/4 speed
@@ -98,7 +99,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
             if(npcShip->aiRotY == AI_ROT_NONE)
             {
                 //Normal attack mode
-                npcShip->rotation.y = angleY;
+                targetY = angleY;
                 npcShip->rotation.x = angleX;
                 accelerateShip(npcShip, 1, ticks);
                 //Fire weapons!
@@ -113,7 +114,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
             else
             {
                 //Veer off
-                npcShip->rotation.y = npcShip->aiRotY;
+                targetY = npcShip->aiRotY;
                 npcShip->rotation.x = npcShip->aiRotX;
                 accelerateShip(npcShip, 1, ticks);
                 if(distance > AI_RANGE_TOONEAR)
@@ -125,4 +126,31 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
             break;
         }
     }
+
+    clampAngle(&targetY);
+    float turnY = 0;
+    if(npcShip->rotation.y < targetY)
+    {
+        if(fabs(npcShip->rotation.y - targetY) < M_PI)
+        {
+            turnY = shipTypes[npcShip->type].maxTurnSpeed; //npcShip->rotation.y - targetY;
+        }
+        else
+        {
+            turnY = -shipTypes[npcShip->type].maxTurnSpeed; //(npcShip->rotation.y - targetY);
+        }
+    }
+    else
+    {
+        if(fabs(npcShip->rotation.y - targetY) < M_PI)
+        {
+            turnY = -shipTypes[npcShip->type].maxTurnSpeed; //-(npcShip->rotation.y - targetY);
+        }
+        else
+        {
+            turnY = shipTypes[npcShip->type].maxTurnSpeed; //npcShip->rotation.y - targetY;
+        }
+    }
+    //printf("dist: %f rot: %f target: %f diff: %f\n", distance, npcShip->rotation.y, targetY, turnY);
+    npcShip->turnSpeedY = clampf(turnY, -shipTypes[npcShip->type].maxTurnSpeed, shipTypes[npcShip->type].maxTurnSpeed);
 }

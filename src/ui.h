@@ -20,7 +20,7 @@
 
 void initUI();
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t displayContract, vec3 contractPos);
+void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos);
 
 void drawSaveLoadUI(uint8_t cursor);
 

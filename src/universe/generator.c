@@ -172,7 +172,7 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 
 void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
 {
-    info->techLevel = 1 + randr(MAX_TECH_LEVEL);
+    info->techLevel = 1 + randr(MAX_TECH_LEVEL - 1);
     info->government = ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 2);
     info->treeDiff = planetTradeDiffs[paletteIndex][0];
     info->rockDiff = planetTradeDiffs[paletteIndex][1];
@@ -202,12 +202,11 @@ void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed)
 {
     //This takes care of the srand() call for us
     sbd->numStars = getNumStarsForSystem(seed);
-    //sbd->numStars = 1 + randr(3);
-    sbd->numPlanets = 1 + randr(MAX_PLANETS);
-    sbd->spIndex = randr(sbd->numPlanets);
+    sbd->numPlanets = 1 + randr(MAX_PLANETS - 1);
+    sbd->spIndex = randr(sbd->numPlanets - 1);
     for(uint8_t i = 0; i < sbd->numPlanets; i++)
     {
-        sbd->paletteIndices[i] = randr(NUM_PALETTES);
+        sbd->paletteIndices[i] = randr(NUM_PALETTES - 1);
     }
     generateSystemInfo(&sbd->info, sbd->paletteIndices[sbd->spIndex]);
 }
@@ -257,7 +256,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         system->planets[i].size = 10.0f + randf(10);
 
         int8_t positive = randr(2) * 2 - 1;
-        uint8_t useX = randr(2);
+        uint8_t useX = randr(10) < 5;
 
         if(useX)
         {
