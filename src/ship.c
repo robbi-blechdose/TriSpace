@@ -3,14 +3,16 @@
 #include "engine/image.h"
 #include "engine/effects.h"
 
-GLuint shipMeshes[2];
-GLuint shipTextures[2];
+GLuint shipMeshes[NUM_SHIP_TYPES];
+GLuint shipTextures[NUM_SHIP_TYPES];
 
-const ShipType shipTypes[] = {
+const ShipType shipTypes[NUM_SHIP_TYPES] = {
     //Normal enemy ship
     {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1},
     //Cruise liner ship
-    {.maxSpeed = 8, .maxTurnSpeed = 3, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1}
+    {.maxSpeed = 5, .maxTurnSpeed = 2, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1},
+    //Police ship
+    {.maxSpeed = 11, .maxTurnSpeed = 6, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 1, .energyRegen = 1}
 };
 
 const WeaponType weaponTypes[] = {
@@ -25,6 +27,8 @@ void initShip()
     shipTextures[0] = loadRGBTexture("res/tex/Ship.png");
     shipMeshes[1] = loadModelList("res/obj/CruiseShip.obj");
     shipTextures[1] = loadRGBTexture("res/tex/CruiseShip.png");
+    shipMeshes[2] = loadModelList("res/obj/PoliceShip.obj");
+    shipTextures[2] = loadRGBTexture("res/tex/PoliceShip.png");
 }
 
 void drawShip(Ship* ship)
