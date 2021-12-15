@@ -32,10 +32,8 @@ void deleteStarSystem(StarSystem* starSystem)
 
 void drawStarSystem(StarSystem* starSystem)
 {
-    uint8_t i;
-
     glBindTexture(GL_TEXTURE_2D, sunTexture);
-    for(i = 0; i < starSystem->numStars; i++)
+    for(uint8_t i = 0; i < starSystem->numStars; i++)
     {
         glPushMatrix();
         glTranslatef(starSystem->stars[i].position.x, starSystem->stars[i].position.y, starSystem->stars[i].position.z);
@@ -48,7 +46,7 @@ void drawStarSystem(StarSystem* starSystem)
         glPopMatrix();
     }
 
-    for(i = 0; i < starSystem->numPlanets; i++)
+    for(uint8_t i = 0; i < starSystem->numPlanets; i++)
     {
         glPushMatrix();
         glTranslatef(starSystem->planets[i].position.x, starSystem->planets[i].position.y, starSystem->planets[i].position.z);
@@ -79,9 +77,34 @@ void drawStarSystem(StarSystem* starSystem)
 
 uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos)
 {
-    if(distance3d(pos, dockingPos) < 2)
+    return distance3d(pos, dockingPos) < 2;
+}
+
+vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects)
+{
+    vec3 vec;
+    uint8_t ok = 0;
+    while(!ok)
     {
-        return 1;
+        vec.x = randf(500) - 250;
+        vec.z = randf(500) - 250;
+        vec.y = randf(50) - 25;
+        ok = 1;
+
+        for(uint8_t i = 0; i < starSystem->numStars; i++)
+        {
+            if(distance3d(&vec, &starSystem->stars[i].position) < starSystem->stars[i].size + minDistanceFromObjects)
+            {
+                ok = 0;
+            }
+        }
+        for(uint8_t i = 0; i < starSystem->numPlanets; i++)
+        {
+            if(distance3d(&vec, &starSystem->planets[i].position) < starSystem->planets[i].size + minDistanceFromObjects)
+            {
+                ok = 0;
+            }
+        }
     }
-    return 0;
+    return vec;
 }

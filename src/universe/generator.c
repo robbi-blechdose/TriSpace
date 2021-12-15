@@ -4,33 +4,9 @@
 #define FNL_IMPL
 #include "FastNoiseLite.h"
 
+//Palettes are ordered by closeness to the sun
 #define NUM_PALETTES 6
 const Color palettes[NUM_PALETTES][8] = {
-    //Earth-type planet
-    {
-        //Ocean
-        {.r = 33, .g = 13, .b = 130},
-        {.r = 32, .g = 41, .b = 212},
-        {.r = 122, .g = 228, .b = 240},
-        //Sand
-        {.r = 255, .g = 239, .b = 145},
-        {.r = 250, .g = 226, .b = 92},
-        //Grass
-        {.r = 73, .g = 163, .b = 42},
-        {.r = 105, .g = 212, .b = 68},
-        {.r = 41, .g = 41, .b = 41}
-    },
-    //Mars-type planet
-    {
-        {.r = 145, .g = 69, .b = 25},
-        {.r = 199, .g = 88, .b = 24},
-        {.r = 227, .g = 132, .b = 36},
-        {.r = 240, .g = 153, .b = 67},
-        {.r = 247, .g = 163, .b = 89},
-        {.r = 199, .g = 160, .b = 125},
-        {.r = 199, .g = 145, .b = 97},
-        {.r = 255, .g = 255, .b = 255}
-    },
     //Venus-type planet
     {
         //Base colors
@@ -44,6 +20,31 @@ const Color palettes[NUM_PALETTES][8] = {
         //Mountains
         {.r = 209, .g = 168, .b = 121},
         {.r = 69, .g = 62, .b = 45},
+    },
+    //Mars-type planet
+    {
+        {.r = 145, .g = 69, .b = 25},
+        {.r = 199, .g = 88, .b = 24},
+        {.r = 227, .g = 132, .b = 36},
+        {.r = 240, .g = 153, .b = 67},
+        {.r = 247, .g = 163, .b = 89},
+        {.r = 199, .g = 160, .b = 125},
+        {.r = 199, .g = 145, .b = 97},
+        {.r = 255, .g = 255, .b = 255}
+    },
+    //Earth-type planet
+    {
+        //Ocean
+        {.r = 33, .g = 13, .b = 130},
+        {.r = 32, .g = 41, .b = 212},
+        {.r = 122, .g = 228, .b = 240},
+        //Sand
+        {.r = 255, .g = 239, .b = 145},
+        {.r = 250, .g = 226, .b = 92},
+        //Grass
+        {.r = 73, .g = 163, .b = 42},
+        {.r = 105, .g = 212, .b = 68},
+        {.r = 41, .g = 41, .b = 41}
     },
     //Ocean-type planet
     //Forest-type planet
@@ -90,12 +91,12 @@ const Color palettes[NUM_PALETTES][8] = {
 
 //Diffs are: Tree, Rock, Water
 const int8_t planetTradeDiffs[NUM_PALETTES][3] = {
-    //Earth-type planet
-    {1, -1, 0},
-    //Mars-type planet
-    {-1, 1, -1},
     //Venus-type planet
     {-2, 2, -2},
+    //Mars-type planet
+    {-1, 1, -1},
+    //Earth-type planet
+    {1, -1, 0},
     //Ocean-type planet
     //Forest-type planet
     {2, -1, 0},
@@ -206,7 +207,8 @@ void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed)
     sbd->spIndex = randr(sbd->numPlanets - 1);
     for(uint8_t i = 0; i < sbd->numPlanets; i++)
     {
-        sbd->paletteIndices[i] = randr(NUM_PALETTES - 1);
+        //TODO: Make this scale (e.g. a 1-planet system should also be able to have gas planets)
+        sbd->paletteIndices[i] = (i + randr(2)) % NUM_PALETTES;
     }
     generateSystemInfo(&sbd->info, sbd->paletteIndices[sbd->spIndex]);
 }
@@ -238,7 +240,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         //Create binary or trinary star systems
         if(i > 0)
         {
-            firstOrbit = baseStarSize * 5;
+            firstOrbit = baseStarSize * 6;
             if(!xUsed)
             {
                 system->stars[i].position.x = baseStarSize * 2;
@@ -268,7 +270,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
             system->planets[i].position.x = randf(50) - 25;
             system->planets[i].position.z = (firstOrbit + (30 * i) + randf(50 * i)) * positive;
         }
-        system->planets[i].position.y = randf(5 * i);
+        system->planets[i].position.y = randf(20 * i) - 10 * i;
         system->planets[i].texture = generatePlanetTexture(seed, sbd.paletteIndices[i]);
         system->planets[i].hasRing = randr(100) < 30;
     }
@@ -298,20 +300,6 @@ void generateSystemPos(vec2* systemPos, uint32_t seed, uint8_t i, uint8_t j)
     srand(seed);
     systemPos->x = (float) i * 64 + (randf(48) - 24);
     systemPos->y = (float) j * 64 + (randf(48) - 24);
-}
-
-void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* system)
-{
-    uint8_t numShips = randr(maxShips);
-
-    for(uint8_t i = 0; i < numShips; i++)
-    {
-        npcShips[i].type = SHIP_TYPE_SMALLPIRATE; //TODO: Randomize a bit
-        npcShips[i].weapon.type = 0; //TODO: Randomize a bit
-        npcShips[i].position.x = randf(500) - 250;
-        npcShips[i].position.z = randf(500) - 250;
-        npcShips[i].position.y = randf(50) - 25;
-    }
 }
 
 const char* greekLetters[] = {

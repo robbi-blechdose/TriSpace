@@ -53,4 +53,10 @@ void drawStarSystem(StarSystem* starSystem);
 
 uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos);
 
+/**
+ * Returns a random position in a star system that's free of objects - stars, planets, ...
+ * @param minDistanceFromObjects The minimum distance from an object the position must have
+ **/
+vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects);
+
 #endif

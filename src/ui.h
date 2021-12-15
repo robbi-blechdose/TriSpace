@@ -5,7 +5,7 @@
 #include "universe/universe.h"
 #include "contracts.h"
 
-#define RADAR_RANGE 100
+#define RADAR_RANGE 120
 
 //Macro for centering text
 //X is the size of the text in characters

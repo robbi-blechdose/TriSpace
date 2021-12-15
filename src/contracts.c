@@ -35,7 +35,8 @@ const char* contractLastnames[NUM_LASTNAMES] = {
     "Brown",
     "Hathaway",
     "Shelby",
-    "Fox"
+    "Fox",
+    "Hobson"
 };
 
 void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contractDifficulty)
@@ -97,13 +98,11 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
             //Base pay + cargo price / 2 + pay on top + pay for illegal cargo
             c.pay = 200 + (getPriceForCargo(c.cargo, info) * c.cargoAmount) / 2 + randr(200) * 10
                         + isCargoIllegal(c.cargo) * 500;
-            //TODO
             break;
         }
         case CONTRACT_DESTROY_SHIP:
         {
             c.pay = 500 + randr(80) * 5;
-            //TODO
             break;
         }
     }
@@ -184,7 +183,7 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
     return 0;
 }
 
-void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2])
+void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2], StarSystem* starSystem)
 {
     if(contract->type == CONTRACT_TYPE_NULL)
     {
@@ -200,9 +199,10 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
         case CONTRACT_DESTROY_SHIP:
         {
             npcShips[NPC_SHIP_CONTRACT].type = SHIP_TYPE_CRUISELINER;
-            npcShips[NPC_SHIP_CONTRACT].position.x = randf(500) - 250;
-            npcShips[NPC_SHIP_CONTRACT].position.z = randf(500) - 250;
-            npcShips[NPC_SHIP_CONTRACT].position.y = randf(50) - 25;
+            vec3 pos = getRandomFreePos(starSystem, 20);
+            npcShips[NPC_SHIP_CONTRACT].position.x = pos.x;
+            npcShips[NPC_SHIP_CONTRACT].position.z = pos.z;
+            npcShips[NPC_SHIP_CONTRACT].position.y = pos.y;
             break;
         }
     }
@@ -219,7 +219,7 @@ void printObjective(char* str, Contract* contract)
     {
         case CONTRACT_GET_ITEM:
         {
-            sprintf(str, "Deliver %d%s %s.", contract->cargoAmount, unit, name);
+            sprintf(str, "Deliver %d%s of %s.", contract->cargoAmount, unit, name);
             break;
         }
         case CONTRACT_SMUGGLE:
@@ -229,7 +229,7 @@ void printObjective(char* str, Contract* contract)
         }
         case CONTRACT_DESTROY_SHIP:
         {
-            sprintf(str, "Destroy the cruise liner.");
+            sprintf(str, "Destroy the cruise liner.\nYou might get some police\nattention...");
             break;
         }
     }

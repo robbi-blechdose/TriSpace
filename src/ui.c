@@ -54,12 +54,12 @@ void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
 
     if(rot.d[2] > 0)
     {
-        rot.d[0] = -rot.d[0] * 30;
-        rot.d[1] = -rot.d[1] * 30;
+        rot.x = -rot.x * 30;
+        rot.y = -rot.y * 30;
     }
     else
     {
-        float angle = atan2f(-rot.d[1], -rot.d[0]);
+        float angle = atan2f(-rot.y, -rot.x);
         rot.x = 32 * cosf(angle);
         rot.y = 32 * sinf(angle);
     }

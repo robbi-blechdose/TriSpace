@@ -29,6 +29,9 @@ typedef enum {
     Narcotics
 } CargoType;
 
+#define CARGO_HOLD_SIZE_NORM  25
+#define CARGO_HOLD_SIZE_LARGE 30
+
 typedef struct {
     uint16_t size;
     uint8_t cargo[NUM_CARGO_TYPES];

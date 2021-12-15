@@ -28,9 +28,6 @@ void clampAngle(float* angle)
     }
 }
 
-/**
- * Returns a random number in the range (0...max) (inclusive)
- **/
 uint32_t randr(uint32_t max)
 {
     return rand() / (RAND_MAX / (max + 1));

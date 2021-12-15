@@ -11,13 +11,8 @@ void calcRotToTarget(vec3* pos, vec3* target, float* yRot, float* xRot)
     *xRot = asinf(diff.y); //TODO: Improve x rot
 }
 
-void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
+void calcNPCAiEnemy(Ship* playerShip, Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
 {
-    float distance = distance3d(&playerShip->position, &npcShip->position);
-    float angleY, angleX;
-    calcRotToTarget(&npcShip->position, &playerShip->position, &angleY, &angleX);
-    float targetX, targetY, targetSpeed;
-
     switch(npcShip->aiState)
     {
         case STATE_IDLE:
@@ -55,19 +50,19 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
                         }
                     }
                     //Keep circling
-                    targetY = angleY + npcShip->aiRotY;
+                    *targetY = angleY + npcShip->aiRotY;
                 }
                 else
                 {
                     //Too far out, move closer
-                    targetY = angleY;
+                    *targetY = angleY;
                     npcShip->aiRotY = AI_ROT_NONE;
                 }
             }
             else
             {
                 //Too close, move away
-                targetY = (angleY + M_PI);
+                *targetY = (angleY + M_PI);
                 npcShip->aiRotY = AI_ROT_NONE;
             }
             //Maintain 3/4 speed
@@ -86,7 +81,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
             }
             else
             {
-                if(rand() < RAND_MAX / 4096)
+                if(rand() < RAND_MAX / 2048)
                 {
                     npcShip->aiState = STATE_ATTACK;
                     npcShip->aiRotY = AI_ROT_NONE;
@@ -99,7 +94,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
             if(npcShip->aiRotY == AI_ROT_NONE)
             {
                 //Normal attack mode
-                targetY = angleY;
+                *targetY = angleY;
                 npcShip->rotation.x = angleX;
                 accelerateShip(npcShip, 1, ticks);
                 //Fire weapons!
@@ -114,7 +109,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
             else
             {
                 //Veer off
-                targetY = npcShip->aiRotY;
+                *targetY = npcShip->aiRotY;
                 npcShip->rotation.x = npcShip->aiRotX;
                 accelerateShip(npcShip, 1, ticks);
                 if(distance > AI_RANGE_TOONEAR)
@@ -123,6 +118,78 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
                     npcShip->aiRotY = AI_ROT_NONE;
                 }
             }
+            break;
+        }
+    }
+}
+
+void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
+{
+    switch(npcShip->aiState)
+    {
+        case STATE_IDLE:
+        {
+            //Do nothing
+            if(npcShip->speed > 0)
+            {
+                accelerateShip(npcShip, -1, ticks);
+            }
+            //State transition
+            if(distance < AI_RANGE * 5)
+            {
+                if(rand() < RAND_MAX / 2048)
+                {
+                    npcShip->aiState = STATE_POLICE_CHECK;
+                }
+            }
+            break;
+        }
+        case STATE_POLICE_CHECK:
+        {
+            npcShip->aiState = STATE_IDLE;
+            for(uint8_t i = 0; i < playerShip->hold.size; i++)
+            {
+                if(playerShip->hold.cargo[i] > 0 && isCargoIllegal(i))
+                {
+                    //Found illegal cargo
+                    npcShip->aiState = STATE_ATTACK;
+                }
+            }
+            break;
+        }
+        //TODO: Attack state
+    }
+}
+
+void calcNPCAiFriendly(Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
+{
+    accelerateShip(npcShip, 1, ticks);
+    *targetY = 0;
+    //TODO
+}
+
+void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
+{
+    float distance = distance3d(&playerShip->position, &npcShip->position);
+    float angleX, angleY;
+    calcRotToTarget(&npcShip->position, &playerShip->position, &angleY, &angleX);
+    float targetX, targetY;
+
+    switch(npcShip->type)
+    {
+        case SHIP_TYPE_SMALLPIRATE:
+        {
+            calcNPCAiEnemy(playerShip, npcShip, ticks, distance, angleX, angleY, &targetX, &targetY);
+            break;
+        }
+        case SHIP_TYPE_CRUISELINER:
+        {
+            calcNPCAiFriendly(npcShip, ticks, distance, angleX, angleY, &targetX, &targetY);
+            break;
+        }
+        case SHIP_TYPE_POLICE:
+        {
+            calcNPCAiPolice(playerShip, npcShip, ticks, distance, angleX, angleY, &targetX, &targetY);
             break;
         }
     }

@@ -11,6 +11,7 @@
 #define CONTRACT_GET_ITEM       0
 #define CONTRACT_SMUGGLE        1
 #define CONTRACT_DESTROY_SHIP   2
+#define CONTRACT_TYPE_PROTECT   3
 #define CONTRACT_TYPE_NULL    255
 extern const char* contractTypes[NUM_CONTRACT_TYPES];
 
@@ -30,7 +31,7 @@ typedef struct {
 
 #define NUM_FIRSTNAMES 13
 extern const char* contractFirstnames[NUM_FIRSTNAMES];
-#define NUM_LASTNAMES 11
+#define NUM_LASTNAMES 12
 extern const char* contractLastnames[NUM_LASTNAMES];
 
 #define MIN_STATION_CONTRACTS 2
@@ -42,7 +43,7 @@ void generateContractsForSystem(Contract stationContracts[], uint8_t* numStation
 
 uint8_t activateContract(Contract* contract, CargoHold* playerHold);
 uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[]);
-void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2]);
+void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2], StarSystem* starSystem);
 void printObjective(char* str, Contract* contract);
 
 #endif

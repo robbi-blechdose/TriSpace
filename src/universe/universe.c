@@ -22,6 +22,21 @@ void initUniverse(uint8_t* currentSystem, StarSystem* starSystem)
     generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
 }
 
+void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* starSystem)
+{
+    uint8_t numShips = randr(maxShips);
+
+    for(uint8_t i = 0; i < numShips; i++)
+    {
+        npcShips[i].type = SHIP_TYPE_SMALLPIRATE; //TODO: Randomize a bit
+        npcShips[i].weapon.type = 0; //TODO: Randomize a bit
+        vec3 pos = getRandomFreePos(starSystem, 10);
+        npcShips[i].position.x = pos.x;
+        npcShips[i].position.z = pos.z;
+        npcShips[i].position.y = pos.y;
+    }
+}
+
 void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[])
 {
     if(newSystem[0] == currentSystem[0] && newSystem[1] == currentSystem[1])

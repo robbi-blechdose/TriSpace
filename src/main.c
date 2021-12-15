@@ -126,12 +126,12 @@ void newGame()
     playerShip.position.x = 150;
     playerShip.position.z = 100;
     playerShip.hold.money = 1000;
-    playerShip.hold.size = 25;
+    playerShip.hold.size = CARGO_HOLD_SIZE_NORM;
     playerShip.weapon.type = 0;
     playerShip.fuel = 35;
 
     //TODO: remove test
-    npcShips[0].type = SHIP_TYPE_SMALLPIRATE;
+    npcShips[0].type = SHIP_TYPE_POLICE;
     npcShips[0].weapon.type = 0;
     npcShips[0].position.x = 160;
     npcShips[0].position.z = 100;
@@ -236,7 +236,7 @@ void calcFrame(uint32_t ticks)
                     //Generate new station cargo hold for this system
                     createStationHold(&stationHold);
                     //Set up the current contract (if necessary)
-                    contractStarSystemSetup(&currentContract, npcShips, currentSystem);
+                    contractStarSystemSetup(&currentContract, npcShips, currentSystem, &starSystem);
                 }
             }
             else
