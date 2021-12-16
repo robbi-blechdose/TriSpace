@@ -228,7 +228,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     system->numPlanets = sbd.numPlanets;
 
     float baseStarSize = 40 + randf(30);
-    float firstOrbit = baseStarSize * 2;
+    float firstOrbit = baseStarSize * 3;
 
     uint8_t xUsed = 0;
     for(uint8_t i = 0; i < system->numStars; i++)
