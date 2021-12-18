@@ -20,7 +20,7 @@
 
 void initUI();
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos);
+void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible);
 
 void drawSaveLoadUI(uint8_t cursor);
 

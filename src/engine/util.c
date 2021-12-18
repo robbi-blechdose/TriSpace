@@ -90,3 +90,53 @@ int intersectTriangle(vec3 origin, vec3 direction, vec3 vert0, vec3 vert1, vec3 
 
     return 1;
 }
+
+void calcRotToTarget(vec3* pos, vec3* target, float* yRot, float* xRot)
+{
+    vec3 diff = subv3(*pos, *target);
+    diff = normalizev3(diff);
+
+    *yRot = atan2f(diff.z, diff.x) - M_PI_2;
+    clampAngle(yRot);
+    *xRot = asinf(diff.y);
+}
+
+float checkHitSphere(vec3* position, vec3* rotation, vec3* center, float radius)
+{
+    //OC = ray origin to sphere center
+    vec3 oc = subv3(*position,*center);
+
+    //Calculate ray direction vector
+    vec3 rot = {.x = 0, .y = 0, .z = 1};
+    vec3 dir = {.x = 0, .y = 1, .z = 0};
+    rot = rotatev3(rot, dir, M_PI - rotation->y);
+    dir.x = 1;
+    dir.y = 0;
+    rot = rotatev3(rot, dir, rotation->x);
+    
+    //TODO: Test
+    float b = dotv3(oc, rot);
+    float c = dotv3(oc, oc) - (radius * radius);
+    if(!(c > 0.0f && b > 0.0f))
+    {
+        float discr = b * b - c;
+        if(discr >= 0)
+        {
+            return -b;
+        }
+    }
+    return -1;
+
+    //TODO: Test alternative version
+    /**
+    float a = dotv3(rot, rot);
+    float b = 2 * dotv3(oc, rot);
+    float c = dotv3(oc, oc) - (radius * radius);
+    float discriminant = b * b - 4 * a * c;
+    if(discriminant >= 0)
+    {
+        return (-b + sqrt(b * b - 4 * a * c)) / 2 * a;
+    }
+    return -1;
+    **/
+}

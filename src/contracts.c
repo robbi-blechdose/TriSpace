@@ -4,7 +4,8 @@
 const char* contractTypes[NUM_CONTRACT_TYPES] = {
     "Obtain cargo",
     "Smuggle cargo",
-    "Destroy ship"
+    "Destroy ship",
+    "Escort ship"
 };
 
 const char* contractFirstnames[NUM_FIRSTNAMES] = {
@@ -15,13 +16,16 @@ const char* contractFirstnames[NUM_FIRSTNAMES] = {
     "Jason",
     "Robert",
     "John",
+    "James"
 
     "Kate",
     "Jill",
     "Susan",
     "Heather",
     "Danielle",
-    "Riley"
+    "Riley",
+    "Jennifer",
+    "Patricia"
 };
 
 const char* contractLastnames[NUM_LASTNAMES] = {
@@ -34,9 +38,11 @@ const char* contractLastnames[NUM_LASTNAMES] = {
     "Davies",
     "Brown",
     "Hathaway",
-    "Shelby",
     "Fox",
-    "Hobson"
+    "Hobson",
+    "Rodriguez",
+    "Moore",
+    "Addams"
 };
 
 void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contractDifficulty)
@@ -102,7 +108,12 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
         }
         case CONTRACT_DESTROY_SHIP:
         {
-            c.pay = 500 + randr(80) * 5;
+            c.pay = 300 + randr(80) * 5;
+            break;
+        }
+        case CONTRACT_PROTECT_SHIP:
+        {
+            c.pay = 350 + randr(50) * 5;
             break;
         }
     }
@@ -126,6 +137,8 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
     switch(contract->type)
     {
         case CONTRACT_GET_ITEM:
+        case CONTRACT_DESTROY_SHIP:
+        case CONTRACT_PROTECT_SHIP:
         {
             return 1;
         }
@@ -138,10 +151,6 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
                 return 1;
             }
             break;
-        }
-        case CONTRACT_DESTROY_SHIP:
-        {
-            return 1;
         }
     }
     return 0;
@@ -179,6 +188,11 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
             }
             break;
         }
+        case CONTRACT_PROTECT_SHIP:
+        {
+            //TODO
+            break;
+        }
     }
     return 0;
 }
@@ -203,6 +217,11 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
             npcShips[NPC_SHIP_CONTRACT].position.x = pos.x;
             npcShips[NPC_SHIP_CONTRACT].position.z = pos.z;
             npcShips[NPC_SHIP_CONTRACT].position.y = pos.y;
+            break;
+        }
+        case CONTRACT_PROTECT_SHIP:
+        {
+            //TODO
             break;
         }
     }
@@ -230,6 +249,11 @@ void printObjective(char* str, Contract* contract)
         case CONTRACT_DESTROY_SHIP:
         {
             sprintf(str, "Destroy the cruise liner.\nYou might get some police\nattention...");
+            break;
+        }
+        case CONTRACT_PROTECT_SHIP:
+        {
+            sprintf(str, "Protect the cargo ship\non its way out of\nthe system.");
             break;
         }
     }

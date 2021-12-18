@@ -13,6 +13,7 @@ typedef struct {
     float energyRegen;
     float maxSpeed;
     float maxTurnSpeed;
+    float hitSphere;
 } ShipType;
 
 typedef struct {
@@ -48,8 +49,6 @@ typedef struct {
     float aiRotY;
 } Ship;
 
-#define SHIP_SPHERE_RADIUS 1.5f
-
 #define MAX_FUEL 70
 
 #define NUM_SHIP_TYPES 3
@@ -67,5 +66,6 @@ void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks);
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks);
 uint8_t shipIsDestroyed(Ship* ship);
 void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets);
+float getTurnSpeedForRotation(float current, float target, float maxSpeed);
 
 #endif

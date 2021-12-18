@@ -1,14 +1,35 @@
 #include "shipAi.h"
 #include <stdlib.h>
 
-void calcRotToTarget(vec3* pos, vec3* target, float* yRot, float* xRot)
+uint8_t calcNPCAiStateAttack(Ship* playerShip, Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
 {
-    vec3 diff = subv3(*pos, *target);
-    diff = normalizev3(diff);
-
-    *yRot = atan2f(diff.z, diff.x) - M_PI_2;
-    clampAngle(yRot);
-    *xRot = asinf(diff.y); //TODO: Improve x rot
+    if(npcShip->aiRotY == AI_ROT_NONE)
+    {
+        //Normal attack mode
+        *targetY = angleY;
+        npcShip->rotation.x = angleX;
+        accelerateShip(npcShip, 1, ticks);
+        //Fire weapons!
+        fireWeapons(npcShip, playerShip, 1);
+        if(distance < AI_RANGE_TOONEAR)
+        {
+            angleY -= DEG_TO_RAD(35);
+            npcShip->aiRotX = angleX;
+            npcShip->aiRotY = angleY;
+        }
+    }
+    else
+    {
+        //Veer off
+        *targetY = npcShip->aiRotY;
+        npcShip->rotation.x = npcShip->aiRotX;
+        accelerateShip(npcShip, 1, ticks);
+        if(distance > AI_RANGE_TOONEAR)
+        {
+            return 1;
+        }
+    }
+    return 0;
 }
 
 void calcNPCAiEnemy(Ship* playerShip, Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
@@ -91,32 +112,11 @@ void calcNPCAiEnemy(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dista
         }
         case STATE_ATTACK:
         {
-            if(npcShip->aiRotY == AI_ROT_NONE)
+            uint8_t ret = calcNPCAiStateAttack(playerShip, npcShip, ticks, distance, angleX, angleY, targetX, targetY);
+            if(ret) //Return to circling state
             {
-                //Normal attack mode
-                *targetY = angleY;
-                npcShip->rotation.x = angleX;
-                accelerateShip(npcShip, 1, ticks);
-                //Fire weapons!
-                fireWeapons(npcShip, playerShip, 1);
-                if(distance < AI_RANGE_TOONEAR)
-                {
-                    angleY -= DEG_TO_RAD(35);
-                    npcShip->aiRotX = angleX;
-                    npcShip->aiRotY = angleY;
-                }
-            }
-            else
-            {
-                //Veer off
-                *targetY = npcShip->aiRotY;
-                npcShip->rotation.x = npcShip->aiRotX;
-                accelerateShip(npcShip, 1, ticks);
-                if(distance > AI_RANGE_TOONEAR)
-                {
-                    npcShip->aiState = STATE_CIRCLE;
-                    npcShip->aiRotY = AI_ROT_NONE;
-                }
+                npcShip->aiState = STATE_CIRCLE;
+                npcShip->aiRotY = AI_ROT_NONE;
             }
             break;
         }
@@ -135,7 +135,7 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
                 accelerateShip(npcShip, -1, ticks);
             }
             //State transition
-            if(distance < AI_RANGE * 5)
+            if(distance < AI_RANGE * 2)
             {
                 if(rand() < RAND_MAX / 2048)
                 {
@@ -157,7 +157,16 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
             }
             break;
         }
-        //TODO: Attack state
+        case STATE_ATTACK:
+        {
+            uint8_t ret = calcNPCAiStateAttack(playerShip, npcShip, ticks, distance, angleX, angleY, targetX, targetY);
+            if(ret) //Return to idle state
+            {
+                npcShip->aiState = STATE_IDLE;
+                npcShip->aiRotY = AI_ROT_NONE;
+            }
+            break;
+        }
     }
 }
 
@@ -194,30 +203,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
         }
     }
 
-    clampAngle(&targetY);
-    float turnY = 0;
-    if(npcShip->rotation.y < targetY)
-    {
-        if(fabs(npcShip->rotation.y - targetY) < M_PI)
-        {
-            turnY = shipTypes[npcShip->type].maxTurnSpeed; //npcShip->rotation.y - targetY;
-        }
-        else
-        {
-            turnY = -shipTypes[npcShip->type].maxTurnSpeed; //(npcShip->rotation.y - targetY);
-        }
-    }
-    else
-    {
-        if(fabs(npcShip->rotation.y - targetY) < M_PI)
-        {
-            turnY = -shipTypes[npcShip->type].maxTurnSpeed; //-(npcShip->rotation.y - targetY);
-        }
-        else
-        {
-            turnY = shipTypes[npcShip->type].maxTurnSpeed; //npcShip->rotation.y - targetY;
-        }
-    }
+    //TODO: Do same thing for x angle
+    npcShip->turnSpeedY = getTurnSpeedForRotation(npcShip->rotation.y, targetY, shipTypes[npcShip->type].maxTurnSpeed);
     //printf("dist: %f rot: %f target: %f diff: %f\n", distance, npcShip->rotation.y, targetY, turnY);
-    npcShip->turnSpeedY = clampf(turnY, -shipTypes[npcShip->type].maxTurnSpeed, shipTypes[npcShip->type].maxTurnSpeed);
 }

@@ -7,11 +7,11 @@
 #include "ship.h"
 #include "universe/universe.h"
 
-#define NUM_CONTRACT_TYPES 3
+#define NUM_CONTRACT_TYPES 4
 #define CONTRACT_GET_ITEM       0
 #define CONTRACT_SMUGGLE        1
 #define CONTRACT_DESTROY_SHIP   2
-#define CONTRACT_TYPE_PROTECT   3
+#define CONTRACT_PROTECT_SHIP   3
 #define CONTRACT_TYPE_NULL    255
 extern const char* contractTypes[NUM_CONTRACT_TYPES];
 
@@ -29,9 +29,9 @@ typedef struct {
     uint8_t cargoAmount;
 } Contract;
 
-#define NUM_FIRSTNAMES 13
+#define NUM_FIRSTNAMES 16
 extern const char* contractFirstnames[NUM_FIRSTNAMES];
-#define NUM_LASTNAMES 12
+#define NUM_LASTNAMES 14
 extern const char* contractLastnames[NUM_LASTNAMES];
 
 #define MIN_STATION_CONTRACTS 2

@@ -15,6 +15,7 @@
 #include "universe/starsystem.h"
 #include "contracts.h"
 #include "spacedust.h"
+#include "autodocking.h"
 
 //Compile with debug functionality
 #define DEBUG
@@ -58,6 +59,8 @@ Ship playerShip;
 Ship npcShips[MAX_NPC_SHIPS];
 
 Contract currentContract;
+
+AutodockData autodock;
 
 uint8_t uiSaveLoadCursor;
 uint8_t uiTradeCursor;
@@ -129,12 +132,8 @@ void newGame()
     playerShip.hold.size = CARGO_HOLD_SIZE_NORM;
     playerShip.weapon.type = 0;
     playerShip.fuel = 35;
-
-    //TODO: remove test
-    npcShips[0].type = SHIP_TYPE_POLICE;
-    npcShips[0].weapon.type = 0;
-    npcShips[0].position.x = 160;
-    npcShips[0].position.z = 100;
+    playerShip.shields = 2;
+    playerShip.energy = 2;
 }
 
 void calcFrame(uint32_t ticks)
@@ -166,33 +165,50 @@ void calcFrame(uint32_t ticks)
         case SPACE:
         case STATION:
         {
-            if(keyPressed(X))
+            if(!autodock.active)
             {
-                accelerateShip(&playerShip, 1, ticks);
+                if(keyPressed(X))
+                {
+                    accelerateShip(&playerShip, 1, ticks);
+                }
+                else if(keyPressed(Y))
+                {
+                    accelerateShip(&playerShip, -1, ticks);
+                }
+                int8_t dirX = 0;
+                int8_t dirY = 0;
+                if(keyPressed(U))
+                {
+                    dirX = 1;
+                }
+                else if(keyPressed(D))
+                {
+                    dirX = -1;
+                }
+                if(keyPressed(L))
+                {
+                    dirY = -1;
+                }
+                else if(keyPressed(R))
+                {
+                    dirY = 1;
+                }
+                steerShip(&playerShip, dirX, dirY, ticks);
+
+                if(keyUp(K))
+                {
+                    preCalcAutodockShip(&autodock, &playerShip, &starSystem);
+                }
             }
-            else if(keyPressed(Y))
+            else
             {
-                accelerateShip(&playerShip, -1, ticks);
+                calcAutodockShip(&autodock, &playerShip, ticks);
+                
+                if(keyUp(K))
+                {
+                    autodock.active = 0;
+                }
             }
-            int8_t dirX = 0;
-            int8_t dirY = 0;
-            if(keyPressed(U))
-            {
-                dirX = 1;
-            }
-            else if(keyPressed(D))
-            {
-                dirX = -1;
-            }
-            if(keyPressed(L))
-            {
-                dirY = -1;
-            }
-            else if(keyPressed(R))
-            {
-                dirY = 1;
-            }
-            steerShip(&playerShip, dirX, dirY, ticks);
 
             uint8_t collided = 0;
             if(state == SPACE)
@@ -215,6 +231,10 @@ void calcFrame(uint32_t ticks)
             }
 
             calcUniverse(&state, &starSystem, &playerShip, npcShips, ticks);
+            if(shipIsDestroyed(&playerShip))
+            {
+                state = GAME_OVER;
+            }
 
             if(keyUp(S) && state == SPACE)
             {
@@ -516,6 +536,15 @@ void calcFrame(uint32_t ticks)
             }
             break;
         }
+        case GAME_OVER:
+        {
+            if(keyUp(A) || keyUp(S))
+            {
+                //TODO: Clean up
+                state = TITLE;
+            }
+            break;
+        }
     }
 }
 
@@ -551,7 +580,7 @@ void drawFrame()
         case STATION:
         case HYPERSPACE:
         {
-            drawUI(state, &playerShip, npcShips, starSystem.station.position);
+            drawUI(state, &playerShip, npcShips, starSystem.station.position, isAutodockPossible(&playerShip, &starSystem));
             break;
         }
         case SAVELOAD:

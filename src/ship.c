@@ -8,11 +8,11 @@ GLuint shipTextures[NUM_SHIP_TYPES];
 
 const ShipType shipTypes[NUM_SHIP_TYPES] = {
     //Normal enemy ship
-    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1},
+    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f * 1.5f},
     //Cruise liner ship
-    {.maxSpeed = 5, .maxTurnSpeed = 2, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1},
+    {.maxSpeed = 5, .maxTurnSpeed = 2, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 5.0f * 5.0f},
     //Police ship
-    {.maxSpeed = 11, .maxTurnSpeed = 6, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 1, .energyRegen = 1}
+    {.maxSpeed = 10, .maxTurnSpeed = 6, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f * 1.5f}
 };
 
 const WeaponType weaponTypes[] = {
@@ -209,7 +209,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
         
         //"Broadphase" hit detection
         float b = dotv3(oc, rot);
-        float c = dotv3(oc, oc) - (SHIP_SPHERE_RADIUS * SHIP_SPHERE_RADIUS);
+        float c = dotv3(oc, oc) - shipTypes[targetShips[i].type].hitSphere;
         if(!(c > 0.0f && b > 0.0f))
         {
             float discr = b * b - c;
@@ -227,5 +227,40 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
                 break;
             }
         }
+    }
+}
+
+float getTurnSpeedForRotation(float current, float target, float maxSpeed)
+{
+    clampAngle(&target);
+    if(fabs(current - target) > 0.05f)
+    {
+        float turnY = 0;
+        if(current < target)
+        {
+            if(fabs(current - target) < M_PI)
+            {
+                return maxSpeed;
+            }
+            else
+            {
+                return -maxSpeed;
+            }
+        }
+        else
+        {
+            if(fabs(current - target) < M_PI)
+            {
+                return -maxSpeed;
+            }
+            else
+            {
+                return maxSpeed;
+            }
+        }
+    }
+    else
+    {
+        return 0;
     }
 }

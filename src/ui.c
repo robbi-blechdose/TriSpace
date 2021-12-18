@@ -69,7 +69,7 @@ void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
     drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
 }
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
+void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
@@ -104,6 +104,11 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos)
     if(fuelTemp > 0)
     {
         drawTexQuad(7, 27, fuelTemp * 4, 4, UITH, 0, PTC(246), PTC(4) * fuelTemp, PTC(248));
+    }
+
+    if(autodockPossible)
+    {
+        drawTexQuad(171, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
     }
 
     //Radar

@@ -30,4 +30,8 @@ float randf(float max);
 int intersectTriangle(vec3 origin, vec3 direction, vec3 vert0, vec3 vert1, vec3 vert2,
                       float* t, float* u, float* v);
 
+void calcRotToTarget(vec3* pos, vec3* target, float* yRot, float* xRot);
+
+float checkHitSphere(vec3* position, vec3* rotation, vec3* center, float radius);
+
 #endif
