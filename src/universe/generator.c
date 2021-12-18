@@ -5,7 +5,7 @@
 #include "FastNoiseLite.h"
 
 //Palettes are ordered by closeness to the sun
-#define NUM_PALETTES 6
+#define NUM_PALETTES 7
 const Color palettes[NUM_PALETTES][8] = {
     //Venus-type planet
     {
@@ -38,13 +38,13 @@ const Color palettes[NUM_PALETTES][8] = {
         {.r = 33, .g = 13, .b = 130},
         {.r = 32, .g = 41, .b = 212},
         {.r = 122, .g = 228, .b = 240},
+        {.r = 44, .g = 130, .b = 232},
         //Sand
-        {.r = 255, .g = 239, .b = 145},
         {.r = 250, .g = 226, .b = 92},
         //Grass
         {.r = 73, .g = 163, .b = 42},
         {.r = 105, .g = 212, .b = 68},
-        {.r = 41, .g = 41, .b = 41}
+        {.r = 107, .g = 128, .b = 38}
     },
     //Ocean-type planet
     //Forest-type planet
@@ -76,6 +76,17 @@ const Color palettes[NUM_PALETTES][8] = {
         {.r = 224, .g = 224, .b = 224},
         {.r = 230, .g = 240, .b = 245}
     },
+    //Dead planet
+    {
+        {.r = 43, .g = 43, .b = 43},
+        {.r = 66, .g = 66, .b = 66},
+        {.r = 75, .g = 75, .b = 75},
+        {.r = 90, .g = 90, .b = 90},
+        {.r = 120, .g = 120, .b = 120},
+        {.r = 80, .g = 80, .b = 80},
+        {.r = 130, .g = 130, .b = 130},
+        {.r = 150, .g = 150, .b = 150},
+    },
     //Gas-type planet
     {
         {.r = 0, .g = 41, .b = 99},
@@ -102,8 +113,28 @@ const int8_t planetTradeDiffs[NUM_PALETTES][3] = {
     {2, -1, 0},
     //Ice-type planet
     {-2, 2, 2},
+    //Dead planet
+    {-2, 2, -2},
     //Gas-type planet
     {-2, -2, 0}
+};
+
+const float planetTextureScalers[NUM_PALETTES] = {
+    //Venus-type planet
+    1.3f,
+    //Mars-type planet
+    1,
+    //Earth-type planet
+    1.3f,
+    //Ocean-type planet
+    //Forest-type planet
+    1,
+    //Ice-type planet
+    1,
+    //Dead planet
+    3,
+    //Gas-type planet
+    1
 };
 
 Color getColorForValue(uint8_t paletteIndex, float value)
@@ -122,7 +153,7 @@ Color getColorForValue(uint8_t paletteIndex, float value)
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
-    float size = 2 + randf(6);
+    float size = (2 + randf(6)) * planetTextureScalers[paletteIndex];
 
     //Generate texture
     fnl_state noise = fnlCreateState();
