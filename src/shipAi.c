@@ -7,7 +7,7 @@ uint8_t calcNPCAiStateAttack(Ship* playerShip, Ship* npcShip, uint32_t ticks, fl
     {
         //Normal attack mode
         *targetY = angleY;
-        npcShip->rotation.x = angleX;
+        *targetX = angleX;
         accelerateShip(npcShip, 1, ticks);
         //Fire weapons!
         fireWeapons(npcShip, playerShip, 1);
@@ -22,7 +22,7 @@ uint8_t calcNPCAiStateAttack(Ship* playerShip, Ship* npcShip, uint32_t ticks, fl
     {
         //Veer off
         *targetY = npcShip->aiRotY;
-        npcShip->rotation.x = npcShip->aiRotX;
+        *targetX = npcShip->aiRotX;
         accelerateShip(npcShip, 1, ticks);
         if(distance > AI_RANGE_TOONEAR)
         {
@@ -53,7 +53,7 @@ void calcNPCAiEnemy(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dista
         }
         case STATE_CIRCLE:
         {
-            npcShip->rotation.x = angleX;
+            *targetX = angleX;
             if(distance > AI_RANGE_CIRCLE_INNER)
             {
                 if(distance < AI_RANGE_CIRCLE_OUTER)
@@ -203,7 +203,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
         }
     }
 
-    //TODO: Do same thing for x angle
+    npcShip->turnSpeedX = getTurnSpeedForRotation(npcShip->rotation.x, targetX, shipTypes[npcShip->type].maxTurnSpeed);
     npcShip->turnSpeedY = getTurnSpeedForRotation(npcShip->rotation.y, targetY, shipTypes[npcShip->type].maxTurnSpeed);
     //printf("dist: %f rot: %f target: %f diff: %f\n", distance, npcShip->rotation.y, targetY, turnY);
 }
