@@ -1,7 +1,7 @@
 CC          	= gcc
 
 CFLAGS			= -O3 -flto
-LDFLAGS     	= -lSDL -lSDL_image -lm
+LDFLAGS     	= -lSDL -lSDL_image -lm -lSDL_mixer -lmikmod
 
 PNAME			= main.elf
 

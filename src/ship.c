@@ -2,6 +2,7 @@
 #include "engine/model.h"
 #include "engine/image.h"
 #include "engine/effects.h"
+#include "engine/audio.h"
 
 GLuint shipMeshes[NUM_SHIP_TYPES];
 GLuint shipTextures[NUM_SHIP_TYPES];
@@ -21,6 +22,8 @@ const WeaponType weaponTypes[] = {
     {.cooldown = 300, .damage = 4, .energyUsage = 2}  //MkIII military laser
 };
 
+uint8_t sampleShoot;
+
 void initShip()
 {
     shipMeshes[0] = loadModelList("res/obj/Ship.obj");
@@ -29,6 +32,7 @@ void initShip()
     shipTextures[1] = loadRGBTexture("res/tex/CruiseShip.png");
     shipMeshes[2] = loadModelList("res/obj/PoliceShip.obj");
     shipTextures[2] = loadRGBTexture("res/tex/PoliceShip.png");
+    sampleShoot = loadSample("res/sfx/flaunch.wav");
 }
 
 void drawShip(Ship* ship)
@@ -228,6 +232,8 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
             }
         }
     }
+
+    playSample(sampleShoot);
 }
 
 float getTurnSpeedForRotation(float current, float target, float maxSpeed)

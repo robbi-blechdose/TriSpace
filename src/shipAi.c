@@ -13,7 +13,14 @@ uint8_t calcNPCAiStateAttack(Ship* playerShip, Ship* npcShip, uint32_t ticks, fl
         fireWeapons(npcShip, playerShip, 1);
         if(distance < AI_RANGE_TOONEAR)
         {
-            angleY -= DEG_TO_RAD(35);
+            if(randr(100) < 50)
+            {
+                angleX -= DEG_TO_RAD(25);
+            }
+            else
+            {
+                angleX += DEG_TO_RAD(25);
+            }
             npcShip->aiRotX = angleX;
             npcShip->aiRotY = angleY;
         }

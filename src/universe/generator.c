@@ -125,12 +125,12 @@ const float planetTextureScalers[NUM_PALETTES] = {
     //Mars-type planet
     1,
     //Earth-type planet
-    1.3f,
+    1.1f,
     //Ocean-type planet
     //Forest-type planet
     1,
     //Ice-type planet
-    1,
+    2,
     //Dead planet
     3,
     //Gas-type planet
@@ -153,7 +153,7 @@ Color getColorForValue(uint8_t paletteIndex, float value)
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
-    float size = (2 + randf(6)) * planetTextureScalers[paletteIndex];
+    float size = (2 + randf(5)) * planetTextureScalers[paletteIndex];
 
     //Generate texture
     fnl_state noise = fnlCreateState();
@@ -287,23 +287,14 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     for(uint8_t i = 0; i < system->numPlanets; i++)
     {
         system->planets[i].size = 10.0f + randf(10);
-
-        int8_t positive = randr(2) * 2 - 1;
-        uint8_t useX = randr(10) < 5;
-
-        if(useX)
-        {
-            system->planets[i].position.x = (firstOrbit + (30 * i) + randf(50 * i)) * positive;
-            system->planets[i].position.z = randf(50) - 25;
-        }
-        else
-        {
-            system->planets[i].position.x = randf(50) - 25;
-            system->planets[i].position.z = (firstOrbit + (30 * i) + randf(50 * i)) * positive;
-        }
-        system->planets[i].position.y = randf(20 * i) - 10 * i;
         system->planets[i].texture = generatePlanetTexture(seed, sbd.paletteIndices[i]);
         system->planets[i].hasRing = randr(100) < 30;
+
+        float orbitRadius = firstOrbit + (i * 40.0f);
+        float angle = randf(M_PI * 2);
+        system->planets[i].position.x = orbitRadius * cos(angle);
+        system->planets[i].position.z = orbitRadius * sin(angle);
+        system->planets[i].position.y = randf(20 * i) - 10 * i;
     }
 
     system->station.position.x = system->planets[sbd.spIndex].position.x + system->planets[sbd.spIndex].size * 2;

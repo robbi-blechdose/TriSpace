@@ -7,6 +7,7 @@
 #include "engine/view.h"
 #include "engine/effects.h"
 #include "engine/savegame.h"
+#include "engine/audio.h"
 
 #include "ui.h"
 #include "ship.h"
@@ -16,6 +17,7 @@
 #include "contracts.h"
 #include "spacedust.h"
 #include "autodocking.h"
+#include "equipment.h"
 
 //Compile with debug functionality
 #define DEBUG
@@ -39,6 +41,8 @@ uint32_t counterFrames = 0;
 uint32_t counterTime = 0;
 uint16_t counterResult = 0;
 #endif
+
+#define MUSIC_DOCKING 0
 
 uint8_t running = 1;
 
@@ -128,7 +132,7 @@ void newGame()
     playerShip.type = 0;
     playerShip.position.x = 150;
     playerShip.position.z = 100;
-    playerShip.hold.money = 1000;
+    playerShip.hold.money = 200;
     playerShip.hold.size = CARGO_HOLD_SIZE_NORM;
     playerShip.weapon.type = 0;
     playerShip.fuel = 35;
@@ -198,15 +202,21 @@ void calcFrame(uint32_t ticks)
                 if(keyUp(K))
                 {
                     preCalcAutodockShip(&autodock, &playerShip, &starSystem);
+                    playMusic(MUSIC_DOCKING, 0);
                 }
             }
             else
             {
                 calcAutodockShip(&autodock, &playerShip, ticks);
-                
+
                 if(keyUp(K))
                 {
                     autodock.active = 0;
+                }
+
+                if(!autodock.active)
+                {
+                    stopMusic(500);
                 }
             }
 
@@ -359,40 +369,16 @@ void calcFrame(uint32_t ticks)
                 }
                 else
                 {
-                    uiEquipCursor = NUM_EQUIPMENT - 1;
+                    uiEquipCursor = NUM_EQUIPMENT_TYPES - 1;
                 }
             }
             else if(keyUp(D))
             {
-                uiEquipCursor = (uiEquipCursor + 1) % NUM_EQUIPMENT;
+                uiEquipCursor = (uiEquipCursor + 1) % NUM_EQUIPMENT_TYPES;
             }
             else if(keyUp(A))
             {
-                switch(uiEquipCursor)
-                {
-                    case EQUIP_FUEL:
-                    {
-                        if(playerShip.fuel < MAX_FUEL && playerShip.hold.money >= 2)
-                        {
-                            playerShip.fuel += 5;
-                            playerShip.hold.money -= 2;
-                            if(playerShip.fuel > MAX_FUEL)
-                            {
-                                playerShip.fuel = MAX_FUEL;
-                            }
-                        }
-                        break;
-                    }
-                    case EQUIP_HOLD30:
-                    {
-                        if(playerShip.hold.money >= 1000)
-                        {
-                            playerShip.hold.size = 30;
-                            playerShip.hold.money-= 1000;
-                        }
-                        break;
-                    }
-                }
+                buyEquipment(&playerShip, uiEquipCursor);
             }
             else if(keyUp(B))
             {
@@ -504,6 +490,8 @@ void calcFrame(uint32_t ticks)
                     jumpStart = playerShip.position;
                     state = HYPERSPACE;
                     playerShip.fuel -= distance * 10;
+                    playerShip.turnSpeedX = 0;
+                    playerShip.turnSpeedY = 0;
                 }
             }
             break;
@@ -630,7 +618,7 @@ void drawFrame()
 
 int main(int argc, char **argv)
 {
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
     screen = SDL_SetVideoMode(WINX, WINY, 16, SDL_SWSURFACE);
 	SDL_ShowCursor(SDL_DISABLE);
 
@@ -654,6 +642,9 @@ int main(int argc, char **argv)
     float clipOrtho[] = {-15, 0};
     initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
     setPerspective();
+
+    initAudio(MIX_MAX_VOLUME, 1, 1);
+    loadMusic(MUSIC_DOCKING, "res/music/Blue_Danube.wav");
 
     //Init UI variables to zero
     uiSaveLoadCursor = 0;

@@ -52,13 +52,12 @@ void calcAutodockShip(AutodockData* ad, Ship* ship, uint32_t ticks)
     }
     //Turn towards point
     calcRotToTarget(&ship->position, &ad->points[ad->pointIndex], &targetY, &targetX);
-    //TODO
     //Set target speed
     switch(ad->pointIndex)
     {
         case POINT_TURN:
         {
-            targetSpeed = shipTypes[ship->type].maxSpeed;
+            targetSpeed = shipTypes[ship->type].maxSpeed * 0.75f;
             break;
         }
         case POINT_APPROACH:

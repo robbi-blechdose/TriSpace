@@ -5,6 +5,7 @@
 #include "cargo.h"
 #include "universe/universe.h"
 #include "universe/generator.h"
+#include "equipment.h"
 
 GLuint mainTexture;
 GLuint firingTexture;
@@ -206,12 +207,6 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
 
-uint16_t equipmentPrices[3] = {
-    2,
-    1500,
-    2000
-};
-
 void drawEquipUI(uint8_t cursor, Ship* playerShip)
 {
     glLoadIdentity();
@@ -222,40 +217,16 @@ void drawEquipUI(uint8_t cursor, Ship* playerShip)
     glDrawText("Equip ship", CENTER(10), 2, 0xFFFFFF);
 
     char buffer[29];
+    char name[21];
+    char status[4];
 
     glDrawText("ITEM                PRICE QTY", 4, 16, 0xFFFFFF);
-    for(uint8_t i = 0; i < NUM_EQUIPMENT; i++)
+    for(uint8_t i = 0; i < NUM_EQUIPMENT_TYPES; i++)
     {
-        switch(i)
-        {
-            case EQUIP_FUEL:
-            {
-                sprintf(buffer, "Fuel (0.5)           %4d %.1f", equipmentPrices[i], playerShip->fuel / 10.0f);
-                break;
-            }
-            case EQUIP_HOLD30:
-            {
-                char* own = " / ";
-                char* own2 = "OWN";
-                if(playerShip->hold.size >= 30)
-                {
-                    own = own2;
-                }
-                sprintf(buffer, "30 unit Cargo Hold   %4d %s", equipmentPrices[i], own);
-                break;
-            }
-            case EQUIP_MK2LASER:
-            {
-                char* own = " / ";
-                char* own2 = "OWN";
-                if(0) //TODO: Check weapon type
-                {
-                    own = own2;
-                }
-                sprintf(buffer, "MkII laser           %4d %s", equipmentPrices[i], own);
-                break;
-            }
-        }
+        printNameForEquipment(name, i);
+        printEquipmentStatusForShip(status, playerShip, i);
+        sprintf(buffer, "%-20s %4d %3s", name, getPriceForEquipment(i), status);
+
         if(i == cursor)
         {
             glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
