@@ -89,7 +89,7 @@ void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship n
             if(hasDockingDistance(&playerShip->position, &starSystem->station.dockingPosition))
             {
                 *state = STATION;
-                playerShip->position.x = 0;
+                playerShip->position.x = 2;
                 playerShip->position.y = 0;
                 playerShip->position.z = 0;
                 playerShip->speed *= 0.5f;

@@ -5,7 +5,7 @@
 #include "FastNoiseLite.h"
 
 //Palettes are ordered by closeness to the sun
-#define NUM_PALETTES 7
+#define NUM_PALETTES 8
 const Color palettes[NUM_PALETTES][8] = {
     //Venus-type planet
     {
@@ -47,6 +47,19 @@ const Color palettes[NUM_PALETTES][8] = {
         {.r = 107, .g = 128, .b = 38}
     },
     //Ocean-type planet
+    {
+        //Ocean
+        {.r = 7, .g = 45, .b = 105},
+        {.r = 29, .g = 85, .b = 173},
+        {.r = 12, .g = 105, .b = 235},
+        {.r = 42, .g = 76, .b = 212},
+        {.r = 29, .g = 173, .b = 209},
+        //Shores
+        {.r = 246, .g = 255, .b = 161},
+        {.r = 243, .g = 255, .b = 130},
+        //Mountains
+        {.r = 105, .g = 105, .b = 105}
+    },
     //Forest-type planet
     {
         //Ground
@@ -109,6 +122,7 @@ const int8_t planetTradeDiffs[NUM_PALETTES][3] = {
     //Earth-type planet
     {1, -1, 0},
     //Ocean-type planet
+    {0, -1, 2},
     //Forest-type planet
     {2, -1, 0},
     //Ice-type planet
@@ -125,8 +139,9 @@ const float planetTextureScalers[NUM_PALETTES] = {
     //Mars-type planet
     1,
     //Earth-type planet
-    1.1f,
+    0.9f,
     //Ocean-type planet
+    0.5f,
     //Forest-type planet
     1,
     //Ice-type planet
@@ -134,7 +149,7 @@ const float planetTextureScalers[NUM_PALETTES] = {
     //Dead planet
     3,
     //Gas-type planet
-    1
+    0.6f
 };
 
 Color getColorForValue(uint8_t paletteIndex, float value)
@@ -238,8 +253,7 @@ void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed)
     sbd->spIndex = randr(sbd->numPlanets - 1);
     for(uint8_t i = 0; i < sbd->numPlanets; i++)
     {
-        //TODO: Make this scale (e.g. a 1-planet system should also be able to have gas planets)
-        sbd->paletteIndices[i] = (i + randr(2)) % NUM_PALETTES;
+        sbd->paletteIndices[i] = (i + randr(NUM_PALETTES - sbd->numPlanets)) % NUM_PALETTES;
     }
     generateSystemInfo(&sbd->info, sbd->paletteIndices[sbd->spIndex]);
 }
@@ -290,7 +304,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         system->planets[i].texture = generatePlanetTexture(seed, sbd.paletteIndices[i]);
         system->planets[i].hasRing = randr(100) < 30;
 
-        float orbitRadius = firstOrbit + (i * 40.0f);
+        float orbitRadius = firstOrbit + (i * 35.0f);
         float angle = randf(M_PI * 2);
         system->planets[i].position.x = orbitRadius * cos(angle);
         system->planets[i].position.z = orbitRadius * sin(angle);

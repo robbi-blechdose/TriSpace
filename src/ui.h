@@ -12,11 +12,15 @@
 //X * 8 / 2 = X * 4
 #define CENTER(X) (120 - (X) * 4)
 
-#define EQUIP_FUEL 0
-#define EQUIP_HOLD30 1
-#define EQUIP_MK2LASER 2
+#define POPUP_CHECKMARK 0
+#define POPUP_ATTENTION 1
 
 void initUI();
+
+void drawPopupIfActive();
+void createPopup(uint8_t icon, char* text);
+void closePopup();
+uint8_t isPopupOpen();
 
 void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible);
 

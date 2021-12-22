@@ -260,7 +260,7 @@ void calcFrame(uint32_t ticks)
                 if(playerShip.speed > 500)
                 {
                     switchSystem(currentSystem, uiMapCursor, &starSystem, npcShips);
-                    playerShip.position = jumpStart;
+                    playerShip.position = getRandomFreePos(&starSystem, 20);
                     //Generate contracts for this system
                     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
                     //Generate new station cargo hold for this system
@@ -286,6 +286,15 @@ void calcFrame(uint32_t ticks)
         }
         case SAVELOAD:
         {
+            if(isPopupOpen())
+            {
+                if(keyUp(A) || keyUp(B))
+                {
+                    closePopup();
+                }
+                break;
+            }
+
             if(keyUp(U) || keyUp(D))
             {
                 if(uiSaveLoadCursor)
@@ -301,13 +310,27 @@ void calcFrame(uint32_t ticks)
             {
                 if(uiSaveLoadCursor == 0)
                 {
-                    saveGame();
-                    //TODO: Read return value and display success or error message
+                    uint8_t ok = saveGame();
+                    if(ok)
+                    {
+                        createPopup(POPUP_CHECKMARK, "Game saved.");
+                    }
+                    else
+                    {
+                        createPopup(POPUP_ATTENTION, "Failed to save.");
+                    }
                 }
                 else
                 {
-                    loadGame();
-                    //TODO: Read return value and display success or error message
+                    uint8_t ok = loadGame();
+                    if(ok)
+                    {
+                        createPopup(POPUP_CHECKMARK, "Game loaded.");
+                    }
+                    else
+                    {
+                        createPopup(POPUP_ATTENTION, "Failed to load.");
+                    }
                 }
             }
             else if(keyUp(B))
@@ -396,6 +419,15 @@ void calcFrame(uint32_t ticks)
         }
         case CONTRACTS:
         {
+            if(isPopupOpen())
+            {
+                if(keyUp(A) || keyUp(B))
+                {
+                    closePopup();
+                }
+                break;
+            }
+
             if(keyUp(U))
             {
                 moveCursorUp(&uiContractCursor, numStationContracts - 1);
@@ -423,17 +455,19 @@ void calcFrame(uint32_t ticks)
                     }
                     else
                     {
-                        //TODO: Error message?
+                        createPopup(POPUP_ATTENTION, "Cannot activate\ncontract.\nMake sure your\ncargo bay has\nspace!");
                     }
                 }
                 else
                 {
                     if(checkContract(&currentContract, &playerShip.hold, currentSystem, npcShips))
                     {
+                        uint8_t buffer[80];
+                        sprintf(buffer, "Contract done.\n%5d credits\nhave been\ntransferred.", currentContract.pay);
+                        createPopup(POPUP_CHECKMARK, buffer);
                         completedContracts[currentSystem[0]][currentSystem[1]]++;
                         currentContract.type = CONTRACT_TYPE_NULL;
                         uiContractCursor = 0;
-                        //TODO: Display completion screen
                     }
                 }
             }
@@ -574,6 +608,7 @@ void drawFrame()
         case SAVELOAD:
         {
             drawSaveLoadUI(uiSaveLoadCursor);
+            drawPopupIfActive();
             break;
         }
         case TRADING:
@@ -589,6 +624,7 @@ void drawFrame()
         case CONTRACTS:
         {
             drawContractUI(uiContractCursor, &currentContract, stationContracts, numStationContracts);
+            drawPopupIfActive();
             break;
         }
         case MAP:

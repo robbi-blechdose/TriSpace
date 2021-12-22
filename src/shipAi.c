@@ -179,9 +179,18 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
 
 void calcNPCAiFriendly(Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
 {
-    accelerateShip(npcShip, 1, ticks);
-    *targetY = 0;
-    //TODO
+    if(npcShip->aiRotY == AI_ROT_NONE || rand() < 100)
+    {
+        npcShip->aiRotY = randf(2 * M_PI);
+    }
+
+    *targetX = npcShip->rotation.x;
+    *targetY = npcShip->aiRotY;
+
+    if(npcShip->speed < shipTypes[npcShip->type].maxSpeed * 0.5f)
+    {
+        accelerateShip(npcShip, 1, ticks);
+    }
 }
 
 void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)

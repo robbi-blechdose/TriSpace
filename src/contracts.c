@@ -16,7 +16,7 @@ const char* contractFirstnames[NUM_FIRSTNAMES] = {
     "Jason",
     "Robert",
     "John",
-    "James"
+    "James",
 
     "Kate",
     "Jill",

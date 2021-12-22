@@ -30,3 +30,8 @@ $(OBJS): %.o : %.c
 
 oclean:
 	rm *.o
+
+dist:
+	rm -r dist/*
+	cp $(PNAME) dist/$(PNAME)
+	cp res/* dist/res/*

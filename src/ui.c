@@ -7,7 +7,17 @@
 #include "universe/generator.h"
 #include "equipment.h"
 
+//UI Base Height
+#define UIBH 10
+//UI Top Height
+#define UITH 11
+//UI Popup Height
+#define UIPH 12
+//UI Popup Top Height
+#define UIPTH 13
+
 GLuint mainTexture;
+GLuint popupTexture;
 GLuint firingTexture;
 GLuint stationUITexture;
 GLuint mapTexture;
@@ -16,10 +26,16 @@ GLuint mapTexture;
 uint8_t mapScrollX;
 uint8_t mapScrollY;
 
+//Popup
+uint8_t popupActive;
+uint8_t popupIcon;
+char popupText[15 * 6];
+
 void initUI()
 {
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
+    popupTexture = loadRGBTexture("res/UI/popup.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
     mapTexture = loadRGBTexture("res/UI/map.png");
@@ -38,10 +54,38 @@ void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
     glVertex3f(posX, posY + sizeY - 1, z);
 }
 
-//UI Base Height
-#define UIBH 10
-//UI Top Height
-#define UITH 11
+void drawPopupIfActive()
+{
+    if(!popupActive)
+    {
+        return;
+    }
+
+    glLoadIdentity();
+    glBindTexture(GL_TEXTURE_2D, popupTexture);
+    glBegin(GL_QUADS);
+    drawTexQuad(40, 80, 160, 80, UIPH, 0, 0, PTC(160), PTC(80));
+    drawTexQuad(48, 136, 16, 16, UIPTH, PTC(16 * popupIcon), PTC(80), PTC(16 + 16 * popupIcon), PTC(96));
+    glDrawText(popupText, 72, 88, 0xFFFFFF);
+    glEnd();
+}
+
+void createPopup(uint8_t icon, char* text)
+{
+    popupActive = 1;
+    popupIcon = icon;
+    strcpy(popupText, text);
+}
+
+void closePopup()
+{
+    popupActive = 0;
+}
+
+uint8_t isPopupOpen()
+{
+    return popupActive;
+}
 
 void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
 {
@@ -262,20 +306,20 @@ void drawContract(Contract* contract, uint8_t cursor, uint8_t numContracts)
     }
 
     glDrawText(contractTypes[contract->type], 40, 16, 0xFFFFFF);
-    sprintf(buffer, "Employer: %s %s", contractFirstnames[contract->employerFirstname],
-                                        contractLastnames[contract->employerLastname]);
+    sprintf(buffer, "Employer: %s\n          %s", contractFirstnames[contract->employerFirstname],
+                                                    contractLastnames[contract->employerLastname]);
     glDrawText(buffer, 40, 32, 0xFFFFFF);
     sprintf(buffer, "Pay: %d credits", contract->pay);
-    glDrawText(buffer, 40, 48, 0xFFFFFF);
-    glDrawText("Destination system:", 40, 64, 0xFFFFFF);
+    glDrawText(buffer, 40, 56, 0xFFFFFF);
+    glDrawText("Destination system:", 40, 72, 0xFFFFFF);
 
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, getSeedForSystem(contract->targetSystem[0], contract->targetSystem[1]));
-    glDrawText(sbd.info.name, 40, 72, 0xFFFFFF);
+    glDrawText(sbd.info.name, 40, 80, 0xFFFFFF);
 
-    glDrawText("Objective:", 40, 88, 0xFFFFFF);
+    glDrawText("Objective:", 40, 96, 0xFFFFFF);
     printObjective(buffer, contract);
-    glDrawText(buffer, 40, 96, 0xFFFFFF);
+    glDrawText(buffer, 40, 104, 0xFFFFFF);
 }
 
 void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contracts, uint8_t numContracts)
