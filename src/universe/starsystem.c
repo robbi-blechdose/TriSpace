@@ -80,22 +80,29 @@ uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos)
     return distance3d(pos, dockingPos) < 2;
 }
 
-vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects)
+vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, float minDistanceFromObjects, float minDistanceFromCenter)
 {
     vec3 vec;
     uint8_t ok = 0;
     while(!ok)
     {
-        vec.x = randf(500) - 250;
-        vec.z = randf(500) - 250;
-        vec.y = randf(50) - 25;
+        vec.x = center.x + randf(bounds.x) - (bounds.x / 2);
+        vec.y = center.y + randf(bounds.y) - (bounds.y / 2);
+        vec.z = center.z + randf(bounds.z) - (bounds.z / 2);
         ok = 1;
+
+        if(distance3d(&vec, &center) < minDistanceFromCenter)
+        {
+            ok = 0;
+            continue;
+        }
 
         for(uint8_t i = 0; i < starSystem->numStars; i++)
         {
             if(distance3d(&vec, &starSystem->stars[i].position) < starSystem->stars[i].size + minDistanceFromObjects)
             {
                 ok = 0;
+                break;
             }
         }
         for(uint8_t i = 0; i < starSystem->numPlanets; i++)
@@ -103,8 +110,14 @@ vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects)
             if(distance3d(&vec, &starSystem->planets[i].position) < starSystem->planets[i].size + minDistanceFromObjects)
             {
                 ok = 0;
+                break;
             }
         }
     }
     return vec;
+}
+
+vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects)
+{
+    return getRandomFreePosBounds(starSystem, (vec3) {.x = 0, .y = 0, .z = 0}, (vec3) {.x = 500, .y = 50, .z = 500}, minDistanceFromObjects, 0);
 }

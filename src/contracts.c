@@ -190,7 +190,12 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
         }
         case CONTRACT_PROTECT_SHIP:
         {
-            //TODO
+            if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL)
+            {
+                npcShips[NPC_SHIP_CONTRACT].type = SHIP_TYPE_NULL;
+                playerHold->money += contract->pay;
+                return 1;
+            }
             break;
         }
     }
@@ -222,6 +227,10 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
         case CONTRACT_PROTECT_SHIP:
         {
             //TODO
+            vec3 pos = getRandomFreePos(starSystem, 20);
+            npcShips[NPC_SHIP_CONTRACT].position.x = pos.x;
+            npcShips[NPC_SHIP_CONTRACT].position.z = pos.z;
+            npcShips[NPC_SHIP_CONTRACT].position.y = pos.y;
             break;
         }
     }
@@ -248,7 +257,7 @@ void printObjective(char* str, Contract* contract)
         }
         case CONTRACT_DESTROY_SHIP:
         {
-            sprintf(str, "Destroy the cruise liner.\nYou might get some police\nattention...");
+            sprintf(str, "Destroy the cruise liner.\nYou might get some\npolice attention...");
             break;
         }
         case CONTRACT_PROTECT_SHIP:

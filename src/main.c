@@ -202,7 +202,10 @@ void calcFrame(uint32_t ticks)
                 if(keyUp(K))
                 {
                     preCalcAutodockShip(&autodock, &playerShip, &starSystem);
-                    playMusic(MUSIC_DOCKING, 0);
+                    if(autodock.active)
+                    {
+                        playMusic(MUSIC_DOCKING, 0);
+                    }
                 }
             }
             else

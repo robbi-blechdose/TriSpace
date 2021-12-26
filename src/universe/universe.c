@@ -4,10 +4,13 @@
 #include "spacestation.h"
 #include "generator.h"
 #include "../engine/effects.h"
+#include "../engine/audio.h"
 #include "../engine/util.h"
 #include "../shipAi.h"
 
 uint32_t systemSeeds[UNIVERSE_SIZE][UNIVERSE_SIZE];
+
+uint8_t sampleExplosion;
 
 void initUniverse(uint8_t* currentSystem, StarSystem* starSystem)
 {
@@ -20,29 +23,7 @@ void initUniverse(uint8_t* currentSystem, StarSystem* starSystem)
     currentSystem[0] = 0;
     currentSystem[1] = 0;
     generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
-}
-
-void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* starSystem)
-{
-    uint8_t numShips = randr(maxShips);
-
-    for(uint8_t i = 0; i < numShips; i++)
-    {
-        npcShips[i].type = SHIP_TYPE_SMALLPIRATE;
-        //Relatively safe system
-        if((MAX_GOVERNMENT - starSystem->info.government) < (MAX_GOVERNMENT / 2))
-        {
-            if(randr(100) < 55)
-            {
-                npcShips[i].type = SHIP_TYPE_POLICE;
-            }
-        }
-        npcShips[i].weapon.type = 0; //TODO: Randomize a bit
-        vec3 pos = getRandomFreePos(starSystem, 10);
-        npcShips[i].position.x = pos.x;
-        npcShips[i].position.z = pos.z;
-        npcShips[i].position.y = pos.y;
-    }
+    sampleExplosion = loadSample("res/sfx/explosion.wav");
 }
 
 void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[])
@@ -55,14 +36,14 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
     currentSystem[1] = newSystem[1];
     deleteStarSystem(starSystem);
     generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
+    //Clear NPC ships
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
         npcShips[i].type = SHIP_TYPE_NULL;
     }
-    generateNPCShips(npcShips, NUM_NORM_NPC_SHIPS, starSystem);
 }
 
-void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uint32_t ticks)
+void calcNPCShips(StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
 {
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
@@ -73,10 +54,96 @@ void calcNPCShips(Ship* playerShip, Ship npcShips[], StarSystem* starSystem, uin
             calcShip(&npcShips[i], 0, ticks);
             if(shipIsDestroyed(&npcShips[i]))
             {
+                playSample(sampleExplosion);
                 createEffect(npcShips[i].position, EXPLOSION);
                 npcShips[i].type = SHIP_TYPE_NULL;
             }
         }
+    }
+}
+
+void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* starSystem, vec3 center)
+{
+    for(uint8_t i = 0; i < NUM_NORM_NPC_SHIPS; i++)
+    {
+        if(npcShips[i].type == SHIP_TYPE_NULL)
+        {
+            if(randr(100) > SPAWN_CHANCE)
+            {
+                continue;
+            }
+
+            //Ship type
+            uint8_t enemyChance = (MAX_GOVERNMENT * 100 - starSystem->info.government * 100) / MAX_GOVERNMENT;
+            uint8_t policeChance = 100 - enemyChance;
+            uint8_t shipType = SHIP_TYPE_NULL;
+
+            if(randr(100) < enemyChance)
+            {
+                shipType = SHIP_TYPE_SMALLPIRATE;
+            }
+            else if(randr(100) < policeChance)
+            {
+                shipType = SHIP_TYPE_POLICE;
+            }
+
+            if(shipType != SHIP_TYPE_NULL)
+            {
+                npcShips[i].type = shipType;
+                npcShips[i].weapon.type = 0; //TODO: Randomize a bit
+                vec3 pos = getRandomFreePosBounds(starSystem, center, (vec3) {.x = 80, .y = 50, .z = 80}, 10, 30);
+                npcShips[i].position.x = pos.x;
+                npcShips[i].position.z = pos.z;
+                npcShips[i].position.y = pos.y;
+            }
+        }
+    }
+
+    /**
+    uint8_t numShips = randr(maxShips / 2);
+    if(numShips == 0)
+    {
+        return;
+    }
+
+    for(uint8_t i = 0; i < NUM_NORM_NPC_SHIPS; i++)
+    {
+        if(npcShips[i].type == SHIP_TYPE_NULL)
+        {
+            npcShips[i].type = SHIP_TYPE_SMALLPIRATE;
+            //Relatively safe system
+            if((MAX_GOVERNMENT - starSystem->info.government) < (MAX_GOVERNMENT / 2))
+            {
+                if(randr(100) < 55)
+                {
+                    npcShips[i].type = SHIP_TYPE_POLICE;
+                }
+            }
+            npcShips[i].weapon.type = 0; //TODO: Randomize a bit
+            vec3 pos = getRandomFreePosBounds(starSystem, center, (vec3) {.x = 80, .y = 50, .z = 80}, 10, 30);
+            npcShips[i].position.x = pos.x;
+            npcShips[i].position.z = pos.z;
+            npcShips[i].position.y = pos.y;
+            numShips--;
+            if(numShips == 0)
+            {
+                break;
+            }
+        }
+    }
+    **/
+}
+
+void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
+{
+    static vec3 lastPlayerPos;
+
+    if(distance3d(&lastPlayerPos, &playerShip->position) > SPAWN_INTERVAL_DISTANCE)
+    {
+        //Generate NPC ships
+        generateNPCShips(npcShips, NUM_NORM_NPC_SHIPS, starSystem, playerShip->position);
+        //Store position for next run
+        lastPlayerPos = playerShip->position;
     }
 }
 
@@ -94,7 +161,8 @@ void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship n
                 playerShip->position.z = 0;
                 playerShip->speed *= 0.5f;
             }
-            calcNPCShips(playerShip, npcShips, starSystem, ticks);
+            calcUniverseSpawnNPCShips(starSystem, playerShip, npcShips, ticks);
+            calcNPCShips(starSystem, playerShip, npcShips, ticks);
             calcEffects(ticks);
             break;
         }

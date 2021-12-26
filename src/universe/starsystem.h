@@ -55,6 +55,14 @@ uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos);
 
 /**
  * Returns a random position in a star system that's free of objects - stars, planets, ...
+ * @param center The center point from which random positions are calculated
+ * @param bounds The bounds in which the random position can be
+ * @param minDistanceFromObjects The minimum distance from an object the position must have
+ * @param minDistanceFromCenter The minimum distance from the center the position must have
+ **/
+vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, float minDistanceFromObjects, float minDistanceFromCenter);
+/**
+ * Returns a random position in a star system that's free of objects - stars, planets, ...
  * @param minDistanceFromObjects The minimum distance from an object the position must have
  **/
 vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects);

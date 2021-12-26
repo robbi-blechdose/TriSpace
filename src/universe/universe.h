@@ -28,6 +28,9 @@ typedef enum {
 #define NUM_NORM_NPC_SHIPS 8
 #define NPC_SHIP_CONTRACT 8
 
+#define SPAWN_INTERVAL_DISTANCE 80
+#define SPAWN_CHANCE 30
+
 void initUniverse(uint8_t* currentSystem, StarSystem* starSystem);
 void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);

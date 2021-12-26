@@ -1,3 +1,4 @@
 sfx/flaunch.wav - https://opengameart.org/content/4-projectile-launches
+sfx/explosion.wav - https://opengameart.org/content/q009s-weapon-sounds
 music/Blue_Danube.wav - https://en.wikipedia.org/wiki/File:Strauss,_An_der_sch%C3%B6nen_blauen_Donau.ogg
 tex/Effects.png - Explosion - https://mattwalkden.itch.io/lunar-battle-pack

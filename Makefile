@@ -31,7 +31,7 @@ $(OBJS): %.o : %.c
 oclean:
 	rm *.o
 
-dist:
-	rm -r dist/*
-	cp $(PNAME) dist/$(PNAME)
-	cp res/* dist/res/*
+DISTFILES = main-funkey.elf ./res icon.png TriSpace.funkey-s.desktop
+
+opk:
+	rm -r ./dist/* && for u in $(DISTFILES); do cp -r $$u dist/; done

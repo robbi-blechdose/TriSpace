@@ -2,3 +2,4 @@
 main.elf
 main-funkey.elf
 .vscode/
+dist/
