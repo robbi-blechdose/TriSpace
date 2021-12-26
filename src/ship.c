@@ -172,6 +172,7 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
 
 uint8_t damageShip(Ship* ship, uint8_t damage)
 {
+    ship->damaged = 1;
     ship->shields -= damage;
     return ship->shields < 0;
 }

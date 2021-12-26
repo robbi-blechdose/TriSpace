@@ -47,6 +47,7 @@ typedef struct {
     uint8_t aiState;
     float aiRotX;
     float aiRotY;
+    uint8_t damaged;
 } Ship;
 
 #define MAX_FUEL 70
