@@ -205,7 +205,7 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
 
 void calcNPCAiFriendly(Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
 {
-    if(npcShip->aiRotY == AI_ROT_NONE || rand() < 100)
+    if(npcShip->aiRotY == AI_ROT_NONE || rand() < RAND_MAX / 8192)
     {
         npcShip->aiRotY = randf(2 * M_PI);
     }

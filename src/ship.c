@@ -9,11 +9,11 @@ GLuint shipTextures[NUM_SHIP_TYPES];
 
 const ShipType shipTypes[NUM_SHIP_TYPES] = {
     //Normal enemy ship
-    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f * 1.5f},
+    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f},
     //Cruise liner ship
-    {.maxSpeed = 5, .maxTurnSpeed = 2, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 5.0f * 5.0f},
+    {.maxSpeed = 5, .maxTurnSpeed = 2, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 5.0f},
     //Police ship
-    {.maxSpeed = 10, .maxTurnSpeed = 6, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f * 1.5f}
+    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f}
 };
 
 const WeaponType weaponTypes[] = {
@@ -27,7 +27,7 @@ uint8_t sampleShoot;
 void initShip()
 {
     shipMeshes[0] = loadModelList("res/obj/Ship.obj");
-    shipTextures[0] = loadRGBTexture("res/tex/Ship.png");
+    shipTextures[0] = loadRGBTexture("res/tex/PirateShip.png");
     shipMeshes[1] = loadModelList("res/obj/CruiseShip.obj");
     shipTextures[1] = loadRGBTexture("res/tex/CruiseShip.png");
     shipMeshes[2] = loadModelList("res/obj/PoliceShip.obj");
@@ -64,22 +64,8 @@ void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
     ship->rotation.x += (ship->turnSpeedX * ticks) / 1000.0f;
     ship->rotation.y += (ship->turnSpeedY * ticks) / 1000.0f;
     //Keep rotation in bounds
-    if(ship->rotation.x < 0)
-    {
-        ship->rotation.x += 2 * M_PI;
-    }
-    if(ship->rotation.x > 2 * M_PI)
-    {
-        ship->rotation.x -= 2 * M_PI;
-    }
-    if(ship->rotation.y < 0)
-    {
-        ship->rotation.y += 2 * M_PI;
-    }
-    if(ship->rotation.y > 2 * M_PI)
-    {
-        ship->rotation.y -= 2 * M_PI;
-    }
+    clampAngle(&ship->rotation.x);
+    clampAngle(&ship->rotation.y);
 
     float diff = (ship->speed * ticks) / 1000.0f;
     ship->position.z -= cos(ship->rotation.y) * cos(ship->rotation.x) * diff;
@@ -128,17 +114,17 @@ void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks)
     }
     else
     {
-        if(ship->turnSpeedX > 0)
+        if(ship->turnSpeedX < 0.1f && ship->turnSpeedX > -0.1f)
+        {
+            ship->turnSpeedX = 0;
+        }
+        else if(ship->turnSpeedX > 0)
         {
             ship->turnSpeedX -= ticks / 125.0f;
         }
         else if(ship->turnSpeedX < 0)
         {
             ship->turnSpeedX += ticks / 125.0f;
-        }
-        if(ship->turnSpeedX < 0.1f && ship->turnSpeedX > -0.1f)
-        {
-            ship->turnSpeedX = 0;
         }
     }
     if(dirY != 0)
@@ -147,17 +133,17 @@ void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks)
     }
     else
     {
-        if(ship->turnSpeedY > 0)
+        if(ship->turnSpeedY < 0.1f && ship->turnSpeedY > -0.1f)
+        {
+            ship->turnSpeedY = 0;
+        }
+        else if(ship->turnSpeedY > 0)
         {
             ship->turnSpeedY -= ticks / 125.0f;
         }
         else if(ship->turnSpeedY < 0)
         {
             ship->turnSpeedY += ticks / 125.0f;
-        }
-        if(ship->turnSpeedY < 0.1f && ship->turnSpeedY > -0.1f)
-        {
-            ship->turnSpeedY = 0;
         }
     }
     ship->turnSpeedX = clampf(ship->turnSpeedX, -shipTypes[ship->type].maxTurnSpeed, shipTypes[ship->type].maxTurnSpeed);
@@ -188,7 +174,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
     {
         return;
     }
-    if(ship->energy - weaponTypes[ship->weapon.type].energyUsage < 0)
+    if(ship->energy < weaponTypes[ship->weapon.type].energyUsage)
     {
         return;
     }
@@ -202,34 +188,15 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
         {
             continue;
         }
-        //OC = ray origin to sphere center
-        vec3 oc = subv3(ship->position, targetShips[i].position);
 
-        vec3 rot = {.x = 0, .y = 0, .z = 1};
-        vec3 dir = {.x = 0, .y = 1, .z = 0};
-        rot = rotatev3(rot, dir, M_PI - ship->rotation.y);
-        dir.x = 1;
-        dir.y = 0;
-        rot = rotatev3(rot, dir, ship->rotation.x);
-        
-        //"Broadphase" hit detection
-        float b = dotv3(oc, rot);
-        float c = dotv3(oc, oc) - shipTypes[targetShips[i].type].hitSphere;
-        if(!(c > 0.0f && b > 0.0f))
+        float hit = checkHitSphere(&ship->position, &ship->rotation, &targetShips[i].position, shipTypes[targetShips[i].type].hitSphere);
+        if(hit != -1)
         {
-            float discr = b * b - c;
-            if(discr >= 0)
+            ship->weapon.distanceToHit = hit;
+            uint8_t destroyed = damageShip(&targetShips[i], weaponTypes[ship->weapon.type].damage);
+            if(!destroyed)
             {
-                //TODO: Fine detection?
-                //printf("HIT %f %f\n", b, distance3d(&ship->position, &targetShips[i].position));
-
-                ship->weapon.distanceToHit = -b;
-                uint8_t destroyed = damageShip(&targetShips[i], weaponTypes[ship->weapon.type].damage);
-                if(!destroyed)
-                {
-                    createEffect(targetShips[i].position, SPARKS);
-                }
-                break;
+                createEffect(targetShips[i].position, SPARKS);
             }
         }
     }

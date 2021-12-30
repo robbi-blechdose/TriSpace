@@ -90,20 +90,12 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
         }
         case CONTRACT_SMUGGLE:
         {
-            if(randr(100) > 40)
-            {
-                //Select illegal cargo type
-                c.cargo = randr(100) > 50 ? Narcotics : Slaves;
-                difficulty = 2;
-            }
-            else
-            {
-                c.cargo = randr(NUM_CARGO_TYPES -1);
-            }
+            //Select illegal cargo type
+            c.cargo = Slaves + randr(Narcotics - Slaves);
+            difficulty = 2;
             c.cargoAmount = 5 + randr(5) * 4;
-            //Base pay + cargo price / 2 + pay on top + pay for illegal cargo
-            c.pay = 200 + (getPriceForCargo(c.cargo, info) * c.cargoAmount) / 2 + randr(200) * 10
-                        + isCargoIllegal(c.cargo) * 500;
+            //Base pay + cargo price / 2 + pay on top
+            c.pay = 400 + (getPriceForCargo(c.cargo, info) * c.cargoAmount) / 2 + randr(20) * 10;
             break;
         }
         case CONTRACT_DESTROY_SHIP:

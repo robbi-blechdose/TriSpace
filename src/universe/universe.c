@@ -98,40 +98,6 @@ void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* starSystem,
             }
         }
     }
-
-    /**
-    uint8_t numShips = randr(maxShips / 2);
-    if(numShips == 0)
-    {
-        return;
-    }
-
-    for(uint8_t i = 0; i < NUM_NORM_NPC_SHIPS; i++)
-    {
-        if(npcShips[i].type == SHIP_TYPE_NULL)
-        {
-            npcShips[i].type = SHIP_TYPE_SMALLPIRATE;
-            //Relatively safe system
-            if((MAX_GOVERNMENT - starSystem->info.government) < (MAX_GOVERNMENT / 2))
-            {
-                if(randr(100) < 55)
-                {
-                    npcShips[i].type = SHIP_TYPE_POLICE;
-                }
-            }
-            npcShips[i].weapon.type = 0; //TODO: Randomize a bit
-            vec3 pos = getRandomFreePosBounds(starSystem, center, (vec3) {.x = 80, .y = 50, .z = 80}, 10, 30);
-            npcShips[i].position.x = pos.x;
-            npcShips[i].position.z = pos.z;
-            npcShips[i].position.y = pos.y;
-            numShips--;
-            if(numShips == 0)
-            {
-                break;
-            }
-        }
-    }
-    **/
 }
 
 void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)

@@ -156,6 +156,16 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
         drawTexQuad(171, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
     }
 
+    if(playerShip->damaged)
+    {
+        playerShip->damaged++;
+        if(playerShip->damaged > 25) //25 frames @ 50fps, ~1/2 second
+        {
+            playerShip->damaged = 0;
+        }
+        drawTexQuad(229, 11, 4, 4, UITH, PTC(252), PTC(20), 1, PTC(23));
+    }
+
     //Radar
     if(state != STATION)
     {
@@ -378,7 +388,7 @@ void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
             generateSystemPos(&systemPos, getSeedForSystem(i, j), i, j);
             drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
                         80 + systemPos.y - (mapScrollY * 64),
-                        16, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
+                        15, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
         }
     }
     generateSystemPos(&systemPos, getSeedForSystem(cursor[0], cursor[1]), cursor[0], cursor[1]);
@@ -386,13 +396,13 @@ void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
     {
         //Green, we can go there
         drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
-                    80 + systemPos.y - (mapScrollY * 64), 16, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
+                    80 + systemPos.y - (mapScrollY * 64), 15, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
     }
     else
     {
         //Red, too far away
         drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
-                    80 + systemPos.y - (mapScrollY * 64), 16, 16, UITH, PTC(241), PTC(64), 1, PTC(80));
+                    80 + systemPos.y - (mapScrollY * 64), 15, 16, UITH, PTC(241), PTC(64), 1, PTC(80));
     }
 
     //System info box

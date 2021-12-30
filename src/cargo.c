@@ -176,8 +176,9 @@ uint8_t isCargoIllegal(CargoType type)
 {
     switch(type)
     {
-        case Narcotics:
         case Slaves:
+        case Firearms:
+        case Narcotics:
         {
             return 1;
         }

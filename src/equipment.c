@@ -70,7 +70,7 @@ void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
         }
         case LaserMkII:
         {
-            //TODO
+            printOwn(str, ship->weapon.type == 1);
             break;
         }
     }
@@ -106,7 +106,7 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
         }
         case LaserMkII:
         {
-            //TODO
+            ship->weapon.type = 1;
             break;
         }
     }
