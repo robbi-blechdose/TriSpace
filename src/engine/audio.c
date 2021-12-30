@@ -11,7 +11,7 @@ void initAudio(uint8_t volume, uint8_t nm, uint8_t ns)
     numMusic = nm;
     numSamples = ns;
 
-    Mix_Init(0);
+    Mix_Init(MIX_INIT_OGG);
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 1, 1024);
     Mix_VolumeMusic(volume);
     Mix_AllocateChannels(NUM_MIX_CHANNELS);

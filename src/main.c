@@ -26,16 +26,16 @@
 #define WINY 240
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
-//#define LIMIT_FPS
+#define LIMIT_FPS
 
 #define SAVE_VERSION 301
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
 SDL_Event event;
-uint16_t fps;
 
 #ifdef DEBUG
+uint16_t fps;
 uint8_t counterEnabled = 0;
 uint32_t counterFrames = 0;
 uint32_t counterTime = 0;
@@ -51,7 +51,6 @@ State state;
 
 uint8_t currentSystem[2];
 StarSystem starSystem;
-vec3 jumpStart;
 
 uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE];
 
@@ -132,7 +131,11 @@ void newGame()
     playerShip.type = 0;
     playerShip.position.x = 150;
     playerShip.position.z = 100;
-    playerShip.hold.money = 200;
+    #ifdef DEBUG
+    playerShip.hold.money = 5000;
+    #else
+    playerShip.hold.money = 150;
+    #endif
     playerShip.hold.size = CARGO_HOLD_SIZE_NORM;
     playerShip.weapon.type = 0;
     playerShip.fuel = 35;
@@ -524,7 +527,6 @@ void calcFrame(uint32_t ticks)
                 float distance = getDistanceToSystem(currentSystem, uiMapCursor);
                 if(playerShip.fuel >= distance * 10)
                 {
-                    jumpStart = playerShip.position;
                     state = HYPERSPACE;
                     playerShip.fuel -= distance * 10;
                     playerShip.turnSpeedX = 0;
@@ -682,8 +684,8 @@ int main(int argc, char **argv)
     initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
     setPerspective();
 
-    initAudio(MIX_MAX_VOLUME, 1, 1);
-    loadMusic(MUSIC_DOCKING, "res/music/Blue_Danube.wav");
+    initAudio(MIX_MAX_VOLUME, 1, 2);
+    loadMusic(MUSIC_DOCKING, "res/music/Blue_Danube.ogg");
 
     //Init UI variables to zero
     uiSaveLoadCursor = 0;
@@ -723,16 +725,22 @@ int main(int argc, char **argv)
         drawFrame();
 
         #ifdef LIMIT_FPS
-		if((1000 / MAX_FPS) > (SDL_GetTicks() - tNow))
+		//if((1000 / MAX_FPS) > (SDL_GetTicks() - tNow))
+		while((1000 / MAX_FPS) > (SDL_GetTicks() - tNow + 1))
         {
-			SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); //Yay stable framerate!
+			//SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); //Yay stable framerate!
+			SDL_Delay(1); //Yay stable framerate!
 		}
         #endif
+        #ifdef DEBUG
 		fps = 1000.0f / (float)(tNow - tLastFrame);
+        #endif
 		tLastFrame = tNow;
     }
+
+    //Cleanup
+    quitAudio();
     
-    //TinyGL cleanup
 	ZB_close(frameBuffer);
 	glClose();
 
