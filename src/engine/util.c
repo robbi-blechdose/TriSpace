@@ -101,21 +101,23 @@ void calcRotToTarget(vec3* pos, vec3* target, float* yRot, float* xRot)
     *xRot = asinf(diff.y);
 }
 
-float checkHitSphere(vec3* position, vec3* rotation, vec3* center, float radius)
+vec3 anglesToDirection(vec3* rotation)
+{
+    vec3 result = {.x = 0, .y = 0, .z = 1};
+    vec3 dir = {.x = 1, .y = 0, .z = 0};
+    result = rotatev3(result, dir, rotation->x);
+    dir = (vec3) {.x = 0, .y = 1, .z = 0};
+    result = rotatev3(result, dir, M_PI - rotation->y);
+    return result;
+}
+
+float checkHitSphere(vec3* position, vec3* direction, vec3* center, float radius)
 {
     //OC = ray origin to sphere center
     vec3 oc = subv3(*position,*center);
-
-    //Calculate ray direction vector
-    vec3 rot = {.x = 0, .y = 0, .z = 1};
-    vec3 dir = {.x = 0, .y = 1, .z = 0};
-    rot = rotatev3(rot, dir, M_PI - rotation->y);
-    dir.x = 1;
-    dir.y = 0;
-    rot = rotatev3(rot, dir, rotation->x);
     
     //TODO: Test
-    float b = dotv3(oc, rot);
+    float b = dotv3(oc, *direction);
     float c = dotv3(oc, oc) - (radius * radius);
     if(!(c > 0.0f && b > 0.0f))
     {

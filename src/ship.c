@@ -182,6 +182,9 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
     ship->energy -= weaponTypes[ship->weapon.type].energyUsage;
     ship->weapon.timer = weaponTypes[ship->weapon.type].cooldown;
 
+    //Calculate ray direction vector
+    vec3 dir = anglesToDirection(&ship->rotation);
+
     for(uint8_t i = 0; i < numTargets; i++)
     {
         if(targetShips[i].type == SHIP_TYPE_NULL)
@@ -189,7 +192,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
             continue;
         }
 
-        float hit = checkHitSphere(&ship->position, &ship->rotation, &targetShips[i].position, shipTypes[targetShips[i].type].hitSphere);
+        float hit = checkHitSphere(&ship->position, &dir, &targetShips[i].position, shipTypes[targetShips[i].type].hitSphere);
         if(hit != -1)
         {
             ship->weapon.distanceToHit = hit;
