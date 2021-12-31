@@ -31,7 +31,7 @@ typedef enum {
 #define SPAWN_INTERVAL_DISTANCE 80
 #define SPAWN_CHANCE 30
 
-void initUniverse(uint8_t* currentSystem, StarSystem* starSystem);
+void initUniverse(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[]);
 void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
 void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[]);

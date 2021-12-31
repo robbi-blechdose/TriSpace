@@ -714,17 +714,13 @@ int main(int argc, char **argv)
 
     //Initialize main systems
     initUI();
-    initUniverse(currentSystem, &starSystem);
+    initUniverse(currentSystem, &starSystem, npcShips);
     initShip();
     initSpacedust();
     createStationHold(&stationHold);
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;
     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
-    for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
-    {
-        npcShips[i].type = SHIP_TYPE_NULL;
-    }
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

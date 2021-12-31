@@ -13,35 +13,8 @@ uint32_t systemSeeds[UNIVERSE_SIZE][UNIVERSE_SIZE];
 
 uint8_t sampleExplosion;
 
-void initUniverse(uint8_t* currentSystem, StarSystem* starSystem)
+void initSystem(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[])
 {
-    initEffects();
-    initStarSystem();
-    initSpaceStation();
-    initAsteroids();
-    sampleExplosion = loadSample("res/sfx/explosion.wav");
-    //Generate system seeds
-    generateSystemSeeds(systemSeeds, BASE_SEED);
-    //Init starting star system
-    currentSystem[0] = 0;
-    currentSystem[1] = 0;
-    generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
-    //Create asteroids for system (if any)
-    if(starSystem->hasAsteroidField)
-    {
-        createAsteroids(starSystem->asteroidFieldPos);
-    }
-}
-
-void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[])
-{
-    if(newSystem[0] == currentSystem[0] && newSystem[1] == currentSystem[1])
-    {
-        return;
-    }
-    currentSystem[0] = newSystem[0];
-    currentSystem[1] = newSystem[1];
-    deleteStarSystem(starSystem);
     generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
     //Clear NPC ships
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
@@ -53,6 +26,33 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
     {
         createAsteroids(starSystem->asteroidFieldPos);
     }
+}
+
+void initUniverse(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[])
+{
+    initEffects();
+    initStarSystem();
+    initSpaceStation();
+    initAsteroids();
+    sampleExplosion = loadSample("res/sfx/explosion.wav");
+    //Generate system seeds
+    generateSystemSeeds(systemSeeds, BASE_SEED);
+    //Init starting star system
+    currentSystem[0] = 0;
+    currentSystem[1] = 0;
+    initSystem(currentSystem, starSystem, npcShips);
+}
+
+void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[])
+{
+    if(newSystem[0] == currentSystem[0] && newSystem[1] == currentSystem[1])
+    {
+        return;
+    }
+    currentSystem[0] = newSystem[0];
+    currentSystem[1] = newSystem[1];
+    deleteStarSystem(starSystem);
+    initSystem(currentSystem, starSystem, npcShips);
 }
 
 void calcNPCShips(StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
