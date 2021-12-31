@@ -3,6 +3,7 @@
 #include "GL/gl.h"
 #define FNL_IMPL
 #include "FastNoiseLite.h"
+#include "asteroids.h"
 
 //Palettes are ordered by closeness to the sun
 #define NUM_PALETTES 8
@@ -311,6 +312,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         system->planets[i].position.y = randf(20 * i) - 10 * i;
     }
 
+    //Space station generation
     system->station.position.x = system->planets[sbd.spIndex].position.x + system->planets[sbd.spIndex].size * 2;
     system->station.position.y = system->planets[sbd.spIndex].position.y;
     system->station.position.z = system->planets[sbd.spIndex].position.z;
@@ -320,6 +322,17 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     system->station.exitPosition.x = system->station.position.x + 7;
     system->station.exitPosition.y = system->station.position.y;
     system->station.exitPosition.z = system->station.position.z + 3;
+
+    //Asteroid field generation
+    if(randr(100) < 40)
+    {
+        system->hasAsteroidField = 1;
+        system->asteroidFieldPos = getRandomFreePos(system, ASTEROID_FIELD_SIZE);
+    }
+    else
+    {
+        system->hasAsteroidField = 0;
+    }
 }
 
 void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed)

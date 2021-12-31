@@ -2,6 +2,7 @@
 
 #include "starsystem.h"
 #include "spacestation.h"
+#include "asteroids.h"
 #include "generator.h"
 #include "../engine/effects.h"
 #include "../engine/audio.h"
@@ -17,13 +18,19 @@ void initUniverse(uint8_t* currentSystem, StarSystem* starSystem)
     initEffects();
     initStarSystem();
     initSpaceStation();
+    initAsteroids();
+    sampleExplosion = loadSample("res/sfx/explosion.wav");
     //Generate system seeds
     generateSystemSeeds(systemSeeds, BASE_SEED);
     //Init starting star system
     currentSystem[0] = 0;
     currentSystem[1] = 0;
     generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
-    sampleExplosion = loadSample("res/sfx/explosion.wav");
+    //Create asteroids for system (if any)
+    if(starSystem->hasAsteroidField)
+    {
+        createAsteroids(starSystem->asteroidFieldPos);
+    }
 }
 
 void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[])
@@ -40,6 +47,11 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
         npcShips[i].type = SHIP_TYPE_NULL;
+    }
+    //Create asteroids for system (if any)
+    if(starSystem->hasAsteroidField)
+    {
+        createAsteroids(starSystem->asteroidFieldPos);
     }
 }
 
@@ -91,6 +103,7 @@ void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* starSystem,
             {
                 npcShips[i].type = shipType;
                 npcShips[i].weapon.type = 0; //TODO: Randomize a bit
+                npcShips[i].shields = shipTypes[shipType].maxShields;
                 vec3 pos = getRandomFreePosBounds(starSystem, center, (vec3) {.x = 80, .y = 50, .z = 80}, 10, 30);
                 npcShips[i].position.x = pos.x;
                 npcShips[i].position.z = pos.z;
@@ -156,8 +169,13 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
     {
         case SPACE:
         case HYPERSPACE:
+        case GAME_OVER:
         {
             drawStarSystem(starSystem);
+            if(starSystem->hasAsteroidField)
+            {
+                drawAsteroids();
+            }
             for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
             {
                 if(npcShips[i].type != SHIP_TYPE_NULL)

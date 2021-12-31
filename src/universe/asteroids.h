@@ -9,8 +9,11 @@ typedef struct {
 } Asteroid;
 
 #define NUM_ASTEROIDS 16
+#define ASTEROID_FIELD_SIZE 35
 
 void initAsteroids();
+
+void createAsteroids(vec3 pos);
 void drawAsteroids();
 
 void damageAsteroid(uint8_t index);

@@ -45,6 +45,8 @@ typedef struct {
     Planet planets[MAX_PLANETS];
     uint8_t numPlanets;
     SpaceStation station;
+    uint8_t hasAsteroidField;
+    vec3 asteroidFieldPos;
 } StarSystem;
 
 void initStarSystem();

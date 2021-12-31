@@ -249,6 +249,9 @@ void calcFrame(uint32_t ticks)
             calcUniverse(&state, &starSystem, &playerShip, npcShips, ticks);
             if(shipIsDestroyed(&playerShip))
             {
+                vec3 effectPos = scalev3(2.5f, anglesToDirection(&playerShip.rotation));
+                effectPos = addv3(playerShip.position, effectPos);
+                createEffect(effectPos, EXPLOSION);
                 state = GAME_OVER;
             }
 
@@ -565,6 +568,8 @@ void calcFrame(uint32_t ticks)
         }
         case GAME_OVER:
         {
+            calcEffects(ticks);
+
             if(keyUp(A) || keyUp(S))
             {
                 //TODO: Clean up
@@ -586,12 +591,22 @@ void drawFrame()
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
-    drawUniverse(&state, &starSystem, npcShips);
+    switch(state)
+    {
+        case SPACE:
+        case HYPERSPACE:
+        case STATION:
+        case GAME_OVER:
+        {
+            drawUniverse(&state, &starSystem, npcShips);
+            break;
+        }
+    }
     if(state == HYPERSPACE)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
-    if(state == SPACE || state == HYPERSPACE)
+    if(state == SPACE || state == HYPERSPACE || state == GAME_OVER)
     {
         drawSpacedust();
     }
@@ -606,6 +621,7 @@ void drawFrame()
         case SPACE:
         case STATION:
         case HYPERSPACE:
+        case GAME_OVER:
         {
             drawUI(state, &playerShip, npcShips, starSystem.station.position, isAutodockPossible(&playerShip, &starSystem));
             break;
