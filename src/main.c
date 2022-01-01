@@ -572,8 +572,12 @@ void calcFrame(uint32_t ticks)
 
             if(keyUp(A) || keyUp(S))
             {
-                //TODO: Clean up
                 state = TITLE;
+                for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
+                {
+                    npcShips[i].type = SHIP_TYPE_NULL;
+                }
+                //TODO: more clean up
             }
             break;
         }
@@ -621,7 +625,6 @@ void drawFrame()
         case SPACE:
         case STATION:
         case HYPERSPACE:
-        case GAME_OVER:
         {
             drawUI(state, &playerShip, npcShips, starSystem.station.position, isAutodockPossible(&playerShip, &starSystem));
             break;
@@ -656,6 +659,13 @@ void drawFrame()
         case TITLE:
         {
             drawTitleScreen(uiTitleCursor);
+            break;
+        }
+        case GAME_OVER:
+        {
+            //Keep drawing game UI
+            drawUI(state, &playerShip, npcShips, starSystem.station.position, isAutodockPossible(&playerShip, &starSystem));
+            drawGameOverScreen();
             break;
         }
     }

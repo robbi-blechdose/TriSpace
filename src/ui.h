@@ -36,6 +36,8 @@ void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel);
 
 void drawTitleScreen(uint8_t cursor);
 
+void drawGameOverScreen();
+
 void moveCursorDown(uint8_t* i, uint8_t max);
 void moveCursorUp(uint8_t* i, uint8_t max);
 

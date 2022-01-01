@@ -446,6 +446,13 @@ void drawTitleScreen(uint8_t cursor)
     }
 }
 
+void drawGameOverScreen()
+{
+    glLoadIdentity();
+    glBegin(GL_QUADS);
+    glDrawText("GAME OVER", CENTER(9), 90, 0xFFFFFF);
+}
+
 void moveCursorDown(uint8_t* i, uint8_t max)
 {
     (*i)++;

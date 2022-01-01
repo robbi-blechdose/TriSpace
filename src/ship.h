@@ -20,6 +20,7 @@ typedef struct {
     uint8_t damage;
     int16_t cooldown;
     uint8_t energyUsage;
+    uint8_t mineChance;
 } WeaponType;
 
 typedef struct {

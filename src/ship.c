@@ -3,6 +3,7 @@
 #include "engine/image.h"
 #include "engine/effects.h"
 #include "engine/audio.h"
+#include "universe/asteroids.h"
 
 GLuint shipMeshes[NUM_SHIP_TYPES];
 GLuint shipTextures[NUM_SHIP_TYPES];
@@ -17,9 +18,10 @@ const ShipType shipTypes[NUM_SHIP_TYPES] = {
 };
 
 const WeaponType weaponTypes[] = {
-    {.cooldown = 400, .damage = 2, .energyUsage = 1}, //MkI kaser
-    {.cooldown = 350, .damage = 2, .energyUsage = 1}, //MkII laser
-    {.cooldown = 300, .damage = 4, .energyUsage = 2}  //MkIII military laser
+    {.cooldown = 400, .damage = 2, .energyUsage = 1, .mineChance = 25}, //MkI laser
+    {.cooldown = 350, .damage = 2, .energyUsage = 1, .mineChance = 20}, //MkII laser
+    {.cooldown = 300, .damage = 4, .energyUsage = 2, .mineChance = 20}, //MkIII military laser
+    {.cooldown = 450, .damage = 2, .energyUsage = 3, .mineChance = 75}  //Mining laser
 };
 
 uint8_t sampleShoot;
@@ -182,9 +184,12 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
     ship->energy -= weaponTypes[ship->weapon.type].energyUsage;
     ship->weapon.timer = weaponTypes[ship->weapon.type].cooldown;
 
+    playSample(sampleShoot);
+
     //Calculate ray direction vector
     vec3 dir = anglesToDirection(&ship->rotation);
 
+    //Check ship hits
     for(uint8_t i = 0; i < numTargets; i++)
     {
         if(targetShips[i].type == SHIP_TYPE_NULL)
@@ -201,10 +206,12 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
             {
                 createEffect(targetShips[i].position, SPARKS);
             }
+            return;
         }
     }
 
-    playSample(sampleShoot);
+    //Check asteroid hits
+    checkAsteroidHit(&ship->position, &dir, weaponTypes[ship->weapon.type].damage, weaponTypes[ship->weapon.type].mineChance);
 }
 
 float getTurnSpeedForRotation(float current, float target, float maxSpeed)

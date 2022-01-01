@@ -16,6 +16,10 @@ uint16_t getPriceForEquipment(EquipmentType type)
         {
             return 2000;
         }
+        case MiningLaser:
+        {
+            return 2000;
+        }
     }
     return 0;
 }
@@ -37,6 +41,11 @@ void printNameForEquipment(char* str, EquipmentType type)
         case LaserMkII:
         {
             strcpy(str, "Laser MkII");
+            break;
+        }
+        case MiningLaser:
+        {
+            strcpy(str, "Mining laser");
             break;
         }
     }
@@ -73,6 +82,11 @@ void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
             printOwn(str, ship->weapon.type == 1);
             break;
         }
+        case MiningLaser:
+        {
+            printOwn(str, ship->weapon.type == 3);
+            break;
+        }
     }
 }
 
@@ -107,6 +121,11 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
         case LaserMkII:
         {
             ship->weapon.type = 1;
+            break;
+        }
+        case MiningLaser:
+        {
+            ship->weapon.type = 3;
             break;
         }
     }

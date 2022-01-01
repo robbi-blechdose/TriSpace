@@ -427,7 +427,7 @@ void generateSystemName(char* buffer)
     //Syllable (x1 - x4)
     for(uint8_t i = 0; i < syllables; i++)
     {
-        //Onset (optional)
+        //Onset
         uint8_t oIndex = randr(NUM_ONSETS - 1);
         strcpy(&name[nameIndex], onsets[oIndex]);
         nameIndex += strlen(onsets[oIndex]);
