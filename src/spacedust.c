@@ -15,8 +15,8 @@ void initSpacedust()
 {
     for(uint8_t i = 0; i < NUM_SPACEDUST; i++)
     {
-        spacedust[i][0] = WINX / 4 + randf(WINX / 2);
-        spacedust[i][1] = WINY_3D / 4 + randf(WINY_3D / 2);
+        //Initialize to out-of-bounds value so the first calculation run computes proper values
+        spacedust[i][0] = -1;
     }
 }
 
