@@ -16,6 +16,10 @@ uint16_t getPriceForEquipment(EquipmentType type)
         {
             return 2000;
         }
+        case LaserMkIII:
+        {
+            return 4000;
+        }
         case MiningLaser:
         {
             return 2000;
@@ -41,6 +45,11 @@ void printNameForEquipment(char* str, EquipmentType type)
         case LaserMkII:
         {
             strcpy(str, "Laser MkII");
+            break;
+        }
+        case LaserMkIII:
+        {
+            strcpy(str, "Laser MkIII");
             break;
         }
         case MiningLaser:
@@ -82,6 +91,11 @@ void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
             printOwn(str, ship->weapon.type == 1);
             break;
         }
+        case LaserMkIII:
+        {
+            printOwn(str, ship->weapon.type == 2);
+            break;
+        }
         case MiningLaser:
         {
             printOwn(str, ship->weapon.type == 3);
@@ -90,6 +104,7 @@ void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
     }
 }
 
+//TODO: Sell old equipment if applicable
 uint8_t buyEquipment(Ship* ship, EquipmentType type)
 {
     uint16_t price = getPriceForEquipment(type);
@@ -97,8 +112,47 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
     {
         return 0;
     }
-    ship->hold.money-= price;
+    ship->hold.money -= price;
 
+    //Sell old equipment (if applicable)
+    switch(type)
+    {
+        case LaserMkII:
+        case LaserMkIII:
+        case MiningLaser:
+        {
+            switch(ship->weapon.type)
+            {
+                //Laser Mk II
+                case 1:
+                {
+                    price = getPriceForEquipment(LaserMkII);
+                    break;
+                }
+                //Laser Mk III
+                case 2:
+                {
+                    price = getPriceForEquipment(LaserMkIII);
+                    break;
+                }
+                //Mining Laser
+                case 3:
+                {
+                    price = getPriceForEquipment(MiningLaser);
+                    break;
+                }
+            }
+            break;
+        }
+        default:
+        {
+            price = 0;
+            break;
+        }
+    }
+    ship->hold.money += price;
+    
+    //Buy new equipment
     switch(type)
     {
         case Fuel:
@@ -121,6 +175,11 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
         case LaserMkII:
         {
             ship->weapon.type = 1;
+            break;
+        }
+        case LaserMkIII:
+        {
+            ship->weapon.type = 2;
             break;
         }
         case MiningLaser:

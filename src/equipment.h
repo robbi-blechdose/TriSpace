@@ -9,6 +9,7 @@ typedef enum {
     Fuel,
     Cargo30,
     LaserMkII,
+    LaserMkIII,
     MiningLaser
 } EquipmentType;
 

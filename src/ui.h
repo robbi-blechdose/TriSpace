@@ -12,10 +12,15 @@
 //X * 8 / 2 = X * 4
 #define CENTER(X) (120 - (X) * 4)
 
+void initUI();
+
+/**
+ * Functions for a popup window
+ * Can hold 15x6 characters, plus an icon
+ **/
+
 #define POPUP_CHECKMARK 0
 #define POPUP_ATTENTION 1
-
-void initUI();
 
 void drawPopupIfActive();
 void createPopup(uint8_t icon, char* text);

@@ -21,6 +21,7 @@ GLuint popupTexture;
 GLuint firingTexture;
 GLuint stationUITexture;
 GLuint mapTexture;
+GLuint equipmentTexture;
 
 //Map
 uint8_t mapScrollX;
@@ -39,6 +40,7 @@ void initUI()
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
     mapTexture = loadRGBTexture("res/UI/map.png");
+    equipmentTexture = loadRGBTexture("res/UI/equipment.png");
 }
 
 void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
@@ -290,6 +292,36 @@ void drawEquipUI(uint8_t cursor, Ship* playerShip)
             glDrawText(buffer, 4, 24 + i * 8, 0xFFFFFF);
         }
     }
+
+    glBindTexture(GL_TEXTURE_2D, equipmentTexture);
+    glBegin(GL_QUADS);
+    drawTexQuad(120 - 48, 32, 24 * 4, 24 * 2, UITH, 0, 0, PTC(24 * 4), PTC(24 * 2));
+    uint8_t x, y;
+    switch(cursor)
+    {
+        case Fuel:
+        {
+            x = 24 * 4;
+            y = 0;
+            break;
+        }
+        case Cargo30:
+        {
+            x = 0;
+            y = 24 * 2;
+            break;
+        }
+        case LaserMkII:
+        case LaserMkIII:
+        case MiningLaser:
+        {
+            x = 24 * 4;
+            y = 24 * 2;
+            break;
+        }
+    }
+    drawTexQuad(120 - 48, 32, 24 * 4, 24 * 2, UITH, PTC(x), PTC(y), PTC(x + 24 * 4), PTC(y + 24 * 2));
+    glEnd();
     
     sprintf(buffer, "%d credits", playerShip->hold.money);
     glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);

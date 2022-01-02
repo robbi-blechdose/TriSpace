@@ -18,10 +18,10 @@ const ShipType shipTypes[NUM_SHIP_TYPES] = {
 };
 
 const WeaponType weaponTypes[] = {
-    {.cooldown = 400, .damage = 2, .energyUsage = 1, .mineChance = 25}, //MkI laser
-    {.cooldown = 350, .damage = 2, .energyUsage = 1, .mineChance = 20}, //MkII laser
-    {.cooldown = 300, .damage = 4, .energyUsage = 2, .mineChance = 20}, //MkIII military laser
-    {.cooldown = 450, .damage = 2, .energyUsage = 3, .mineChance = 75}  //Mining laser
+    {.cooldown = 400, .damage = 2, .energyUsage = 1, .mineChance = 15}, //MkI laser
+    {.cooldown = 350, .damage = 2, .energyUsage = 1, .mineChance = 8}, //MkII laser
+    {.cooldown = 300, .damage = 4, .energyUsage = 2, .mineChance = 8}, //MkIII military laser
+    {.cooldown = 400, .damage = 2, .energyUsage = 3, .mineChance = 40}  //Mining laser
 };
 
 uint8_t sampleShoot;
@@ -211,7 +211,31 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
     }
 
     //Check asteroid hits
-    checkAsteroidHit(&ship->position, &dir, weaponTypes[ship->weapon.type].damage, weaponTypes[ship->weapon.type].mineChance);
+    uint8_t mine = checkAsteroidHit(&ship->position, &dir, weaponTypes[ship->weapon.type].damage, weaponTypes[ship->weapon.type].mineChance);
+    //Asteroid destruction yielded mineable resources
+    if(mine)
+    {
+        //Determine what we mined
+        uint8_t type = randr(100);
+        if(type < 33)
+        {
+            type = Gold;
+        }
+        else if(type < 66)
+        {
+            type = Dilithium;
+        }
+        else
+        {
+            type = Platinum;
+        }
+        //Do we have enough space?
+        uint8_t amount = 1 + randr(2);
+        if(getCargoHoldSize(&ship->hold) + amount <= ship->hold.size)
+        {
+            ship->hold.cargo[type] += amount;
+        }
+    }
 }
 
 float getTurnSpeedForRotation(float current, float target, float maxSpeed)

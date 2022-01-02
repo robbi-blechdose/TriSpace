@@ -66,7 +66,8 @@ uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t 
                 createAsteroid(i);
                 if(randr(100) < mineChance)
                 {
-                    //TODO: if there were mineable resources here, add them to the player ship hold
+                    //We got mineable resources here
+                    return 1;
                 }
             }
             else
@@ -76,4 +77,5 @@ uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t 
             break;
         }
     }
+    return 0;
 }

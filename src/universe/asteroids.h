@@ -10,7 +10,7 @@ typedef struct {
 } Asteroid;
 
 #define NUM_ASTEROIDS 16
-#define ASTEROID_FIELD_SIZE 35
+#define ASTEROID_FIELD_SIZE 40
 #define ASTEROID_HEALTH 3
 
 void initAsteroids();
