@@ -3,6 +3,6 @@ Type=Application
 Name=TriSpace
 Comment=Space trading/fighting game
 Exec=main-funkey.elf
-Icon=icon
+Icon=res/icon
 Terminal=false
 Categories=games;
