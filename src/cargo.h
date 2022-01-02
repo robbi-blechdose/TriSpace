@@ -41,9 +41,19 @@ typedef struct {
 uint8_t getPriceForCargo(CargoType type, SystemInfo* info);
 void printNameForCargo(char* str, CargoType type);
 void printUnitForCargo(char* str, CargoType type);
+
 uint8_t isCargoIllegal(CargoType type);
+
+/**
+ * Calculates the current size of a cargo hold (the amount of cargo units it contains)
+ **/
 uint8_t getCargoHoldSize(CargoHold* hold);
+
+/**
+ * Transfers cargo between two holds, using the current star system for price calculations
+ **/
 uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info);
+
 void createStationHold(CargoHold* hold);
 
 #endif

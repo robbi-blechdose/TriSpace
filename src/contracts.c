@@ -103,11 +103,6 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
             c.pay = 300 + randr(80) * 5;
             break;
         }
-        case CONTRACT_PROTECT_SHIP:
-        {
-            c.pay = 350 + randr(50) * 5;
-            break;
-        }
     }
     selectTargetSystem(&c, currentStarSystem, difficulty);
     return c;
@@ -130,7 +125,6 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
     {
         case CONTRACT_GET_ITEM:
         case CONTRACT_DESTROY_SHIP:
-        case CONTRACT_PROTECT_SHIP:
         {
             return 1;
         }
@@ -180,16 +174,6 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
             }
             break;
         }
-        case CONTRACT_PROTECT_SHIP:
-        {
-            if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL)
-            {
-                npcShips[NPC_SHIP_CONTRACT].type = SHIP_TYPE_NULL;
-                playerHold->money += contract->pay;
-                return 1;
-            }
-            break;
-        }
     }
     return 0;
 }
@@ -210,15 +194,6 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
         case CONTRACT_DESTROY_SHIP:
         {
             npcShips[NPC_SHIP_CONTRACT].type = SHIP_TYPE_CRUISELINER;
-            vec3 pos = getRandomFreePos(starSystem, 20);
-            npcShips[NPC_SHIP_CONTRACT].position.x = pos.x;
-            npcShips[NPC_SHIP_CONTRACT].position.z = pos.z;
-            npcShips[NPC_SHIP_CONTRACT].position.y = pos.y;
-            break;
-        }
-        case CONTRACT_PROTECT_SHIP:
-        {
-            //TODO
             vec3 pos = getRandomFreePos(starSystem, 20);
             npcShips[NPC_SHIP_CONTRACT].position.x = pos.x;
             npcShips[NPC_SHIP_CONTRACT].position.z = pos.z;
@@ -250,11 +225,6 @@ void printObjective(char* str, Contract* contract)
         case CONTRACT_DESTROY_SHIP:
         {
             sprintf(str, "Destroy the cruise liner.\nYou might get some\npolice attention...");
-            break;
-        }
-        case CONTRACT_PROTECT_SHIP:
-        {
-            sprintf(str, "Protect the cargo ship\non its way out of\nthe system.");
             break;
         }
     }

@@ -80,7 +80,7 @@ void drawFPS(uint16_t fps)
     char buffer[12];
 	sprintf(buffer, "FPS: %i", fps);
 	glDrawText(buffer, 2, 2, 0xFFFFFF);
-	sprintf(buffer, "FPS: %i", counterResult);
+	sprintf(buffer, "AVG: %i", counterResult);
 	glDrawText(buffer, 2, 10, 0xFFFFFF);
 }
 #endif

@@ -7,11 +7,10 @@
 #include "ship.h"
 #include "universe/universe.h"
 
-#define NUM_CONTRACT_TYPES 4
+#define NUM_CONTRACT_TYPES      3
 #define CONTRACT_GET_ITEM       0
 #define CONTRACT_SMUGGLE        1
 #define CONTRACT_DESTROY_SHIP   2
-#define CONTRACT_PROTECT_SHIP   3
 #define CONTRACT_TYPE_NULL    255
 extern const char* contractTypes[NUM_CONTRACT_TYPES];
 
