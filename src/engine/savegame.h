@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-void openSave(char* folder, char* name, uint8_t writing);
+uint8_t openSave(char* folder, char* name, uint8_t writing);
 void writeElement(void* ptr, uint16_t size);
 void readElement(void* ptr, uint16_t size);
 void closeSave();

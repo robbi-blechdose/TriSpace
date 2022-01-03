@@ -7,6 +7,10 @@ GLuint effectTexture;
 void initEffects()
 {
     effectTexture = loadRGBTexture("res/tex/Effects.png");
+    for(uint8_t i = 0; i < MAX_EFFECTS; i++)
+    {
+        effects[i].life = 0;
+    }
 }
 
 //TODO: Since the data here is game-dependent, we should move it out of the engine code

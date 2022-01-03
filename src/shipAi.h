@@ -4,10 +4,11 @@
 #include "ship.h"
 #include "engine/util.h"
 
-#define AI_RANGE              75
-#define AI_RANGE_CIRCLE_INNER 25
-#define AI_RANGE_CIRCLE_OUTER 26
-#define AI_RANGE_TOONEAR      15
+#define AI_RANGE               75
+#define AI_RANGE_CIRCLE_INNER  25
+#define AI_RANGE_CIRCLE_OUTER  26
+#define AI_RANGE_TOONEAR       15
+#define AI_RANGE_POLICECHECK  150
 
 #define STATE_IDLE         0
 #define STATE_CIRCLE       1

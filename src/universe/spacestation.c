@@ -12,11 +12,6 @@ void initSpaceStation()
     stationInteriorTexture = loadRGBTexture("res/tex/SpaceStation_Interior.png");
 }
 
-void loadSpaceStation()
-{
-
-}
-
 void drawSpaceStation()
 {
     glBindTexture(GL_TEXTURE_2D, stationInteriorTexture);

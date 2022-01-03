@@ -78,7 +78,7 @@ void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
     {
         ship->speed = 0;
         ship->shields = 0;
-        //TODO: Move ship away
+        //TODO: Move ship away?
     }
 
     if(ship->shields < shipTypes[ship->type].maxShields)

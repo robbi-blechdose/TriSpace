@@ -3,7 +3,7 @@
 
 #include "ship.h"
 
-#define NUM_EQUIPMENT_TYPES 4
+#define NUM_EQUIPMENT_TYPES 5
 
 typedef enum {
     Fuel,

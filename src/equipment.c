@@ -104,7 +104,6 @@ void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
     }
 }
 
-//TODO: Sell old equipment if applicable
 uint8_t buyEquipment(Ship* ship, EquipmentType type)
 {
     uint16_t price = getPriceForEquipment(type);
@@ -115,6 +114,7 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
     ship->hold.money -= price;
 
     //Sell old equipment (if applicable)
+    price = 0;
     switch(type)
     {
         case LaserMkII:
@@ -142,11 +142,6 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
                     break;
                 }
             }
-            break;
-        }
-        default:
-        {
-            price = 0;
             break;
         }
     }

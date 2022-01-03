@@ -4,8 +4,7 @@
 const char* contractTypes[NUM_CONTRACT_TYPES] = {
     "Obtain cargo",
     "Smuggle cargo",
-    "Destroy ship",
-    "Escort ship"
+    "Destroy ship"
 };
 
 const char* contractFirstnames[NUM_FIRSTNAMES] = {

@@ -157,9 +157,9 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
                 npcShip->aiState = STATE_ATTACK;
                 break;
             }
-            if(distance < AI_RANGE * 2)
+            if(distance < AI_RANGE_POLICECHECK)
             {
-                if(rand() < RAND_MAX / 2048)
+                if(rand() < RAND_MAX / 4096)
                 {
                     npcShip->aiState = STATE_POLICE_CHECK;
                 }

@@ -132,6 +132,9 @@ void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship n
     {
         case SPACE:
         {
+            calcUniverseSpawnNPCShips(starSystem, playerShip, npcShips, ticks);
+            calcNPCShips(starSystem, playerShip, npcShips, ticks);
+            calcEffects(ticks);
             if(hasDockingDistance(&playerShip->position, &starSystem->station.dockingPosition))
             {
                 *state = STATION;
@@ -140,9 +143,6 @@ void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship n
                 playerShip->position.z = 0;
                 playerShip->speed *= 0.5f;
             }
-            calcUniverseSpawnNPCShips(starSystem, playerShip, npcShips, ticks);
-            calcNPCShips(starSystem, playerShip, npcShips, ticks);
-            calcEffects(ticks);
             break;
         }
         case STATION:

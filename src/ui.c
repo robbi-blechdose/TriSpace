@@ -66,7 +66,7 @@ void drawPopupIfActive()
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, popupTexture);
     glBegin(GL_QUADS);
-    drawTexQuad(40, 80, 160, 80, UIPH, 0, 0, PTC(160), PTC(80));
+    drawTexQuad(40, 80, 160, 80, UIPH, 0, 0, PTC(160), PTC(79));
     drawTexQuad(48, 136, 16, 16, UIPTH, PTC(16 * popupIcon), PTC(80), PTC(16 + 16 * popupIcon), PTC(96));
     glDrawText(popupText, 72, 88, 0xFFFFFF);
     glEnd();
@@ -153,11 +153,6 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
         drawTexQuad(7, 27, fuelTemp * 4, 4, UITH, 0, PTC(246), PTC(4) * fuelTemp, PTC(248));
     }
 
-    if(autodockPossible)
-    {
-        drawTexQuad(171, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
-    }
-
     if(playerShip->damaged)
     {
         playerShip->damaged++;
@@ -171,6 +166,11 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
     //Radar
     if(state != STATION)
     {
+        if(autodockPossible)
+        {
+            drawTexQuad(171, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
+        }
+
         drawRadarDot(playerShip->position, playerShip->rotation, stationPos, 1);
 
         for(uint8_t i = 0; i < NUM_NORM_NPC_SHIPS; i++)

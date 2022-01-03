@@ -43,6 +43,7 @@ uint16_t counterResult = 0;
 #endif
 
 #define MUSIC_DOCKING 0
+#define MUSIC_MAIN    1
 
 uint8_t running = 1;
 
@@ -103,36 +104,39 @@ uint8_t saveGame()
 
 uint8_t loadGame()
 {
-    openSave(".trispace", "game.sav", 0);
-    uint16_t version = 0;
-    readElement(&version, sizeof(version));
-    if((version / 100) == (SAVE_VERSION / 100)) //Check major version for save compatability
+    if(openSave(".trispace", "game.sav", 0))
     {
-        readElement(&playerShip.type, sizeof(playerShip.type));
-        readElement(&playerShip.hold, sizeof(playerShip.hold));
-        readElement(&playerShip.fuel, sizeof(playerShip.fuel));
-        uint8_t savedSystem[2];
-        readElement(&savedSystem[0], sizeof(uint8_t));
-        readElement(&savedSystem[1], sizeof(uint8_t));
-        switchSystem(currentSystem, savedSystem, &starSystem, npcShips);
-        readElement(&currentContract, sizeof(currentContract));
-        readElement(&completedContracts, sizeof(completedContracts));
-        return 1;
+        uint16_t version = 0;
+        readElement(&version, sizeof(version));
+        if((version / 100) == (SAVE_VERSION / 100)) //Check major version for save compatability
+        {
+            readElement(&playerShip.type, sizeof(playerShip.type));
+            readElement(&playerShip.hold, sizeof(playerShip.hold));
+            readElement(&playerShip.fuel, sizeof(playerShip.fuel));
+            uint8_t savedSystem[2];
+            readElement(&savedSystem[0], sizeof(uint8_t));
+            readElement(&savedSystem[1], sizeof(uint8_t));
+            switchSystem(currentSystem, savedSystem, &starSystem, npcShips);
+            readElement(&currentContract, sizeof(currentContract));
+            readElement(&completedContracts, sizeof(completedContracts));
+            return 1;
+        }
+        closeSave();
     }
-    else
-    {
-        return 0;
-    }
-    closeSave();
+    return 0;
 }
 
 void newGame()
 {
     playerShip.type = 0;
     playerShip.position.x = 150;
+    playerShip.position.y = 0;
     playerShip.position.z = 100;
+    playerShip.speed = 0;
+    playerShip.turnSpeedX = 0;
+    playerShip.turnSpeedY = 0;
     #ifdef DEBUG
-    playerShip.hold.money = 5000;
+    playerShip.hold.money = 50000;
     #else
     playerShip.hold.money = 150;
     #endif
@@ -141,6 +145,50 @@ void newGame()
     playerShip.fuel = 35;
     playerShip.shields = 2;
     playerShip.energy = 2;
+}
+
+uint8_t checkClosePopup()
+{
+    if(isPopupOpen())
+    {
+        if(keyUp(A) || keyUp(B))
+        {
+            closePopup();
+            return 1;
+        }
+    }
+    return 0;
+}
+
+void calcShipControl(uint32_t ticks)
+{
+    if(keyPressed(X))
+    {
+        accelerateShip(&playerShip, 1, ticks);
+    }
+    else if(keyPressed(Y))
+    {
+        accelerateShip(&playerShip, -1, ticks);
+    }
+    int8_t dirX = 0;
+    int8_t dirY = 0;
+    if(keyPressed(U))
+    {
+            dirX = 1;
+    }
+    else if(keyPressed(D))
+    {
+        dirX = -1;
+    }
+    if(keyPressed(L))
+    {
+        dirY = -1;
+    }
+    else if(keyPressed(R))
+    {
+        dirY = 1;
+    }
+    steerShip(&playerShip, dirX, dirY, ticks);
 }
 
 void calcFrame(uint32_t ticks)
@@ -170,44 +218,17 @@ void calcFrame(uint32_t ticks)
     switch(state)
     {
         case SPACE:
-        case STATION:
         {
             if(!autodock.active)
             {
-                if(keyPressed(X))
-                {
-                    accelerateShip(&playerShip, 1, ticks);
-                }
-                else if(keyPressed(Y))
-                {
-                    accelerateShip(&playerShip, -1, ticks);
-                }
-                int8_t dirX = 0;
-                int8_t dirY = 0;
-                if(keyPressed(U))
-                {
-                    dirX = 1;
-                }
-                else if(keyPressed(D))
-                {
-                    dirX = -1;
-                }
-                if(keyPressed(L))
-                {
-                    dirY = -1;
-                }
-                else if(keyPressed(R))
-                {
-                    dirY = 1;
-                }
-                steerShip(&playerShip, dirX, dirY, ticks);
+                calcShipControl(ticks);
 
                 if(keyUp(K))
                 {
                     preCalcAutodockShip(&autodock, &playerShip, &starSystem);
                     if(autodock.active)
                     {
-                        playMusic(MUSIC_DOCKING, 0);
+                        playMusic(MUSIC_DOCKING, 250);
                     }
                 }
             }
@@ -222,21 +243,11 @@ void calcFrame(uint32_t ticks)
 
                 if(!autodock.active)
                 {
-                    stopMusic(500);
+                    playMusic(MUSIC_MAIN, 250);
                 }
             }
 
-            uint8_t collided = 0;
-            if(state == SPACE)
-            {
-                collided = checkStarSystemCollision(&playerShip, &starSystem);
-            }
-            else
-            {
-                collided = checkStationCollision(&playerShip);
-            }
-
-            calcShip(&playerShip, collided, ticks);
+            calcShip(&playerShip, checkStarSystemCollision(&playerShip, &starSystem), ticks);
             setCameraPos(playerShip.position);
             setCameraRot(playerShip.rotation);
             calcSpacedust(&playerShip, ticks);
@@ -255,10 +266,21 @@ void calcFrame(uint32_t ticks)
                 state = GAME_OVER;
             }
 
-            if(keyUp(S) && state == SPACE)
+            if(keyUp(S))
             {
                 state = MAP;
             }
+            break;
+        }
+        case STATION:
+        {
+            calcShipControl(ticks);
+
+            calcShip(&playerShip, checkStationCollision(&playerShip), ticks);
+            setCameraPos(playerShip.position);
+            setCameraRot(playerShip.rotation);
+
+            calcUniverse(&state, &starSystem, &playerShip, npcShips, ticks);
             break;
         }
         case HYPERSPACE:
@@ -295,12 +317,8 @@ void calcFrame(uint32_t ticks)
         }
         case SAVELOAD:
         {
-            if(isPopupOpen())
+            if(checkClosePopup())
             {
-                if(keyUp(A) || keyUp(B))
-                {
-                    closePopup();
-                }
                 break;
             }
 
@@ -356,14 +374,7 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(U))
             {
-                if(uiTradeCursor > 0)
-                {
-                    uiTradeCursor--;
-                }
-                else
-                {
-                    uiTradeCursor = NUM_CARGO_TYPES - 1;
-                }
+                moveCursorUp(&uiTradeCursor, NUM_CARGO_TYPES - 1);
             }
             else if(keyUp(D))
             {
@@ -395,14 +406,7 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(U))
             {
-                if(uiEquipCursor > 0)
-                {
-                    uiEquipCursor--;
-                }
-                else
-                {
-                    uiEquipCursor = NUM_EQUIPMENT_TYPES - 1;
-                }
+                moveCursorUp(&uiEquipCursor, NUM_EQUIPMENT_TYPES - 1);
             }
             else if(keyUp(D))
             {
@@ -428,12 +432,8 @@ void calcFrame(uint32_t ticks)
         }
         case CONTRACTS:
         {
-            if(isPopupOpen())
+            if(checkClosePopup())
             {
-                if(keyUp(A) || keyUp(B))
-                {
-                    closePopup();
-                }
                 break;
             }
 
@@ -540,6 +540,11 @@ void calcFrame(uint32_t ticks)
         }
         case TITLE:
         {
+            if(checkClosePopup())
+            {
+                break;
+            }
+
             if(keyUp(U) || keyUp(D))
             {
                 if(uiTitleCursor)
@@ -560,8 +565,14 @@ void calcFrame(uint32_t ticks)
                 }
                 else
                 {
-                    loadGame();
-                    state = STATION;
+                    if(loadGame())
+                    {
+                        state = STATION;
+                    }
+                    else
+                    {
+                        createPopup(POPUP_ATTENTION, "Failed to load.");
+                    }
                 }
             }
             break;
@@ -619,6 +630,7 @@ void drawFrame()
     drawFPS(fps);
     #endif
 
+    //GUI drawing
     setOrtho();
     switch(state)
     {
@@ -659,6 +671,7 @@ void drawFrame()
         case TITLE:
         {
             drawTitleScreen(uiTitleCursor);
+            drawPopupIfActive();
             break;
         }
         case GAME_OVER:
@@ -710,8 +723,9 @@ int main(int argc, char **argv)
     initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
     setPerspective();
 
-    initAudio(MIX_MAX_VOLUME, 1, 2);
+    initAudio(MIX_MAX_VOLUME, 2, 2);
     loadMusic(MUSIC_DOCKING, "res/music/Blue_Danube.ogg");
+    loadMusic(MUSIC_MAIN, "res/music/menuLoops_rock.ogg");
 
     //Init UI variables to zero
     uiSaveLoadCursor = 0;
@@ -731,6 +745,8 @@ int main(int argc, char **argv)
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;
     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
+
+    playMusic(MUSIC_MAIN, 0);
 
     //Run main loop
 	uint32_t tNow = SDL_GetTicks();

@@ -7,7 +7,7 @@
 
 FILE* saveFile;
 
-void openSave(char* folder, char* name, uint8_t writing)
+uint8_t openSave(char* folder, char* name, uint8_t writing)
 {
     char buffer[255];
     sprintf(buffer, "%s/%s/", getenv("HOME"), folder);
@@ -24,6 +24,15 @@ void openSave(char* folder, char* name, uint8_t writing)
     else
     {
         saveFile = fopen(buffer, "rb");
+    }
+
+    if(saveFile == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        return 1;
     }
 }
 
