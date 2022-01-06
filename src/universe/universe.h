@@ -32,9 +32,15 @@ typedef enum {
 #define SPAWN_CHANCE 25
 
 void initUniverse(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[]);
+
+void initSystem(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[]);
+void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[]);
+
+void setInitialSpawnPos(vec3 playerPos);
+
 void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
-void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[]);
+
 uint32_t getSeedForSystem(uint8_t x, uint8_t y);
 float getDistanceToSystem(uint8_t currentSystem[2], uint8_t targetSystem[2]);
 

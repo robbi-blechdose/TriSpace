@@ -10,7 +10,7 @@ uint8_t calcNPCAiStateAttack(Ship* playerShip, Ship* npcShip, uint32_t ticks, fl
         *targetX = angleX;
         accelerateShip(npcShip, 1, ticks);
         //Fire weapons!
-        fireWeapons(npcShip, playerShip, 1);
+        fireWeapons(npcShip, playerShip, 1, DAMAGE_SOURCE_NPC);
         if(distance < AI_RANGE_TOONEAR)
         {
             if(randr(100) < 50)
@@ -151,7 +151,7 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
             }
             //State transition
             //TODO: Check for damage to mission-specific ship!
-            if(npcShip->damaged)
+            if(npcShip->damaged == DAMAGE_SOURCE_PLAYER)
             {
                 npcShip->damaged = 0;
                 npcShip->aiState = STATE_ATTACK;

@@ -116,7 +116,8 @@ uint8_t loadGame()
             uint8_t savedSystem[2];
             readElement(&savedSystem[0], sizeof(uint8_t));
             readElement(&savedSystem[1], sizeof(uint8_t));
-            switchSystem(currentSystem, savedSystem, &starSystem, npcShips);
+            deleteStarSystem(&starSystem);
+            initSystem(currentSystem, &starSystem, npcShips);
             readElement(&currentContract, sizeof(currentContract));
             readElement(&completedContracts, sizeof(completedContracts));
             return 1;
@@ -128,13 +129,11 @@ uint8_t loadGame()
 
 void newGame()
 {
+    //Initialize player ship
     playerShip.type = 0;
     playerShip.position.x = 150;
     playerShip.position.y = 0;
     playerShip.position.z = 100;
-    playerShip.speed = 0;
-    playerShip.turnSpeedX = 0;
-    playerShip.turnSpeedY = 0;
     #ifdef DEBUG
     playerShip.hold.money = 50000;
     #else
@@ -145,6 +144,11 @@ void newGame()
     playerShip.fuel = 35;
     playerShip.shields = 2;
     playerShip.energy = 2;
+    //Initialize system
+    currentSystem[0] = 0;
+    currentSystem[1] = 0;
+    initSystem(currentSystem, &starSystem, npcShips);
+    setInitialSpawnPos(playerShip.position);
 }
 
 uint8_t checkClosePopup()
@@ -254,7 +258,7 @@ void calcFrame(uint32_t ticks)
 
             if(keyUp(A))
             {
-                fireWeapons(&playerShip, npcShips, MAX_NPC_SHIPS);
+                fireWeapons(&playerShip, npcShips, MAX_NPC_SHIPS, DAMAGE_SOURCE_PLAYER);
             }
 
             calcUniverse(&state, &starSystem, &playerShip, npcShips, ticks);
@@ -292,6 +296,7 @@ void calcFrame(uint32_t ticks)
                 {
                     switchSystem(currentSystem, uiMapCursor, &starSystem, npcShips);
                     playerShip.position = getRandomFreePos(&starSystem, 20);
+                    setInitialSpawnPos(playerShip.position);
                     //Generate contracts for this system
                     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
                     //Generate new station cargo hold for this system
@@ -584,11 +589,15 @@ void calcFrame(uint32_t ticks)
             if(keyUp(A) || keyUp(S))
             {
                 state = TITLE;
-                for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
+                //Clear player ship fields
+                playerShip.speed = 0;
+                playerShip.turnSpeedX = 0;
+                playerShip.turnSpeedY = 0;
+                for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
                 {
-                    npcShips[i].type = SHIP_TYPE_NULL;
+                    playerShip.hold.cargo[i] = 0;
                 }
-                //TODO: more clean up
+                //TODO: more clean up?
             }
             break;
         }
@@ -763,7 +772,6 @@ int main(int argc, char **argv)
         drawFrame();
 
         #ifdef LIMIT_FPS
-		//if((1000 / MAX_FPS) > (SDL_GetTicks() - tNow))
 		while((1000 / MAX_FPS) > (SDL_GetTicks() - tNow + 1))
         {
 			//SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); //Yay stable framerate!

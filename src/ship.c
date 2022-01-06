@@ -158,9 +158,9 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
     ship->speed = clampf(ship->speed, 0, shipTypes[ship->type].maxSpeed);
 }
 
-uint8_t damageShip(Ship* ship, uint8_t damage)
+uint8_t damageShip(Ship* ship, uint8_t damage, uint8_t source)
 {
-    ship->damaged = 1;
+    ship->damaged = source;
     ship->shields -= damage;
     return ship->shields < 0;
 }
@@ -170,7 +170,7 @@ uint8_t shipIsDestroyed(Ship* ship)
     return ship->shields < 0;
 }
 
-void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
+void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t source)
 {
     if(ship->weapon.timer)
     {
@@ -201,7 +201,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets)
         if(hit != -1)
         {
             ship->weapon.distanceToHit = hit;
-            uint8_t destroyed = damageShip(&targetShips[i], weaponTypes[ship->weapon.type].damage);
+            uint8_t destroyed = damageShip(&targetShips[i], weaponTypes[ship->weapon.type].damage, source);
             if(!destroyed)
             {
                 createEffect(targetShips[i].position, SPARKS);

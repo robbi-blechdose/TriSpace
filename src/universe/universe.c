@@ -13,20 +13,7 @@ uint32_t systemSeeds[UNIVERSE_SIZE][UNIVERSE_SIZE];
 
 uint8_t sampleExplosion;
 
-void initSystem(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[])
-{
-    generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
-    //Clear NPC ships
-    for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
-    {
-        npcShips[i].type = SHIP_TYPE_NULL;
-    }
-    //Create asteroids for system (if any)
-    if(starSystem->hasAsteroidField)
-    {
-        createAsteroids(starSystem->asteroidFieldPos);
-    }
-}
+vec3 lastPlayerPos;
 
 void initUniverse(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[])
 {
@@ -40,7 +27,21 @@ void initUniverse(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[
     //Init starting star system
     currentSystem[0] = 0;
     currentSystem[1] = 0;
-    initSystem(currentSystem, starSystem, npcShips);
+}
+
+void initSystem(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[])
+{
+    generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
+    //Clear NPC ships
+    for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
+    {
+        npcShips[i].type = SHIP_TYPE_NULL;
+    }
+    //Create asteroids for system (if any)
+    if(starSystem->hasAsteroidField)
+    {
+        createAsteroids(starSystem->asteroidFieldPos);
+    }
 }
 
 void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Ship npcShips[])
@@ -113,10 +114,13 @@ void generateNPCShips(Ship npcShips[], uint8_t maxShips, StarSystem* starSystem,
     }
 }
 
+void setInitialSpawnPos(vec3 playerPos)
+{
+    lastPlayerPos = playerPos;
+}
+
 void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
 {
-    static vec3 lastPlayerPos;
-
     if(distance3d(&lastPlayerPos, &playerShip->position) > SPAWN_INTERVAL_DISTANCE)
     {
         //Generate NPC ships
