@@ -79,3 +79,8 @@ uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t 
     }
     return 0;
 }
+
+Asteroid* getAsteroids()
+{
+    return asteroids;
+}

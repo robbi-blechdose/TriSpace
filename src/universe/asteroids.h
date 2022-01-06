@@ -20,4 +20,6 @@ void drawAsteroids();
 
 uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance);
 
+Asteroid* getAsteroids();
+
 #endif

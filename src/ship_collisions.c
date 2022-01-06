@@ -1,5 +1,6 @@
 #include "ship_collisions.h"
 #include <math.h>
+#include "universe/asteroids.h"
 
 uint8_t checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
 {
@@ -23,6 +24,19 @@ uint8_t checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
     if(distance3d(&starSystem->station.position, &ship->position) < 6.75f && fabs(starSystem->station.position.y - ship->position.y) < 2.4f)
     {
         return 1;
+    }
+    //Basic collisions for asteroids
+    //Preliminary check (are we near the asteroid field?)
+    if(distance3d(&starSystem->asteroidFieldPos, &ship->position) < ASTEROID_FIELD_SIZE + 10)
+    {
+        for(uint8_t i = 0; i < NUM_ASTEROIDS; i++)
+        {
+            Asteroid asteroid = getAsteroids()[i];
+            if(distance3d(&asteroid.position, &ship->position) < asteroid.size + 2)
+            {
+                return 1;
+            }
+        }
     }
     return 0;
 }
