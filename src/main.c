@@ -476,7 +476,7 @@ void calcFrame(uint32_t ticks)
                 {
                     if(checkContract(&currentContract, &playerShip.hold, currentSystem, npcShips))
                     {
-                        uint8_t buffer[80];
+                        uint8_t buffer[64];
                         sprintf(buffer, "Contract done.\n%5d credits\nhave been\ntransferred.", currentContract.pay);
                         createPopup(POPUP_CHECKMARK, buffer);
                         completedContracts[currentSystem[0]][currentSystem[1]]++;

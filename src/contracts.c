@@ -192,11 +192,25 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
     {
         case CONTRACT_DESTROY_SHIP:
         {
+            //Spawn the cruise liner
             npcShips[NPC_SHIP_CONTRACT].type = SHIP_TYPE_CRUISELINER;
             vec3 pos = getRandomFreePos(starSystem, 20);
             npcShips[NPC_SHIP_CONTRACT].position.x = pos.x;
             npcShips[NPC_SHIP_CONTRACT].position.z = pos.z;
             npcShips[NPC_SHIP_CONTRACT].position.y = pos.y;
+
+            //Spawn a few police ships to protect it
+            uint8_t numPoliceShips = randr(5);
+            for(uint8_t i = 0; i < numPoliceShips; i++)
+            {
+                vec3 policePos = getRandomFreePosBounds(starSystem, pos, (vec3) {.x = 100, .y = 50, .z = 100}, 25, 25);
+                npcShips[i].type = SHIP_TYPE_POLICE;
+                npcShips[i].position.x = policePos.x;
+                npcShips[i].position.y = policePos.y;
+                npcShips[i].position.z = policePos.z;
+                printf("%d\n", numPoliceShips);
+            }
+
             break;
         }
     }

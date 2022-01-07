@@ -19,8 +19,8 @@ const ShipType shipTypes[NUM_SHIP_TYPES] = {
 
 const WeaponType weaponTypes[] = {
     {.cooldown = 400, .damage = 2, .energyUsage = 1, .mineChance = 15}, //MkI laser
-    {.cooldown = 350, .damage = 2, .energyUsage = 1, .mineChance = 8}, //MkII laser
-    {.cooldown = 300, .damage = 4, .energyUsage = 2, .mineChance = 8}, //MkIII military laser
+    {.cooldown = 350, .damage = 2, .energyUsage = 1, .mineChance = 8},  //MkII laser
+    {.cooldown = 300, .damage = 4, .energyUsage = 2, .mineChance = 8},  //MkIII military laser
     {.cooldown = 400, .damage = 2, .energyUsage = 3, .mineChance = 40}  //Mining laser
 };
 

@@ -469,12 +469,12 @@ void drawTitleScreen(uint8_t cursor)
     if(cursor == 0)
     {
         glDrawText("New game", CENTER(8), 32, 0x00FFFF);
-        glDrawText("Load game", CENTER(9), 48, 0xFFFFFF);
+        glDrawText("Continue game", CENTER(13), 48, 0xFFFFFF);
     }
     else
     {
         glDrawText("New game", CENTER(8), 32, 0xFFFFFF);
-        glDrawText("Load game", CENTER(9), 48, 0x00FFFF);
+        glDrawText("Continue game", CENTER(13), 48, 0x00FFFF);
     }
 }
 
