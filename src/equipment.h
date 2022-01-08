@@ -3,14 +3,15 @@
 
 #include "ship.h"
 
-#define NUM_EQUIPMENT_TYPES 5
+#define NUM_EQUIPMENT_TYPES 6
 
 typedef enum {
     Fuel,
     Cargo30,
     LaserMkII,
     LaserMkIII,
-    MiningLaser
+    MiningLaser,
+    DockingComputer
 } EquipmentType;
 
 uint16_t getPriceForEquipment(EquipmentType type);

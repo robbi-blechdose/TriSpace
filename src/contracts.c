@@ -208,9 +208,7 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
                 npcShips[i].position.x = policePos.x;
                 npcShips[i].position.y = policePos.y;
                 npcShips[i].position.z = policePos.z;
-                printf("%d\n", numPoliceShips);
             }
-
             break;
         }
     }

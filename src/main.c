@@ -28,7 +28,7 @@
 #define MAX_FPS 50
 #define LIMIT_FPS
 
-#define SAVE_VERSION 301
+#define SAVE_VERSION 400
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
@@ -94,6 +94,8 @@ uint8_t saveGame()
     writeElement(&playerShip.type, sizeof(playerShip.type));
     writeElement(&playerShip.hold, sizeof(playerShip.hold));
     writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
+    writeElement(&playerShip.hasAutodock, sizeof(playerShip.hasAutodock));
+    writeElement(&playerShip.weapon.type, sizeof(playerShip.weapon.type));
     writeElement(&currentSystem[0], sizeof(uint8_t));
     writeElement(&currentSystem[1], sizeof(uint8_t));
     writeElement(&currentContract, sizeof(currentContract));
@@ -113,6 +115,8 @@ uint8_t loadGame()
             readElement(&playerShip.type, sizeof(playerShip.type));
             readElement(&playerShip.hold, sizeof(playerShip.hold));
             readElement(&playerShip.fuel, sizeof(playerShip.fuel));
+            readElement(&playerShip.hasAutodock, sizeof(playerShip.hasAutodock));
+            readElement(&playerShip.weapon.type, sizeof(playerShip.weapon.type));
             uint8_t savedSystem[2];
             readElement(&savedSystem[0], sizeof(uint8_t));
             readElement(&savedSystem[1], sizeof(uint8_t));
@@ -141,6 +145,7 @@ void newGame()
     #endif
     playerShip.hold.size = CARGO_HOLD_SIZE_NORM;
     playerShip.weapon.type = 0;
+    playerShip.hasAutodock = 0;
     playerShip.fuel = 35;
     playerShip.shields = 2;
     playerShip.energy = 2;
@@ -227,7 +232,7 @@ void calcFrame(uint32_t ticks)
             {
                 calcShipControl(ticks);
 
-                if(keyUp(K))
+                if(keyUp(K) && playerShip.hasAutodock)
                 {
                     preCalcAutodockShip(&autodock, &playerShip, &starSystem);
                     if(autodock.active)
@@ -597,7 +602,6 @@ void calcFrame(uint32_t ticks)
                 {
                     playerShip.hold.cargo[i] = 0;
                 }
-                //TODO: more clean up?
             }
             break;
         }
@@ -647,7 +651,7 @@ void drawFrame()
         case STATION:
         case HYPERSPACE:
         {
-            drawUI(state, &playerShip, npcShips, starSystem.station.position, isAutodockPossible(&playerShip, &starSystem));
+            drawUI(state, &playerShip, npcShips, starSystem.station.position, playerShip.hasAutodock && isAutodockPossible(&playerShip, &starSystem));
             break;
         }
         case SAVELOAD:

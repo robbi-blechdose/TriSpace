@@ -319,6 +319,12 @@ void drawEquipUI(uint8_t cursor, Ship* playerShip)
             y = 24 * 2;
             break;
         }
+        case DockingComputer:
+        {
+            x = 0;
+            y = 24 * 4;
+            break;
+        }
     }
     drawTexQuad(120 - 48, 32, 24 * 4, 24 * 2, UITH, PTC(x), PTC(y), PTC(x + 24 * 4), PTC(y + 24 * 2));
     glEnd();

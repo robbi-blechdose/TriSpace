@@ -44,8 +44,11 @@ typedef struct {
     float turnSpeedX;
     float turnSpeedY;
 
-    //AI-specific stuff
-    uint8_t aiState;
+    //The player ships has no AI, and AI ships can't autodock, so we can reuse this memory
+    union {
+        uint8_t aiState;
+        uint8_t hasAutodock;
+    };
     float aiRotX;
     float aiRotY;
     uint8_t damaged;

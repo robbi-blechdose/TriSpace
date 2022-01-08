@@ -24,6 +24,10 @@ uint16_t getPriceForEquipment(EquipmentType type)
         {
             return 2000;
         }
+        case DockingComputer:
+        {
+            return 450;
+        }
     }
     return 0;
 }
@@ -55,6 +59,11 @@ void printNameForEquipment(char* str, EquipmentType type)
         case MiningLaser:
         {
             strcpy(str, "Mining laser");
+            break;
+        }
+        case DockingComputer:
+        {
+            strcpy(str, "Docking computer");
             break;
         }
     }
@@ -101,6 +110,11 @@ void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
             printOwn(str, ship->weapon.type == 3);
             break;
         }
+        case DockingComputer:
+        {
+            printOwn(str, ship->hasAutodock);
+            break;
+        }
     }
 }
 
@@ -111,10 +125,9 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
     {
         return 0;
     }
-    ship->hold.money -= price;
 
     //Sell old equipment (if applicable)
-    price = 0;
+    uint16_t sellPrice = 0;
     switch(type)
     {
         case LaserMkII:
@@ -126,26 +139,26 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
                 //Laser Mk II
                 case 1:
                 {
-                    price = getPriceForEquipment(LaserMkII);
+                    sellPrice = getPriceForEquipment(LaserMkII);
                     break;
                 }
                 //Laser Mk III
                 case 2:
                 {
-                    price = getPriceForEquipment(LaserMkIII);
+                    sellPrice = getPriceForEquipment(LaserMkIII);
                     break;
                 }
                 //Mining Laser
                 case 3:
                 {
-                    price = getPriceForEquipment(MiningLaser);
+                    sellPrice = getPriceForEquipment(MiningLaser);
                     break;
                 }
             }
             break;
         }
     }
-    ship->hold.money += price;
+    ship->hold.money += sellPrice;
     
     //Buy new equipment
     switch(type)
@@ -159,27 +172,44 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
                 {
                     ship->fuel = MAX_FUEL;
                 }
+                ship->hold.money -= price;
             }
             break;
         }
         case Cargo30:
         {
-            ship->hold.size = 30;
+            if(ship->hold.size != 30)
+            {
+                ship->hold.size = 30;
+                ship->hold.money -= price;
+            }
             break;
         }
         case LaserMkII:
         {
             ship->weapon.type = 1;
+            ship->hold.money -= price;
             break;
         }
         case LaserMkIII:
         {
             ship->weapon.type = 2;
+            ship->hold.money -= price;
             break;
         }
         case MiningLaser:
         {
             ship->weapon.type = 3;
+            ship->hold.money -= price;
+            break;
+        }
+        case DockingComputer:
+        {
+            if(!ship->hasAutodock)
+            {
+                ship->hasAutodock = 1;
+                ship->hold.money -= price;
+            }
             break;
         }
     }

@@ -1,5 +1,6 @@
 #include "shipAi.h"
 #include <stdlib.h>
+#include "universe/universe.h"
 
 uint8_t calcNPCAiStateAttack(Ship* playerShip, Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
 {
@@ -138,7 +139,7 @@ void calcNPCAiEnemy(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dista
     }
 }
 
-void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY)
+void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float distance, float angleX, float angleY, float* targetX, float* targetY, Ship* npcShips)
 {
     switch(npcShip->aiState)
     {
@@ -150,7 +151,12 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
                 accelerateShip(npcShip, -1, ticks);
             }
             //State transition
-            //TODO: Check for damage to mission-specific ship!
+            if(npcShips[NPC_SHIP_CONTRACT].damaged == DAMAGE_SOURCE_PLAYER)
+            {
+                npcShips[NPC_SHIP_CONTRACT].damaged = 0;
+                npcShip->aiState = STATE_ATTACK;
+                break;
+            }
             if(npcShip->damaged == DAMAGE_SOURCE_PLAYER)
             {
                 npcShip->damaged = 0;
@@ -219,7 +225,7 @@ void calcNPCAiFriendly(Ship* npcShip, uint32_t ticks, float distance, float angl
     }
 }
 
-void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
+void calcNPCAi(Ship* playerShip, Ship* npcShip, Ship* npcShips, uint32_t ticks)
 {
     float distance = distance3d(&playerShip->position, &npcShip->position);
     float angleX, angleY;
@@ -240,7 +246,7 @@ void calcNPCAi(Ship* playerShip, Ship* npcShip, uint32_t ticks)
         }
         case SHIP_TYPE_POLICE:
         {
-            calcNPCAiPolice(playerShip, npcShip, ticks, distance, angleX, angleY, &targetX, &targetY);
+            calcNPCAiPolice(playerShip, npcShip, ticks, distance, angleX, angleY, &targetX, &targetY, npcShips);
             break;
         }
     }

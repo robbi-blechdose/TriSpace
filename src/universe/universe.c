@@ -62,7 +62,7 @@ void calcNPCShips(StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uin
     {
         if(npcShips[i].type != SHIP_TYPE_NULL)
         {
-            calcNPCAi(playerShip, &npcShips[i], ticks);
+            calcNPCAi(playerShip, &npcShips[i], npcShips, ticks);
             //TODO: Collisions?
             calcShip(&npcShips[i], 0, ticks);
             if(shipIsDestroyed(&npcShips[i]))
