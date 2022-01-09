@@ -33,42 +33,42 @@ uint8_t handleInput()
         {
             case SDLK_u:
             {
-                keys[U] = state;
+                keys[B_UP] = state;
                 break;
             }
             case SDLK_d:
             {
-                keys[D] = state;
+                keys[B_DOWN] = state;
                 break;
             }
             case SDLK_l:
             {
-                keys[L] = state;
+                keys[B_LEFT] = state;
                 break;
             }
             case SDLK_r:
             {
-                keys[R] = state;
+                keys[B_RIGHT] = state;
                 break;
             }
             case SDLK_a:
             {
-                keys[A] = state;
+                keys[B_A] = state;
                 break;
             }
             case SDLK_b:
             {
-                keys[B] = state;
+                keys[B_B] = state;
                 break;
             }
             case SDLK_x:
             {
-                keys[X] = state;
+                keys[B_X] = state;
                 break;
             }
             case SDLK_y:
             {
-                keys[Y] = state;
+                keys[B_Y] = state;
                 break;
             }
             case SDLK_m:
@@ -88,17 +88,12 @@ uint8_t handleInput()
             }
             case SDLK_k:
             {
-                keys[K] = state;
+                keys[B_SELECT] = state;
                 break;
             }
             case SDLK_s:
             {
-                keys[S] = state;
-                break;
-            }
-            case SDLK_z:
-            {
-                keys[Z] = state;
+                keys[B_START] = state;
                 break;
             }
         }

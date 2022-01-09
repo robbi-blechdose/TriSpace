@@ -3,28 +3,26 @@
 
 #include <SDL.h>
 
-#define NUM_KEYS 14
+#define NUM_KEYS 13
 
 typedef enum {
     //Keypad
-    U,
-    D,
-    L,
-    R,
+    B_UP,
+    B_DOWN,
+    B_LEFT,
+    B_RIGHT,
     //ABXY
-    A,
-    B,
-    X,
-    Y,
+    B_A,
+    B_B,
+    B_X,
+    B_Y,
     //Shoulder buttons
     M,
     N,
     //Power, Start, Select
     Q,
-    K,
-    S,
-    //Debug key (PC only, the FK doesn't have it)
-    Z
+    B_SELECT,
+    B_START
 } Key;
 
 uint8_t handleInput();

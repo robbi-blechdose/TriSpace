@@ -160,7 +160,7 @@ uint8_t checkClosePopup()
 {
     if(isPopupOpen())
     {
-        if(keyUp(A) || keyUp(B))
+        if(keyUp(B_A) || keyUp(B_B))
         {
             closePopup();
             return 1;
@@ -171,29 +171,29 @@ uint8_t checkClosePopup()
 
 void calcShipControl(uint32_t ticks)
 {
-    if(keyPressed(X))
+    if(keyPressed(B_X))
     {
         accelerateShip(&playerShip, 1, ticks);
     }
-    else if(keyPressed(Y))
+    else if(keyPressed(B_Y))
     {
         accelerateShip(&playerShip, -1, ticks);
     }
     int8_t dirX = 0;
     int8_t dirY = 0;
-    if(keyPressed(U))
+    if(keyPressed(B_UP))
     {
-            dirX = 1;
+        dirX = 1;
     }
-    else if(keyPressed(D))
+    else if(keyPressed(B_DOWN))
     {
         dirX = -1;
     }
-    if(keyPressed(L))
+    if(keyPressed(B_LEFT))
     {
         dirY = -1;
     }
-    else if(keyPressed(R))
+    else if(keyPressed(B_RIGHT))
     {
         dirY = 1;
     }
@@ -209,7 +209,7 @@ void calcFrame(uint32_t ticks)
         counterFrames++;
     }
 
-    if(keyUp(K))
+    if(keyUp(B_SELECT))
     {
         counterEnabled = !counterEnabled;
         if(!counterEnabled)
@@ -232,7 +232,7 @@ void calcFrame(uint32_t ticks)
             {
                 calcShipControl(ticks);
 
-                if(keyUp(K) && playerShip.hasAutodock)
+                if(keyUp(B_SELECT) && playerShip.hasAutodock)
                 {
                     preCalcAutodockShip(&autodock, &playerShip, &starSystem);
                     if(autodock.active)
@@ -245,7 +245,7 @@ void calcFrame(uint32_t ticks)
             {
                 calcAutodockShip(&autodock, &playerShip, ticks);
 
-                if(keyUp(K))
+                if(keyUp(B_SELECT))
                 {
                     autodock.active = 0;
                 }
@@ -261,7 +261,7 @@ void calcFrame(uint32_t ticks)
             setCameraRot(playerShip.rotation);
             calcSpacedust(&playerShip, ticks);
 
-            if(keyUp(A))
+            if(keyUp(B_A))
             {
                 fireWeapons(&playerShip, npcShips, MAX_NPC_SHIPS, DAMAGE_SOURCE_PLAYER);
             }
@@ -275,7 +275,7 @@ void calcFrame(uint32_t ticks)
                 state = GAME_OVER;
             }
 
-            if(keyUp(S))
+            if(keyUp(B_START))
             {
                 state = MAP;
             }
@@ -332,7 +332,7 @@ void calcFrame(uint32_t ticks)
                 break;
             }
 
-            if(keyUp(U) || keyUp(D))
+            if(keyUp(B_UP) || keyUp(B_DOWN))
             {
                 if(uiSaveLoadCursor)
                 {
@@ -343,7 +343,7 @@ void calcFrame(uint32_t ticks)
                     uiSaveLoadCursor = 1;
                 }
             }
-            else if(keyUp(A))
+            else if(keyUp(B_A))
             {
                 if(uiSaveLoadCursor == 0)
                 {
@@ -370,7 +370,7 @@ void calcFrame(uint32_t ticks)
                     }
                 }
             }
-            else if(keyUp(B))
+            else if(keyUp(B_B))
             {
                 state = STATION;
             }
@@ -382,23 +382,23 @@ void calcFrame(uint32_t ticks)
         }
         case TRADING:
         {
-            if(keyUp(U))
+            if(keyUp(B_UP))
             {
                 moveCursorUp(&uiTradeCursor, NUM_CARGO_TYPES - 1);
             }
-            else if(keyUp(D))
+            else if(keyUp(B_DOWN))
             {
                 uiTradeCursor = (uiTradeCursor + 1) % NUM_CARGO_TYPES;
             }
-            else if(keyUp(L))
+            else if(keyUp(B_LEFT))
             {
                 transferCargo(&playerShip.hold, &stationHold, uiTradeCursor, &starSystem.info);
             }
-            else if(keyUp(R))
+            else if(keyUp(B_RIGHT))
             {
                 transferCargo(&stationHold, &playerShip.hold, uiTradeCursor, &starSystem.info);
             }
-            else if(keyUp(B))
+            else if(keyUp(B_B))
             {
                 state = STATION;
             }
@@ -414,19 +414,19 @@ void calcFrame(uint32_t ticks)
         }
         case EQUIP:
         {
-            if(keyUp(U))
+            if(keyUp(B_UP))
             {
                 moveCursorUp(&uiEquipCursor, NUM_EQUIPMENT_TYPES - 1);
             }
-            else if(keyUp(D))
+            else if(keyUp(B_DOWN))
             {
                 uiEquipCursor = (uiEquipCursor + 1) % NUM_EQUIPMENT_TYPES;
             }
-            else if(keyUp(A))
+            else if(keyUp(B_A))
             {
                 buyEquipment(&playerShip, uiEquipCursor);
             }
-            else if(keyUp(B))
+            else if(keyUp(B_B))
             {
                 state = STATION;
             }
@@ -447,15 +447,15 @@ void calcFrame(uint32_t ticks)
                 break;
             }
 
-            if(keyUp(U))
+            if(keyUp(B_UP))
             {
                 moveCursorUp(&uiContractCursor, numStationContracts - 1);
             }
-            else if(keyUp(D))
+            else if(keyUp(B_DOWN))
             {
                 moveCursorDown(&uiContractCursor, numStationContracts - 1);
             }
-            else if(keyUp(A))
+            else if(keyUp(B_A))
             {
                 if(currentContract.type == CONTRACT_TYPE_NULL)
                 {
@@ -490,7 +490,7 @@ void calcFrame(uint32_t ticks)
                     }
                 }
             }
-            else if(keyUp(B))
+            else if(keyUp(B_B))
             {
                 state = STATION;
             }
@@ -502,28 +502,28 @@ void calcFrame(uint32_t ticks)
         }
         case MAP:
         {
-            if(keyUp(U))
+            if(keyUp(B_UP))
             {
                 if(uiMapCursor[1] < UNIVERSE_SIZE - 1)
                 {
                     uiMapCursor[1]++;
                 }
             }
-            else if(keyUp(D))
+            else if(keyUp(B_DOWN))
             {
                 if(uiMapCursor[1] > 0)
                 {
                     uiMapCursor[1]--;
                 }
             }
-            if(keyUp(L))
+            if(keyUp(B_LEFT))
             {
                 if(uiMapCursor[0] > 0)
                 {
                     uiMapCursor[0]--;
                 }
             }
-            else if(keyUp(R))
+            else if(keyUp(B_RIGHT))
             {
                 if(uiMapCursor[0] < UNIVERSE_SIZE - 1)
                 {
@@ -531,11 +531,11 @@ void calcFrame(uint32_t ticks)
                 }
             }
 
-            if(keyUp(S))
+            if(keyUp(B_START))
             {
                 state = SPACE;
             }
-            else if(keyUp(A))
+            else if(keyUp(B_A))
             {
                 float distance = getDistanceToSystem(currentSystem, uiMapCursor);
                 if(playerShip.fuel >= distance * 10)
@@ -555,7 +555,7 @@ void calcFrame(uint32_t ticks)
                 break;
             }
 
-            if(keyUp(U) || keyUp(D))
+            if(keyUp(B_UP) || keyUp(B_DOWN))
             {
                 if(uiTitleCursor)
                 {
@@ -566,7 +566,7 @@ void calcFrame(uint32_t ticks)
                     uiTitleCursor = 1;
                 }
             }
-            else if(keyUp(A) || keyUp(S))
+            else if(keyUp(B_A) || keyUp(B_START))
             {
                 if(uiTitleCursor == 0)
                 {
@@ -591,7 +591,7 @@ void calcFrame(uint32_t ticks)
         {
             calcEffects(ticks);
 
-            if(keyUp(A) || keyUp(S))
+            if(keyUp(B_A) || keyUp(B_START))
             {
                 state = TITLE;
                 //Clear player ship fields
