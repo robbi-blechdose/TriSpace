@@ -153,6 +153,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
         drawTexQuad(7, 27, fuelTemp * 4, 4, UITH, 0, PTC(246), PTC(4) * fuelTemp, PTC(248));
     }
 
+    //Damage indicator
     if(playerShip->damaged)
     {
         playerShip->damaged++;
@@ -183,7 +184,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
                 }
             }
         }
-        ///Contract ship
+        //Contract ship
         if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL)
         {
             drawRadarDot(playerShip->position, playerShip->rotation, npcShips[NPC_SHIP_CONTRACT].position, 3);
@@ -293,6 +294,7 @@ void drawEquipUI(uint8_t cursor, Ship* playerShip)
         }
     }
 
+    //Draw ship with highlight for selected component
     glBindTexture(GL_TEXTURE_2D, equipmentTexture);
     glBegin(GL_QUADS);
     drawTexQuad(120 - 48, 32, 24 * 4, 24 * 2, UITH, 0, 0, PTC(24 * 4), PTC(24 * 2));
@@ -424,7 +426,7 @@ void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
         {
             uint8_t numStars = getNumStarsForSystem(getSeedForSystem(i, j)) - 1;
             generateSystemPos(&systemPos, getSeedForSystem(i, j), i, j);
-            drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
+            drawTexQuad(24 + systemPos.x - (mapScrollX * 64),
                         80 + systemPos.y - (mapScrollY * 64),
                         15, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
         }
@@ -433,13 +435,13 @@ void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
     if(getDistanceToSystem(currentSystem, cursor) <= fuel)
     {
         //Green, we can go there
-        drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
+        drawTexQuad(24 + systemPos.x - (mapScrollX * 64),
                     80 + systemPos.y - (mapScrollY * 64), 15, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
     }
     else
     {
         //Red, too far away
-        drawTexQuad(8 + systemPos.x - (mapScrollX * 64),
+        drawTexQuad(24 + systemPos.x - (mapScrollX * 64),
                     80 + systemPos.y - (mapScrollY * 64), 15, 16, UITH, PTC(241), PTC(64), 1, PTC(80));
     }
 
@@ -470,18 +472,23 @@ void drawTitleScreen(uint8_t cursor)
     glBegin(GL_QUADS);
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
     glEnd();
-    glDrawText("TriSpace", CENTER(8), 2, 0xFFFFFF);
+    glTextSize(GL_TEXT_SIZE16x16);
+    glDrawText("TriSpace", CENTER(8 * 2), 20, 0xFFFFFF);
+    glTextSize(GL_TEXT_SIZE8x8);
 
     if(cursor == 0)
     {
-        glDrawText("New game", CENTER(8), 32, 0x00FFFF);
-        glDrawText("Continue game", CENTER(13), 48, 0xFFFFFF);
+        glDrawText("New game", CENTER(8), 64, 0x00FFFF);
+        glDrawText("Continue game", CENTER(13), 80, 0xFFFFFF);
     }
     else
     {
-        glDrawText("New game", CENTER(8), 32, 0xFFFFFF);
-        glDrawText("Continue game", CENTER(13), 48, 0x00FFFF);
+        glDrawText("New game", CENTER(8), 64, 0xFFFFFF);
+        glDrawText("Continue game", CENTER(13), 80, 0x00FFFF);
     }
+
+    glDrawText("2021 - 2022", CENTER(11), 220, 0xFFFFFF);
+    glDrawText("Robbi Blechdose", CENTER(15), 230, 0xFFFFFF);
 }
 
 void drawGameOverScreen()
