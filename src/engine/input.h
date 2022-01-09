@@ -16,9 +16,9 @@ typedef enum {
     B_B,
     B_X,
     B_Y,
-    //Shoulder buttons
-    M,
-    N,
+    //Shoulder (trigger) buttons
+    B_TL,
+    B_TR,
     //Power, Start, Select
     Q,
     B_SELECT,

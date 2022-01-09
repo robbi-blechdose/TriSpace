@@ -374,7 +374,7 @@ void calcFrame(uint32_t ticks)
             {
                 state = STATION;
             }
-            else if(keyUp(N))
+            else if(keyUp(B_TR))
             {
                 state = TRADING;
             }
@@ -402,11 +402,11 @@ void calcFrame(uint32_t ticks)
             {
                 state = STATION;
             }
-            else if(keyUp(M))
+            else if(keyUp(B_TL))
             {
                 state = SAVELOAD;
             }
-            else if(keyUp(N))
+            else if(keyUp(B_TR))
             {
                 state = EQUIP;
             }
@@ -430,11 +430,11 @@ void calcFrame(uint32_t ticks)
             {
                 state = STATION;
             }
-            else if(keyUp(M))
+            else if(keyUp(B_TL))
             {
                 state = TRADING;
             }
-            else if(keyUp(N))
+            else if(keyUp(B_TR))
             {
                 state = CONTRACTS;
             }
@@ -494,7 +494,7 @@ void calcFrame(uint32_t ticks)
             {
                 state = STATION;
             }
-            else if(keyUp(M))
+            else if(keyUp(B_TL))
             {
                 state = EQUIP;
             }

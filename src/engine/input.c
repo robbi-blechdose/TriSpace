@@ -73,12 +73,12 @@ uint8_t handleInput()
             }
             case SDLK_m:
             {
-                keys[M] = state;
+                keys[B_TL] = state;
                 break;
             }
             case SDLK_n:
             {
-                keys[N] = state;
+                keys[B_TR] = state;
                 break;
             }
             case SDLK_q:
