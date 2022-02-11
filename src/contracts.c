@@ -1,10 +1,12 @@
 #include "contracts.h"
 #include "engine/util.h"
+#include "universe/satellites.h"
 
 const char* contractTypes[NUM_CONTRACT_TYPES] = {
     "Obtain cargo",
     "Smuggle cargo",
-    "Destroy ship"
+    "Destroy ship",
+    "Reconnaissance"
 };
 
 const char* contractFirstnames[NUM_FIRSTNAMES] = {
@@ -102,6 +104,12 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
             c.pay = 300 + randr(80) * 5;
             break;
         }
+        case CONTRACT_RECONNAISSANCE:
+        {
+            c.numSatellites = 3 + randr(NUM_SATELLITES - 3);
+            c.pay = 200 + c.numSatellites * 100 + randr(25) * 8;
+            break;
+        }
     }
     selectTargetSystem(&c, currentStarSystem, difficulty);
     return c;
@@ -124,6 +132,7 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
     {
         case CONTRACT_GET_ITEM:
         case CONTRACT_DESTROY_SHIP:
+        case CONTRACT_RECONNAISSANCE:
         {
             return 1;
         }
@@ -173,6 +182,16 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
             }
             break;
         }
+        case CONTRACT_RECONNAISSANCE:
+        {
+            if(checkAllSatellitesVisited())
+            {
+                clearSatellites();
+                playerHold->money += contract->pay;
+                return 1;
+            }
+            break;
+        }
     }
     return 0;
 }
@@ -211,6 +230,18 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
             }
             break;
         }
+        case CONTRACT_RECONNAISSANCE:
+        {
+            vec3 pos = getRandomFreePosBounds(starSystem, starSystem->station.position, (vec3) {.x = 75, .y = 25, .z = 75}, 25, 50);
+            createSatellite(pos, 0);
+            for(uint8_t i = 1; i < contract->numSatellites; i++)
+            {
+                //TODO: improve
+                pos = getRandomFreePosBounds(starSystem, pos, (vec3) {.x = 75, .y = 50, .z = 75}, 25, 50);
+                createSatellite(pos, randf(2 * M_PI));
+            }
+            break;
+        }
     }
 }
 
@@ -236,6 +267,11 @@ void printObjective(char* str, Contract* contract)
         case CONTRACT_DESTROY_SHIP:
         {
             sprintf(str, "Destroy the cruise liner.\nYou might get some\npolice attention...");
+            break;
+        }
+        case CONTRACT_RECONNAISSANCE:
+        {
+            sprintf(str, "Check out each of the %d\nnav satellites.\nKeep your eyes open!", contract->numSatellites);
             break;
         }
     }

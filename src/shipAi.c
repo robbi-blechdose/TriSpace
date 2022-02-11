@@ -10,8 +10,10 @@ uint8_t calcNPCAiStateAttack(Ship* playerShip, Ship* npcShip, uint32_t ticks, fl
         *targetY = angleY;
         *targetX = angleX;
         accelerateShip(npcShip, 1, ticks);
-        //Fire weapons!
-        fireWeapons(npcShip, playerShip, 1, DAMAGE_SOURCE_NPC);
+        if(randr(100) < AI_FIRING_CHANCE)
+        {
+            fireWeapons(npcShip, playerShip, 1, DAMAGE_SOURCE_NPC);
+        }
         if(distance < AI_RANGE_TOONEAR)
         {
             if(randr(100) < 50)
@@ -118,7 +120,7 @@ void calcNPCAiEnemy(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dista
             {
                 npcShip->aiState = STATE_IDLE;
             }
-            else if(rand() < RAND_MAX / 2048)
+            else if(rand() < RAND_MAX / 3072)
             {
                 //Randomly attack
                 npcShip->aiState = STATE_ATTACK;
@@ -151,7 +153,7 @@ void calcNPCAiPolice(Ship* playerShip, Ship* npcShip, uint32_t ticks, float dist
                 accelerateShip(npcShip, -1, ticks);
             }
             //State transition
-            if(npcShips[NPC_SHIP_CONTRACT].damaged == DAMAGE_SOURCE_PLAYER)
+            if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL && npcShips[NPC_SHIP_CONTRACT].damaged == DAMAGE_SOURCE_PLAYER)
             {
                 npcShips[NPC_SHIP_CONTRACT].damaged = 0;
                 npcShip->aiState = STATE_ATTACK;

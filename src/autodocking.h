@@ -11,10 +11,9 @@
  * target
  * O --- O approach
  *        \
- *         O turn2
+ *         O turn
  *        /
- * O --- O turn1
- * start
+ *       O start
  **/
 
 #define NUM_POINTS 3

@@ -6,6 +6,7 @@
 #include "universe/universe.h"
 #include "universe/generator.h"
 #include "equipment.h"
+#include "universe/satellites.h"
 
 //UI Base Height
 #define UIBH 10
@@ -188,6 +189,10 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
         if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL)
         {
             drawRadarDot(playerShip->position, playerShip->rotation, npcShips[NPC_SHIP_CONTRACT].position, 3);
+        }
+        else if(hasSatellites() && !checkAllSatellitesVisited())
+        {
+            drawRadarDot(playerShip->position, playerShip->rotation, getSatellitePosition(), 3);
         }
     }
 

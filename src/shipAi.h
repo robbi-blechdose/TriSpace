@@ -19,6 +19,8 @@
 //-20 will never occur (since we wrap values to be in the interval [0, 2 * M_PI]), so we use it as "uninitialized"
 #define AI_ROT_NONE -20.0f
 
+#define AI_FIRING_CHANCE 75
+
 void calcNPCAi(Ship* playerShip, Ship* npcShip, Ship* npcShips, uint32_t ticks);
 
 #endif

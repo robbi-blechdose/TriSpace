@@ -482,7 +482,7 @@ void calcFrame(uint32_t ticks)
                     if(checkContract(&currentContract, &playerShip.hold, currentSystem, npcShips))
                     {
                         uint8_t buffer[64];
-                        sprintf(buffer, "Contract done.\n%5d credits\nhave been\ntransferred.", currentContract.pay);
+                        sprintf(buffer, "Contract done.\n%d credits\nhave been\ntransferred.", currentContract.pay);
                         createPopup(POPUP_CHECKMARK, buffer);
                         completedContracts[currentSystem[0]][currentSystem[1]]++;
                         currentContract.type = CONTRACT_TYPE_NULL;
@@ -723,7 +723,7 @@ int main(int argc, char **argv)
 	glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-	glClearColor(0, 0, 0, 0);
+	glClearColor(0, 0, 0.1f, 0);
 	glClearDepth(1.0f);
     glViewport(0, 0, WINX, WINY_3D);
 	glTextSize(GL_TEXT_SIZE8x8);

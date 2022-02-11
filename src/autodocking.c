@@ -27,12 +27,6 @@ void preCalcAutodockShip(AutodockData* ad, Ship* ship, StarSystem* starSystem)
         {
             ad->points[POINT_TURN] = (vec3) {.x = ad->points[POINT_APPROACH].x - 1.25f * 2 ,.y = dock.y, .z = ad->points[POINT_APPROACH].z + 5 * 2};
         }
-
-        /**
-        for(uint8_t i = 0; i < NUM_POINTS; i++)
-        {
-            printf("%d: %f %f %f\n", i, ad->points[i].x, ad->points[i].y, ad->points[i].z);
-        }**/
     }
 }
 

@@ -8,6 +8,7 @@
 #include "../engine/audio.h"
 #include "../engine/util.h"
 #include "../shipAi.h"
+#include "satellites.h"
 
 uint32_t systemSeeds[UNIVERSE_SIZE][UNIVERSE_SIZE];
 
@@ -21,6 +22,7 @@ void initUniverse(uint8_t* currentSystem, StarSystem* starSystem, Ship npcShips[
     initStarSystem();
     initSpaceStation();
     initAsteroids();
+    initSatellites();
     sampleExplosion = loadSample("res/sfx/explosion.wav");
     //Generate system seeds
     generateSystemSeeds(systemSeeds, BASE_SEED);
@@ -53,6 +55,7 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
     currentSystem[0] = newSystem[0];
     currentSystem[1] = newSystem[1];
     deleteStarSystem(starSystem);
+    clearSatellites();
     initSystem(currentSystem, starSystem, npcShips);
 }
 
@@ -136,6 +139,10 @@ void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship n
     {
         case SPACE:
         {
+            if(hasSatellites())
+            {
+                checkVisitSatellite(&playerShip->position);
+            }
             calcUniverseSpawnNPCShips(starSystem, playerShip, npcShips, ticks);
             calcNPCShips(starSystem, playerShip, npcShips, ticks);
             calcEffects(ticks);
@@ -187,6 +194,7 @@ void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[])
                     drawShip(&npcShips[i]);
                 }
             }
+            drawSatellites();
             drawEffects();
             break;
         }
