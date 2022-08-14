@@ -29,7 +29,7 @@ uint8_t mapScrollX;
 uint8_t mapScrollY;
 
 //Popup
-uint8_t popupActive;
+bool popupActive;
 uint8_t popupIcon;
 char popupText[15 * 6];
 
@@ -75,17 +75,17 @@ void drawPopupIfActive()
 
 void createPopup(uint8_t icon, char* text)
 {
-    popupActive = 1;
+    popupActive = true;
     popupIcon = icon;
     strcpy(popupText, text);
 }
 
 void closePopup()
 {
-    popupActive = 0;
+    popupActive = false;
 }
 
-uint8_t isPopupOpen()
+bool isPopupOpen()
 {
     return popupActive;
 }
@@ -190,6 +190,7 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
         {
             drawRadarDot(playerShip->position, playerShip->rotation, npcShips[NPC_SHIP_CONTRACT].position, 3);
         }
+        //Next contract satellite to visit
         else if(hasSatellites() && !checkAllSatellitesVisited())
         {
             drawRadarDot(playerShip->position, playerShip->rotation, getSatellitePosition(), 3);

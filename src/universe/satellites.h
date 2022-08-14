@@ -1,6 +1,8 @@
 #ifndef _SATELLITES_H
 #define _SATELLITES_H
 
+#include <stdbool.h>
+
 #include "../engine/util.h"
 
 #define NUM_SATELLITES 8
@@ -20,9 +22,9 @@ void clearSatellites();
 void drawSatellites();
 
 void checkVisitSatellite(vec3* playerPos);
-uint8_t checkAllSatellitesVisited();
+bool checkAllSatellitesVisited();
 vec3 getSatellitePosition();
 
-uint8_t hasSatellites();
+bool hasSatellites();
 
 #endif

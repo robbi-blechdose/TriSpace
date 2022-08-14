@@ -1,7 +1,9 @@
 #ifndef _SHIP_H
 #define _SHIP_H
 
+#include <stdbool.h>
 #include <SDL.h>
+
 #include "engine/includes/3dMath.h"
 #include "engine/util.h"
 #include "cargo.h"
@@ -73,7 +75,7 @@ void drawShip(Ship* ship);
 void calcShip(Ship* ship, uint8_t collided, uint32_t ticks);
 void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks);
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks);
-uint8_t shipIsDestroyed(Ship* ship);
+bool shipIsDestroyed(Ship* ship);
 
 /**
  * Fires the weapons of a ship in the forward direction

@@ -196,7 +196,7 @@ uint8_t getCargoHoldSize(CargoHold* hold)
     return size;
 }
 
-uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info)
+uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info, uint8_t limit)
 {
     uint8_t cost = getPriceForCargo(type, info);
     if(holdBuy->money >= cost && getCargoHoldSize(holdBuy) < holdBuy->size && holdSell->cargo[type] > 0)
@@ -205,6 +205,13 @@ uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, S
         holdSell->money += cost;
         holdSell->cargo[type]--;
         holdBuy->cargo[type]++;
+        if(limit)
+        {
+            if(holdBuy->cargo[type] > 99)
+            {
+                holdBuy->cargo[type] = 99;
+            }
+        }
         return 1;
     }
     return 0;

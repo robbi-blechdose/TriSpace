@@ -52,7 +52,7 @@ void checkVisitSatellite(vec3* playerPos)
     }
 }
 
-uint8_t checkAllSatellitesVisited()
+bool checkAllSatellitesVisited()
 {
     return satelliteVisitIndex == satelliteIndex;
 }
@@ -66,7 +66,7 @@ vec3 getSatellitePosition()
     return (vec3){.x = 0, .y = 0, .z = 0};
 }
 
-uint8_t hasSatellites()
+bool hasSatellites()
 {
     return satelliteIndex;
 }

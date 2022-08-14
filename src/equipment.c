@@ -1,72 +1,31 @@
 #include "equipment.h"
 
+uint16_t equipmentPrices[] = {
+    [Fuel] = 2,
+    [Cargo30] = 1500,
+    [LaserMkII] = 2000,
+    [LaserMkIII] = 4000,
+    [MiningLaser] = 2000,
+    [DockingComputer] = 450
+};
+
+const char* equipmentNames[] = {
+    [Fuel] = "Fuel (0.5)",
+    [Cargo30] = "Cargo hold (30)",
+    [LaserMkII] = "Laser MkII",
+    [LaserMkIII] = "Laser MkIII",
+    [MiningLaser] = "Mining laser",
+    [DockingComputer] = "Docking computer"
+};
+
 uint16_t getPriceForEquipment(EquipmentType type)
 {
-    switch(type)
-    {
-        case Fuel:
-        {
-            return 2;
-        }
-        case Cargo30:
-        {
-            return 1500;
-        }
-        case LaserMkII:
-        {
-            return 2000;
-        }
-        case LaserMkIII:
-        {
-            return 4000;
-        }
-        case MiningLaser:
-        {
-            return 2000;
-        }
-        case DockingComputer:
-        {
-            return 450;
-        }
-    }
-    return 0;
+    return equipmentPrices[type];
 }
 
 void printNameForEquipment(char* str, EquipmentType type)
 {
-    switch(type)
-    {
-        case Fuel:
-        {
-            strcpy(str, "Fuel (0.5)");
-            break;
-        }
-        case Cargo30:
-        {
-            strcpy(str, "Cargo hold (30)");
-            break;
-        }
-        case LaserMkII:
-        {
-            strcpy(str, "Laser MkII");
-            break;
-        }
-        case LaserMkIII:
-        {
-            strcpy(str, "Laser MkIII");
-            break;
-        }
-        case MiningLaser:
-        {
-            strcpy(str, "Mining laser");
-            break;
-        }
-        case DockingComputer:
-        {
-            strcpy(str, "Docking computer");
-            break;
-        }
-    }
+    strcpy(str, equipmentNames[type]);
 }
 
 void printOwn(char* str, uint8_t own)

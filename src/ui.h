@@ -1,6 +1,8 @@
 #ifndef _UI_H
 #define _UI_H
 
+#include <stdbool.h>
+
 #include "ship.h"
 #include "universe/universe.h"
 #include "contracts.h"
@@ -25,7 +27,7 @@ void initUI();
 void drawPopupIfActive();
 void createPopup(uint8_t icon, char* text);
 void closePopup();
-uint8_t isPopupOpen();
+bool isPopupOpen();
 
 void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible);
 

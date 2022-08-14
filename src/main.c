@@ -20,7 +20,7 @@
 #include "equipment.h"
 
 //Compile with debug functionality
-#define DEBUG
+//#define DEBUG
 
 #define WINX 240
 #define WINY 240
@@ -32,7 +32,6 @@
 
 SDL_Surface* screen;
 ZBuffer* frameBuffer = NULL;
-SDL_Event event;
 
 #ifdef DEBUG
 uint16_t fps;
@@ -45,7 +44,7 @@ uint16_t counterResult = 0;
 #define MUSIC_DOCKING 0
 #define MUSIC_MAIN    1
 
-uint8_t running = 1;
+bool running = true;
 
 //---------- Main game stuff ----------//
 State state;
@@ -392,11 +391,11 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(B_LEFT))
             {
-                transferCargo(&playerShip.hold, &stationHold, uiTradeCursor, &starSystem.info);
+                transferCargo(&playerShip.hold, &stationHold, uiTradeCursor, &starSystem.info, 1);
             }
             else if(keyUp(B_RIGHT))
             {
-                transferCargo(&stationHold, &playerShip.hold, uiTradeCursor, &starSystem.info);
+                transferCargo(&stationHold, &playerShip.hold, uiTradeCursor, &starSystem.info, 0);
             }
             else if(keyUp(B_B))
             {

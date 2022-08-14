@@ -164,7 +164,7 @@ uint8_t damageShip(Ship* ship, uint8_t damage, uint8_t source)
     return ship->shields < 0;
 }
 
-uint8_t shipIsDestroyed(Ship* ship)
+bool shipIsDestroyed(Ship* ship)
 {
     return ship->shields < 0;
 }
@@ -210,7 +210,7 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t sour
     }
 
     //Check asteroid hits
-    uint8_t mine = checkAsteroidHit(&ship->position, &dir, weaponTypes[ship->weapon.type].damage, weaponTypes[ship->weapon.type].mineChance);
+    bool mine = checkAsteroidHit(&ship->position, &dir, weaponTypes[ship->weapon.type].damage, weaponTypes[ship->weapon.type].mineChance);
     //Asteroid destruction yielded mineable resources
     if(mine)
     {

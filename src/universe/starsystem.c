@@ -23,8 +23,7 @@ void initStarSystem()
 
 void deleteStarSystem(StarSystem* starSystem)
 {
-    uint8_t i;
-    for(i = 0; i < starSystem->numPlanets; i++)
+    for(uint8_t i = 0; i < starSystem->numPlanets; i++)
     {
         deleteRGBTexture(starSystem->planets[i].texture);
     }
@@ -75,7 +74,7 @@ void drawStarSystem(StarSystem* starSystem)
     glPopMatrix();
 }
 
-uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos)
+bool hasDockingDistance(vec3* pos, vec3* dockingPos)
 {
     return distance3d(pos, dockingPos) < 2;
 }
@@ -83,17 +82,17 @@ uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos)
 vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, float minDistanceFromObjects, float minDistanceFromCenter)
 {
     vec3 vec;
-    uint8_t ok = 0;
+    bool ok = false;
     while(!ok)
     {
         vec.x = center.x + randf(bounds.x) - (bounds.x / 2);
         vec.y = center.y + randf(bounds.y) - (bounds.y / 2);
         vec.z = center.z + randf(bounds.z) - (bounds.z / 2);
-        ok = 1;
+        ok = true;
 
         if(distance3d(&vec, &center) < minDistanceFromCenter)
         {
-            ok = 0;
+            ok = false;
             continue;
         }
 
@@ -101,7 +100,7 @@ vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, fl
         {
             if(distance3d(&vec, &starSystem->stars[i].position) < starSystem->stars[i].size + minDistanceFromObjects)
             {
-                ok = 0;
+                ok = false;
                 break;
             }
         }
@@ -109,7 +108,7 @@ vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, fl
         {
             if(distance3d(&vec, &starSystem->planets[i].position) < starSystem->planets[i].size + minDistanceFromObjects)
             {
-                ok = 0;
+                ok = false;
                 break;
             }
         }

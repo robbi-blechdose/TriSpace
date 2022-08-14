@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "GL/gl.h"
 #define FNL_IMPL
-#include "FastNoiseLite.h"
+#include "../engine/includes/FastNoiseLite.h"
 #include "asteroids.h"
 
 //Palettes are ordered by closeness to the sun

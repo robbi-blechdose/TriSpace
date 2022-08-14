@@ -2,6 +2,8 @@
 #define _CONTRACTS_H
 
 #include <stdint.h>
+#include <stdbool.h>
+
 #include "engine/includes/3dMath.h"
 #include "cargo.h"
 #include "ship.h"
@@ -44,8 +46,8 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
 void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2],
                                     uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE]);
 
-uint8_t activateContract(Contract* contract, CargoHold* playerHold);
-uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[]);
+bool activateContract(Contract* contract, CargoHold* playerHold);
+bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[]);
 void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2], StarSystem* starSystem);
 void printObjective(char* str, Contract* contract);
 

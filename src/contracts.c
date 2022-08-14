@@ -107,7 +107,7 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
         case CONTRACT_RECONNAISSANCE:
         {
             c.numSatellites = 3 + randr(NUM_SATELLITES - 3);
-            c.pay = 200 + c.numSatellites * 100 + randr(25) * 8;
+            c.pay = 100 + c.numSatellites * 75 + randr(25) * 5;
             break;
         }
     }
@@ -126,7 +126,7 @@ void generateContractsForSystem(Contract stationContracts[], uint8_t* numStation
     }
 }
 
-uint8_t activateContract(Contract* contract, CargoHold* playerHold)
+bool activateContract(Contract* contract, CargoHold* playerHold)
 {
     switch(contract->type)
     {
@@ -134,7 +134,7 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
         case CONTRACT_DESTROY_SHIP:
         case CONTRACT_RECONNAISSANCE:
         {
-            return 1;
+            return true;
         }
         case CONTRACT_SMUGGLE:
         {
@@ -142,19 +142,19 @@ uint8_t activateContract(Contract* contract, CargoHold* playerHold)
             if(playerHold->size >= (getCargoHoldSize(playerHold) + contract->cargoAmount))
             {
                 playerHold->cargo[contract->cargo] += contract->cargoAmount;
-                return 1;
+                return true;
             }
             break;
         }
     }
-    return 0;
+    return false;
 }
 
-uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[])
+bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[])
 {
     if(currentSystem[0] != contract->targetSystem[0] || currentSystem[1] != contract->targetSystem[1])
     {
-        return 0;
+        return false;
     }
 
     switch(contract->type)
@@ -168,7 +168,7 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
                 {
                     playerHold->cargo[contract->cargo] -= contract->cargoAmount;
                     playerHold->money += contract->pay;
-                    return 1;
+                    return true;
                 }
             }
             break;
@@ -178,7 +178,7 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
             if(npcShips[NPC_SHIP_CONTRACT].type == SHIP_TYPE_NULL)
             {
                 playerHold->money += contract->pay;
-                return 1;
+                return true;
             }
             break;
         }
@@ -188,12 +188,12 @@ uint8_t checkContract(Contract* contract, CargoHold* playerHold, uint8_t current
             {
                 clearSatellites();
                 playerHold->money += contract->pay;
-                return 1;
+                return true;
             }
             break;
         }
     }
-    return 0;
+    return false;
 }
 
 void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2], StarSystem* starSystem)

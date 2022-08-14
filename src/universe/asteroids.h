@@ -1,6 +1,8 @@
 #ifndef _ASTEROIDS_H
 #define _ASTEROIDS_H
 
+#include <stdbool.h>
+
 #include "../engine/util.h"
 
 typedef struct {
@@ -18,7 +20,7 @@ void initAsteroids();
 void createAsteroids(vec3 pos);
 void drawAsteroids();
 
-uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance);
+bool checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance);
 
 Asteroid* getAsteroids();
 

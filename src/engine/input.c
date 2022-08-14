@@ -1,11 +1,11 @@
 #include "input.h"
 
-uint8_t keysLast[NUM_KEYS];
-uint8_t keys[NUM_KEYS];
+bool keysLast[NUM_KEYS];
+bool keys[NUM_KEYS];
 
-uint8_t handleInput()
+bool handleInput()
 {
-    uint8_t running = 1;
+    bool running = true;
 
     for(uint8_t i = 0; i < NUM_KEYS; i++)
     {
@@ -17,20 +17,21 @@ uint8_t handleInput()
     {
         if(event.type == SDL_QUIT)
         {
-            running = 0;
+            running = false;
         }
         else if(event.type != SDL_KEYDOWN && event.type != SDL_KEYUP)
         {
             continue;
         }
 
-        uint8_t state = 0;
+        bool state = false;
         if(event.type == SDL_KEYDOWN)
         {
-            state = 1;
+            state = true;
         }
         switch(event.key.keysym.sym)
         {
+            #ifdef FUNKEY
             case SDLK_u:
             {
                 keys[B_UP] = state;
@@ -96,17 +97,88 @@ uint8_t handleInput()
                 keys[B_START] = state;
                 break;
             }
+            #else
+            case SDLK_UP:
+            {
+                keys[B_UP] = state;
+                break;
+            }
+            case SDLK_DOWN:
+            {
+                keys[B_DOWN] = state;
+                break;
+            }
+            case SDLK_LEFT:
+            {
+                keys[B_LEFT] = state;
+                break;
+            }
+            case SDLK_RIGHT:
+            {
+                keys[B_RIGHT] = state;
+                break;
+            }
+            case SDLK_a:
+            {
+                keys[B_A] = state;
+                break;
+            }
+            case SDLK_s:
+            {
+                keys[B_B] = state;
+                break;
+            }
+            case SDLK_x:
+            {
+                keys[B_X] = state;
+                break;
+            }
+            case SDLK_y:
+            {
+                keys[B_Y] = state;
+                break;
+            }
+            case SDLK_u:
+            {
+                keys[B_TL] = state;
+                break;
+            }
+            case SDLK_i:
+            {
+                keys[B_TR] = state;
+                break;
+            }
+            case SDLK_q:
+            {
+                keys[B_MENU] = state;
+                break;
+            }
+            case SDLK_n:
+            {
+                keys[B_SELECT] = state;
+                break;
+            }
+            case SDLK_m:
+            {
+                keys[B_START] = state;
+                break;
+            }
+            #endif
+            default:
+            {
+                break;
+            }
         }
     }
     return running;
 }
 
-uint8_t keyPressed(Key key)
+bool keyPressed(Key key)
 {
     return keys[key];
 }
 
-uint8_t keyUp(Key key)
+bool keyUp(Key key)
 {
     if(keysLast[key] == 1 && keys[key] == 0)
     {

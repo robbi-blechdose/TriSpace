@@ -52,7 +52,7 @@ uint8_t getCargoHoldSize(CargoHold* hold);
 /**
  * Transfers cargo between two holds, using the current star system for price calculations
  **/
-uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info);
+uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info, uint8_t limit);
 
 void createStationHold(CargoHold* hold);
 

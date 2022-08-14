@@ -1,7 +1,9 @@
 #ifndef _STARSYSTEM_H
 #define _STARSYSTEM_H
 
+#include <stdbool.h>
 #include <SDL.h>
+
 #include "GL/gl.h"
 #include "../engine/util.h"
 
@@ -53,7 +55,7 @@ void initStarSystem();
 void deleteStarSystem(StarSystem* starSystem);
 void drawStarSystem(StarSystem* starSystem);
 
-uint8_t hasDockingDistance(vec3* pos, vec3* dockingPos);
+bool hasDockingDistance(vec3* pos, vec3* dockingPos);
 
 /**
  * Returns a random position in a star system that's free of objects - stars, planets, ...

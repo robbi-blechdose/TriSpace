@@ -51,7 +51,7 @@ void drawAsteroids()
     }
 }
 
-uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance)
+bool checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance)
 {
     for(uint8_t i = 0; i < NUM_ASTEROIDS; i++)
     {
@@ -67,7 +67,7 @@ uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t 
                 if(randr(100) < mineChance)
                 {
                     //We got mineable resources here
-                    return 1;
+                    return true;
                 }
             }
             else
@@ -77,7 +77,7 @@ uint8_t checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t 
             break;
         }
     }
-    return 0;
+    return false;
 }
 
 Asteroid* getAsteroids()
