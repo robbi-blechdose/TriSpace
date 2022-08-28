@@ -1,10 +1,9 @@
 #include <SDL.h>
-#define CHAD_API_IMPL
-#include "zbuffer.h"
+
+#include "engine/video.h"
 #include "engine/includes/3dMath.h"
 #include "engine/input.h"
 #include "engine/camera.h"
-#include "engine/view.h"
 #include "engine/effects.h"
 #include "engine/savegame.h"
 #include "engine/audio.h"
@@ -22,24 +21,18 @@
 //Compile with debug functionality
 //#define DEBUG
 
-#define WINX 240
-#define WINY 240
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
 #define LIMIT_FPS
 
-#define SAVE_VERSION 400
-
-SDL_Surface* screen;
-ZBuffer* frameBuffer = NULL;
-
 #ifdef DEBUG
 uint16_t fps;
-uint8_t counterEnabled = 0;
+#define FPS_WINDOW 250
 uint32_t counterFrames = 0;
 uint32_t counterTime = 0;
-uint16_t counterResult = 0;
 #endif
+
+#define SAVE_VERSION 400
 
 #define MUSIC_DOCKING 0
 #define MUSIC_MAIN    1
@@ -85,25 +78,28 @@ void drawFPS(uint16_t fps)
 }
 #endif
 
-uint8_t saveGame()
+bool saveGame()
 {
-    openSave(".trispace", "game.sav", 1);
-    uint16_t version = SAVE_VERSION;
-    writeElement(&version, sizeof(version));
-    writeElement(&playerShip.type, sizeof(playerShip.type));
-    writeElement(&playerShip.hold, sizeof(playerShip.hold));
-    writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
-    writeElement(&playerShip.hasAutodock, sizeof(playerShip.hasAutodock));
-    writeElement(&playerShip.weapon.type, sizeof(playerShip.weapon.type));
-    writeElement(&currentSystem[0], sizeof(uint8_t));
-    writeElement(&currentSystem[1], sizeof(uint8_t));
-    writeElement(&currentContract, sizeof(currentContract));
-    writeElement(&completedContracts, sizeof(completedContracts));
-    closeSave();
-    return 1;
+    if(openSave(".trispace", "game.sav", 1))
+    {
+        uint16_t version = SAVE_VERSION;
+        writeElement(&version, sizeof(version));
+        writeElement(&playerShip.type, sizeof(playerShip.type));
+        writeElement(&playerShip.hold, sizeof(playerShip.hold));
+        writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
+        writeElement(&playerShip.hasAutodock, sizeof(playerShip.hasAutodock));
+        writeElement(&playerShip.weapon.type, sizeof(playerShip.weapon.type));
+        writeElement(&currentSystem[0], sizeof(uint8_t));
+        writeElement(&currentSystem[1], sizeof(uint8_t));
+        writeElement(&currentContract, sizeof(currentContract));
+        writeElement(&completedContracts, sizeof(completedContracts));
+        closeSave();
+        return true;
+    }
+    return false;
 }
 
-uint8_t loadGame()
+bool loadGame()
 {
     if(openSave(".trispace", "game.sav", 0))
     {
@@ -123,11 +119,12 @@ uint8_t loadGame()
             initSystem(currentSystem, &starSystem, npcShips);
             readElement(&currentContract, sizeof(currentContract));
             readElement(&completedContracts, sizeof(completedContracts));
-            return 1;
+            closeSave();
+            return true;
         }
         closeSave();
     }
-    return 0;
+    return false;
 }
 
 void newGame()
@@ -155,17 +152,17 @@ void newGame()
     setInitialSpawnPos(playerShip.position);
 }
 
-uint8_t checkClosePopup()
+bool checkClosePopup()
 {
     if(isPopupOpen())
     {
         if(keyUp(B_A) || keyUp(B_B))
         {
             closePopup();
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 }
 
 void calcShipControl(uint32_t ticks)
@@ -201,28 +198,6 @@ void calcShipControl(uint32_t ticks)
 
 void calcFrame(uint32_t ticks)
 {
-    #ifdef DEBUG
-    if(counterEnabled)
-    {
-        counterTime += ticks;
-        counterFrames++;
-    }
-
-    if(keyUp(B_SELECT))
-    {
-        counterEnabled = !counterEnabled;
-        if(!counterEnabled)
-        {
-            counterResult = ((float) counterFrames / counterTime) * 1000.0f;
-            printf("%d frames in %d ms. %d fps. %f ms/frame.\n", counterFrames, counterTime,
-                                                        counterResult,
-                                                        (float) counterTime / counterFrames);
-            counterTime = 0;
-            counterFrames = 0;
-        }
-    }
-    #endif
-
     switch(state)
     {
         case SPACE:
@@ -346,8 +321,7 @@ void calcFrame(uint32_t ticks)
             {
                 if(uiSaveLoadCursor == 0)
                 {
-                    uint8_t ok = saveGame();
-                    if(ok)
+                    if(saveGame())
                     {
                         createPopup(POPUP_CHECKMARK, "Game saved.");
                     }
@@ -358,8 +332,7 @@ void calcFrame(uint32_t ticks)
                 }
                 else
                 {
-                    uint8_t ok = loadGame();
-                    if(ok)
+                    if(loadGame())
                     {
                         createPopup(POPUP_CHECKMARK, "Game loaded.");
                     }
@@ -609,8 +582,11 @@ void calcFrame(uint32_t ticks)
 
 void drawFrame()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	clearFrame();
     glEnable(GL_CULL_FACE);
+    
+    glViewport(0, 0, WINX, WINY_3D);
+    setPerspective();
 
     drawCamera();
 
@@ -643,6 +619,7 @@ void drawFrame()
     #endif
 
     //GUI drawing
+    glViewport(0, 0, WINX, WINY);
     setOrtho();
     switch(state)
     {
@@ -694,46 +671,15 @@ void drawFrame()
             break;
         }
     }
-    setPerspective();
 
-    if(SDL_MUSTLOCK(screen))
-    {
-        SDL_LockSurface(screen);
-    }
-    ZB_copyFrameBuffer(frameBuffer, screen->pixels, screen->pitch);
-	if(SDL_MUSTLOCK(screen))
-    {
-		SDL_UnlockSurface(screen);
-    }
-	SDL_Flip(screen);
+    flipFrame();
 }
 
 int main(int argc, char **argv)
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    screen = SDL_SetVideoMode(WINX, WINY, 16, SDL_SWSURFACE);
-	SDL_ShowCursor(SDL_DISABLE);
 
-    //Initialize TinyGL
-	frameBuffer = ZB_open(WINX, WINY, ZB_MODE_5R6G5B, 0);
-	glInit(frameBuffer);
-	glShadeModel(GL_FLAT);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
-	glClearColor(0, 0, 0.1f, 0);
-	glClearDepth(1.0f);
-    glViewport(0, 0, WINX, WINY_3D);
-	glTextSize(GL_TEXT_SIZE8x8);
-	glEnable(GL_TEXTURE_2D);
-
-    float winPersp[] = {WINX, WINY_3D};
-    float winOrtho[] = {WINX, WINY};
-    float clipPersp[] = {1, 512};
-    float clipOrtho[] = {-15, 0};
-    initView(70, winPersp, winOrtho, clipPersp, clipOrtho);
-    setPerspective();
+    initVideo((vec4) {.d = {0, 0, 0.1f, 0}}, (vec4) {.d = {0, 0, WINX, WINY_3D}}, 70, 1, 512);
 
     initAudio(MIX_MAX_VOLUME, 2, 2);
     loadMusic(MUSIC_DOCKING, "res/music/Blue_Danube.ogg");
@@ -782,7 +728,15 @@ int main(int argc, char **argv)
 		}
         #endif
         #ifdef DEBUG
-		fps = 1000.0f / (float)(tNow - tLastFrame);
+		//fps = 1000.0f / (float)(tNow - tLastFrame);
+        counterTime += ticks;
+        counterFrames++;
+        if(counterTime > FPS_WINDOW)
+        {
+            fps = ((float) counterFrames / counterTime) * 1000.0f;
+            counterTime = 0;
+            counterFrames = 0;
+        }
         #endif
 		tLastFrame = tNow;
     }
@@ -790,10 +744,7 @@ int main(int argc, char **argv)
     //Cleanup
     quitAudio();
     
-	ZB_close(frameBuffer);
-	glClose();
-
-    SDL_Quit();
+	quitVideo();
 
 	return 0;
 }
