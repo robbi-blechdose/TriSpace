@@ -18,12 +18,8 @@
 #include "autodocking.h"
 #include "equipment.h"
 
-//Compile with debug functionality
-//#define DEBUG
-
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
-#define LIMIT_FPS
 
 #ifdef DEBUG
 uint16_t fps;
@@ -66,17 +62,6 @@ uint8_t uiMapCursor[2];
 uint8_t uiTitleCursor;
 
 //-------------------------------------//
-
-#ifdef DEBUG
-void drawFPS(uint16_t fps)
-{
-    char buffer[12];
-	sprintf(buffer, "FPS: %i", fps);
-	glDrawText(buffer, 2, 2, 0xFFFFFF);
-	sprintf(buffer, "AVG: %i", counterResult);
-	glDrawText(buffer, 2, 10, 0xFFFFFF);
-}
-#endif
 
 bool saveGame()
 {
@@ -584,7 +569,7 @@ void drawFrame()
 {
 	clearFrame();
     glEnable(GL_CULL_FACE);
-    
+
     glViewport(0, 0, WINX, WINY_3D);
     setPerspective();
 
@@ -720,7 +705,7 @@ int main(int argc, char **argv)
         calcFrame(ticks);
         drawFrame();
 
-        #ifdef LIMIT_FPS
+        #ifndef NO_FPS_LIMIT
 		while((1000 / MAX_FPS) > (SDL_GetTicks() - tNow + 1))
         {
 			//SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); //Yay stable framerate!
