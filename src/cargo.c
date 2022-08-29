@@ -63,81 +63,26 @@ uint8_t getPriceForCargo(CargoType type, SystemInfo* info)
     }
 }
 
+const char* cargoNames[] = {
+    [Food] = "Food",
+    [Textiles] = "Textiles",
+    [Liquor] = "Liquor",
+    [Furs] = "Furs",
+    [Radioactives] = "Radioactives",
+    [Luxuries] = "Luxuries",
+    [Computers] = "Computers",
+    [Machinery] = "Machinery",
+    [Gold] = "Gold",
+    [Platinum] = "Platinum",
+    [Dilithium] = "Dilithium",
+    [Slaves] = "Slaves",
+    [Firearms] = "Firearms",
+    [Narcotics] = "Narcotics"
+};
+
 void printNameForCargo(char* str, CargoType type)
 {
-    switch(type)
-    {
-        case Food:
-        {
-            strcpy(str, "Food");
-            break;
-        }
-        case Textiles:
-        {
-            strcpy(str, "Textiles");
-            break;
-        }
-        case Liquor:
-        {
-            strcpy(str, "Liquor");
-            break;
-        }
-        case Furs:
-        {
-            strcpy(str, "Furs");
-            break;
-        }
-        case Radioactives:
-        {
-            strcpy(str, "Radioactives");
-            break;
-        }
-        case Luxuries:
-        {
-            strcpy(str, "Luxuries");
-            break;
-        }
-        case Computers:
-        {
-            strcpy(str, "Computers");
-            break;
-        }
-        case Machinery:
-        {
-            strcpy(str, "Machinery");
-            break;
-        }
-        case Gold:
-        {
-            strcpy(str, "Gold");
-            break;
-        }
-        case Platinum:
-        {
-            strcpy(str, "Platinum");
-            break;
-        }
-        case Dilithium:
-        {
-            strcpy(str, "Dilithium");
-            break;
-        }
-        case Slaves:
-        {
-            strcpy(str, "Slaves");
-            break;
-        }
-        case Firearms:
-        {
-            strcpy(str, "Firearms");
-            break;
-        }
-        case Narcotics:
-        {
-            strcpy(str, "Narcotics");
-            break;
-        }
-    }
+    strcpy(str, cargoNames[type]);
 }
 
 void printUnitForCargo(char* str, CargoType type)
@@ -172,7 +117,7 @@ void printUnitForCargo(char* str, CargoType type)
     }
 }
 
-uint8_t isCargoIllegal(CargoType type)
+bool isCargoIllegal(CargoType type)
 {
     switch(type)
     {
@@ -180,10 +125,13 @@ uint8_t isCargoIllegal(CargoType type)
         case Firearms:
         case Narcotics:
         {
-            return 1;
+            return true;
+        }
+        default:
+        {
+            return false;
         }
     }
-    return 0;
 }
 
 uint8_t getCargoHoldSize(CargoHold* hold)
@@ -196,7 +144,7 @@ uint8_t getCargoHoldSize(CargoHold* hold)
     return size;
 }
 
-uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info, uint8_t limit)
+bool transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info, uint8_t limit)
 {
     uint8_t cost = getPriceForCargo(type, info);
     if(holdBuy->money >= cost && getCargoHoldSize(holdBuy) < holdBuy->size && holdSell->cargo[type] > 0)
@@ -212,9 +160,9 @@ uint8_t transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, S
                 holdBuy->cargo[type] = 99;
             }
         }
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 
 void createStationHold(CargoHold* hold)

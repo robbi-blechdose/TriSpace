@@ -1,32 +1,34 @@
 #include "autodocking.h"
 
-uint8_t isAutodockPossible(Ship* ship, StarSystem* starSystem)
+bool isAutodockPossible(Ship* ship, StarSystem* starSystem)
 {
     return distance3d(&ship->position, &starSystem->station.dockingPosition) < DOCK_AUTO_DISTANCE;
 }
 
 void preCalcAutodockShip(AutodockData* ad, Ship* ship, StarSystem* starSystem)
 {
-    if(isAutodockPossible(ship, starSystem))
+    if(!isAutodockPossible(ship, starSystem))
     {
-        vec3 dock = starSystem->station.dockingPosition;
+        return;
+    }
+    
+    vec3 dock = starSystem->station.dockingPosition;
 
-        ad->active = 1;
-        ad->pointIndex = 0;
-        ad->points[POINT_APPROACH] = (vec3) {.x = dock.x + 5 * DOCK_APPROACH_DISTANCE, .y = dock.y, .z = dock.z + 1.25f * DOCK_APPROACH_DISTANCE};
-        ad->points[POINT_TARGET] = dock;
-        //Calculate turn point based on ship position
-        //Are we left or right of the "line" (target - approach)? (Use determinant of the vectors)
-        float lr = (dock.x - ad->points[POINT_APPROACH].x) * (ship->position.z - ad->points[POINT_APPROACH].z) -
-                    (dock.z - ad->points[POINT_APPROACH].z) * (ship->position.x - ad->points[POINT_APPROACH].x);
-        if(lr > 0)
-        {
-            ad->points[POINT_TURN] = (vec3) {.x = ad->points[POINT_APPROACH].x + 1.25f * 2 ,.y = dock.y, .z = ad->points[POINT_APPROACH].z - 5 * 2};
-        }
-        else
-        {
-            ad->points[POINT_TURN] = (vec3) {.x = ad->points[POINT_APPROACH].x - 1.25f * 2 ,.y = dock.y, .z = ad->points[POINT_APPROACH].z + 5 * 2};
-        }
+    ad->active = 1;
+    ad->pointIndex = 0;
+    ad->points[POINT_APPROACH] = (vec3) {.x = dock.x + 5 * DOCK_APPROACH_DISTANCE, .y = dock.y, .z = dock.z + 1.25f * DOCK_APPROACH_DISTANCE};
+    ad->points[POINT_TARGET] = dock;
+    //Calculate turn point based on ship position
+    //Are we left or right of the "line" (target - approach)? (Use determinant of the vectors)
+    float lr = (dock.x - ad->points[POINT_APPROACH].x) * (ship->position.z - ad->points[POINT_APPROACH].z) -
+                (dock.z - ad->points[POINT_APPROACH].z) * (ship->position.x - ad->points[POINT_APPROACH].x);
+    if(lr > 0)
+    {
+        ad->points[POINT_TURN] = (vec3) {.x = ad->points[POINT_APPROACH].x + 1.25f * 2 ,.y = dock.y, .z = ad->points[POINT_APPROACH].z - 5 * 2};
+    }
+    else
+    {
+        ad->points[POINT_TURN] = (vec3) {.x = ad->points[POINT_APPROACH].x - 1.25f * 2 ,.y = dock.y, .z = ad->points[POINT_APPROACH].z + 5 * 2};
     }
 }
 
