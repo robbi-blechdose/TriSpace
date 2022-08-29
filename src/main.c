@@ -28,7 +28,7 @@ uint32_t counterFrames = 0;
 uint32_t counterTime = 0;
 #endif
 
-#define SAVE_VERSION 400
+#define SAVE_VERSION 500
 
 #define MUSIC_DOCKING 0
 #define MUSIC_MAIN    1
@@ -127,7 +127,7 @@ void newGame()
     playerShip.hold.size = CARGO_HOLD_SIZE_NORM;
     playerShip.weapon.type = 0;
     playerShip.hasAutodock = 0;
-    playerShip.fuel = 35;
+    playerShip.fuel = 3.5f;
     playerShip.shields = 2;
     playerShip.energy = 2;
     //Initialize system
@@ -214,6 +214,8 @@ void calcFrame(uint32_t ticks)
                     playMusic(MUSIC_MAIN, 250);
                 }
             }
+
+            playerShip.fuelScoopsActive = hasSunFuelDistance(&starSystem, &playerShip.position);
 
             calcShip(&playerShip, checkStarSystemCollision(&playerShip, &starSystem), ticks);
             setCameraPos(playerShip.position);
@@ -495,10 +497,10 @@ void calcFrame(uint32_t ticks)
             else if(keyUp(B_A))
             {
                 float distance = getDistanceToSystem(currentSystem, uiMapCursor);
-                if(playerShip.fuel >= distance * 10)
+                if(playerShip.fuel >= distance)
                 {
                     state = HYPERSPACE;
-                    playerShip.fuel -= distance * 10;
+                    playerShip.fuel -= distance;
                     playerShip.turnSpeedX = 0;
                     playerShip.turnSpeedY = 0;
                 }
@@ -639,7 +641,7 @@ void drawFrame()
         }
         case MAP:
         {
-            drawMap(uiMapCursor, currentSystem, playerShip.fuel / 10.0f);
+            drawMap(uiMapCursor, currentSystem, playerShip.fuel);
             break;
         }
         case TITLE:

@@ -71,4 +71,6 @@ vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, fl
  **/
 vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects);
 
+bool hasSunFuelDistance(StarSystem* starSystem, vec3* pos);
+
 #endif

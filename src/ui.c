@@ -165,6 +165,12 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
         drawTexQuad(229, 11, 4, 4, UITH, PTC(252), PTC(20), 1, PTC(23));
     }
 
+    //Fuel scoop indicator
+    if(playerShip->fuelScoopsActive)
+    {
+        drawTexQuad(185, 11, 4, 4, UITH, PTC(252), PTC(28), 1, PTC(31));
+    }
+
     //Radar
     if(state != STATION)
     {
@@ -330,6 +336,12 @@ void drawEquipUI(uint8_t cursor, Ship* playerShip)
         case DockingComputer:
         {
             x = 0;
+            y = 24 * 4;
+            break;
+        }
+        case FuelScoops:
+        {
+            x = 24 * 4;
             y = 24 * 4;
             break;
         }

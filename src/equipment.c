@@ -6,7 +6,8 @@ uint16_t equipmentPrices[] = {
     [LaserMkII] = 2000,
     [LaserMkIII] = 4000,
     [MiningLaser] = 2000,
-    [DockingComputer] = 450
+    [DockingComputer] = 450,
+    [FuelScoops] = 800
 };
 
 const char* equipmentNames[] = {
@@ -15,7 +16,8 @@ const char* equipmentNames[] = {
     [LaserMkII] = "Laser MkII",
     [LaserMkIII] = "Laser MkIII",
     [MiningLaser] = "Mining laser",
-    [DockingComputer] = "Docking computer"
+    [DockingComputer] = "Docking computer",
+    [FuelScoops] = "Fuel scoops"
 };
 
 uint16_t getPriceForEquipment(EquipmentType type)
@@ -28,7 +30,7 @@ void printNameForEquipment(char* str, EquipmentType type)
     strcpy(str, equipmentNames[type]);
 }
 
-void printOwn(char* str, uint8_t own)
+void printOwn(char* str, bool own)
 {
     if(own)
     {
@@ -74,15 +76,20 @@ void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
             printOwn(str, ship->hasAutodock);
             break;
         }
+        case FuelScoops:
+        {
+            printOwn(str, ship->hasFuelScoops);
+            break;
+        }
     }
 }
 
-uint8_t buyEquipment(Ship* ship, EquipmentType type)
+bool buyEquipment(Ship* ship, EquipmentType type)
 {
-    uint16_t price = getPriceForEquipment(type);
+    uint16_t price = equipmentPrices[type];
     if(ship->hold.money < price)
     {
-        return 0;
+        return false;
     }
 
     //Sell old equipment (if applicable)
@@ -98,19 +105,19 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
                 //Laser Mk II
                 case 1:
                 {
-                    sellPrice = getPriceForEquipment(LaserMkII);
+                    sellPrice = equipmentPrices[LaserMkII];
                     break;
                 }
                 //Laser Mk III
                 case 2:
                 {
-                    sellPrice = getPriceForEquipment(LaserMkIII);
+                    sellPrice = equipmentPrices[LaserMkIII];
                     break;
                 }
                 //Mining Laser
                 case 3:
                 {
-                    sellPrice = getPriceForEquipment(MiningLaser);
+                    sellPrice = equipmentPrices[MiningLaser];
                     break;
                 }
             }
@@ -166,11 +173,20 @@ uint8_t buyEquipment(Ship* ship, EquipmentType type)
         {
             if(!ship->hasAutodock)
             {
-                ship->hasAutodock = 1;
+                ship->hasAutodock = true;
+                ship->hold.money -= price;
+            }
+            break;
+        }
+        case FuelScoops:
+        {
+            if(!ship->hasFuelScoops)
+            {
+                ship->hasFuelScoops = true;
                 ship->hold.money -= price;
             }
             break;
         }
     }
-    return 0;
+    return false;
 }

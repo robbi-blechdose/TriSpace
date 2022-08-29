@@ -97,6 +97,11 @@ void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
         }
     }
 
+    if(ship->fuelScoopsActive && ship->fuel < MAX_FUEL)
+    {
+        ship->fuel += 0.5f * ticks / 1000.0f;
+    }
+
     if(ship->weapon.timer)
     {
         ship->weapon.timer -= ticks;

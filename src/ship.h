@@ -38,7 +38,7 @@ typedef struct {
 
     float shields;
     float energy;
-    uint8_t fuel;
+    float fuel;
 
     vec3 position;
     vec3 rotation;
@@ -48,15 +48,21 @@ typedef struct {
 
     //The player ships has no AI, and AI ships can't autodock, so we can reuse this memory
     union {
-        uint8_t aiState;
-        uint8_t hasAutodock;
+        struct {
+            uint8_t aiState;
+            float aiRotX;
+            float aiRotY;
+        };
+        struct {
+            bool hasAutodock;
+            bool hasFuelScoops;
+            bool fuelScoopsActive;
+        };
     };
-    float aiRotX;
-    float aiRotY;
     uint8_t damaged;
 } Ship;
 
-#define MAX_FUEL 70
+#define MAX_FUEL 7
 
 #define NUM_SHIP_TYPES 3
 #define SHIP_TYPE_SMALLPIRATE 0
