@@ -215,7 +215,10 @@ void calcFrame(uint32_t ticks)
                 }
             }
 
-            playerShip.fuelScoopsActive = hasSunFuelDistance(&starSystem, &playerShip.position);
+            if(playerShip.hasFuelScoops)
+            {
+                playerShip.fuelScoopsActive = hasSunFuelDistance(&starSystem, &playerShip.position);
+            }
 
             calcShip(&playerShip, checkStarSystemCollision(&playerShip, &starSystem), ticks);
             setCameraPos(playerShip.position);
