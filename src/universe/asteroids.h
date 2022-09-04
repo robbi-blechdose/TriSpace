@@ -5,6 +5,8 @@
 
 #include "../engine/util.h"
 
+#include "../player.h"
+
 typedef struct {
     vec3 position;
     float size;
@@ -23,5 +25,7 @@ void drawAsteroids();
 bool checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance);
 
 Asteroid* getAsteroids();
+
+void checkWeaponsAsteroidHit(Player* player);
 
 #endif

@@ -97,11 +97,6 @@ void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
         }
     }
 
-    if(ship->fuelScoopsActive && ship->fuel < MAX_FUEL)
-    {
-        ship->fuel += 0.5f * ticks / 1000.0f;
-    }
-
     if(ship->weapon.timer)
     {
         ship->weapon.timer -= ticks;
@@ -174,22 +169,26 @@ bool shipIsDestroyed(Ship* ship)
     return ship->shields < 0;
 }
 
-void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t source)
+bool fireWeapons(Ship* ship)
 {
     if(ship->weapon.timer)
     {
-        return;
+        return false;
     }
     if(ship->energy < weaponTypes[ship->weapon.type].energyUsage)
     {
-        return;
+        return false;
     }
 
     ship->energy -= weaponTypes[ship->weapon.type].energyUsage;
     ship->weapon.timer = weaponTypes[ship->weapon.type].cooldown;
 
     playSample(sampleShoot);
+    return true;
+}
 
+bool checkWeaponsShipHit(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t source)
+{
     //Calculate ray direction vector
     vec3 dir = anglesToDirection(&ship->rotation);
 
@@ -210,69 +209,42 @@ void fireWeapons(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t sour
             {
                 createEffect(targetShips[i].position, SPARKS);
             }
-            return;
+            return true;
         }
     }
 
-    //Check asteroid hits
-    bool mine = checkAsteroidHit(&ship->position, &dir, weaponTypes[ship->weapon.type].damage, weaponTypes[ship->weapon.type].mineChance);
-    //Asteroid destruction yielded mineable resources
-    if(mine)
-    {
-        //Determine what we mined
-        uint8_t type = randr(100);
-        if(type < 33)
-        {
-            type = Gold;
-        }
-        else if(type < 66)
-        {
-            type = Dilithium;
-        }
-        else
-        {
-            type = Platinum;
-        }
-        //Do we have enough space?
-        uint8_t amount = 1 + randr(2);
-        if(getCargoHoldSize(&ship->hold) + amount <= ship->hold.size)
-        {
-            ship->hold.cargo[type] += amount;
-        }
-    }
+    return false;
 }
 
 float getTurnSpeedForRotation(float current, float target, float maxSpeed)
 {
     clampAngle(&target);
-    if(fabs(current - target) > 0.05f)
+    if(fabs(current - target) < 0.05f)
     {
-        float turnY = 0;
-        if(current < target)
+        return 0;
+    }
+    
+    float turnY = 0;
+    if(current < target)
+    {
+        if(fabs(current - target) < M_PI)
         {
-            if(fabs(current - target) < M_PI)
-            {
-                return maxSpeed;
-            }
-            else
-            {
-                return -maxSpeed;
-            }
+            return maxSpeed;
         }
         else
         {
-            if(fabs(current - target) < M_PI)
-            {
-                return -maxSpeed;
-            }
-            else
-            {
-                return maxSpeed;
-            }
+            return -maxSpeed;
         }
     }
     else
     {
-        return 0;
+        if(fabs(current - target) < M_PI)
+        {
+            return -maxSpeed;
+        }
+        else
+        {
+            return maxSpeed;
+        }
     }
 }

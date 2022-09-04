@@ -59,13 +59,13 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
     initSystem(currentSystem, starSystem, npcShips);
 }
 
-void calcNPCShips(StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
+void calcNPCShips(StarSystem* starSystem, Player* player, Ship npcShips[], uint32_t ticks)
 {
     for(uint8_t i = 0; i < MAX_NPC_SHIPS; i++)
     {
         if(npcShips[i].type != SHIP_TYPE_NULL)
         {
-            calcNPCAi(playerShip, &npcShips[i], npcShips, ticks);
+            calcNPCAi(player, &npcShips[i], npcShips, ticks);
             //TODO: Collisions?
             calcShip(&npcShips[i], 0, ticks);
             if(shipIsDestroyed(&npcShips[i]))
@@ -133,7 +133,7 @@ void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Ship np
     }
 }
 
-void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks)
+void calcUniverse(State* state, StarSystem* starSystem, Player* player, Ship npcShips[], uint32_t ticks)
 {
     switch(*state)
     {
@@ -141,33 +141,33 @@ void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship n
         {
             if(hasSatellites())
             {
-                checkVisitSatellite(&playerShip->position);
+                checkVisitSatellite(&player->ship.position);
             }
-            calcUniverseSpawnNPCShips(starSystem, playerShip, npcShips, ticks);
-            calcNPCShips(starSystem, playerShip, npcShips, ticks);
+            calcUniverseSpawnNPCShips(starSystem, &player->ship, npcShips, ticks);
+            calcNPCShips(starSystem, player, npcShips, ticks);
             calcEffects(ticks);
-            if(hasDockingDistance(&playerShip->position, &starSystem->station.dockingPosition))
+            if(hasDockingDistance(&player->ship.position, &starSystem->station.dockingPosition))
             {
                 *state = STATION;
-                playerShip->position.x = 2;
-                playerShip->position.y = 0;
-                playerShip->position.z = 0;
-                playerShip->speed *= 0.5f;
+                player->ship.position.x = 2;
+                player->ship.position.y = 0;
+                player->ship.position.z = 0;
+                player->ship.speed *= 0.5f;
             }
             break;
         }
         case STATION:
         {
-            if(hasLeavingDistance(playerShip->position))
+            if(hasLeavingDistance(player->ship.position))
             {
                 *state = SPACE;
-                playerShip->position = starSystem->station.exitPosition;
+                player->ship.position = starSystem->station.exitPosition;
             }
-            else if(hasLandingDistance(playerShip->position))
+            else if(hasLandingDistance(player->ship.position))
             {
                 *state = TRADING;
-                playerShip->position.y = 0;
-                playerShip->speed = 0;
+                player->ship.position.y = 0;
+                player->ship.speed = 0;
             }
             break;
         }

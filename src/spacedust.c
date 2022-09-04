@@ -1,6 +1,9 @@
 #include "spacedust.h"
-#include "engine/util.h"
+
 #include <math.h>
+
+#include "GL/gl.h"
+#include "engine/util.h"
 
 #define NUM_SPACEDUST_COLORS 3
 

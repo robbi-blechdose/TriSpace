@@ -3,9 +3,10 @@
 
 #include <stdbool.h>
 
-#include "ship.h"
-#include "universe/universe.h"
-#include "contracts.h"
+#include "../ship.h"
+#include "../universe/universe.h"
+#include "../contracts.h"
+#include "../player.h"
 
 #define RADAR_RANGE 120
 
@@ -16,26 +17,13 @@
 
 void initUI();
 
-/**
- * Functions for a popup window
- * Can hold 15x6 characters, plus an icon
- **/
-
-#define POPUP_CHECKMARK 0
-#define POPUP_ATTENTION 1
-
-void drawPopupIfActive();
-void createPopup(uint8_t icon, char* text);
-void closePopup();
-bool isPopupOpen();
-
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible);
+void drawUI(State state, Player* player, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible);
 
 void drawSaveLoadUI(uint8_t cursor);
 
 void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info);
 
-void drawEquipUI(uint8_t cursor, Ship* playerShip);
+void drawEquipUI(uint8_t cursor, Player* player);
 
 void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contracts, uint8_t numContracts);
 

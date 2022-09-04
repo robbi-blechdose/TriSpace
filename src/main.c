@@ -8,7 +8,6 @@
 #include "engine/savegame.h"
 #include "engine/audio.h"
 
-#include "ui.h"
 #include "ship.h"
 #include "ship_collisions.h"
 #include "universe/universe.h"
@@ -17,6 +16,11 @@
 #include "spacedust.h"
 #include "autodocking.h"
 #include "equipment.h"
+#include "player.h"
+#include "universe/asteroids.h"
+
+#include "ui/popup.h"
+#include "ui/ui.h"
 
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
@@ -47,7 +51,7 @@ CargoHold stationHold;
 Contract stationContracts[MAX_STATION_CONTRACTS];
 uint8_t numStationContracts;
 
-Ship playerShip;
+Player player;
 Ship npcShips[MAX_NPC_SHIPS];
 
 Contract currentContract;
@@ -69,11 +73,9 @@ bool saveGame()
     {
         uint16_t version = SAVE_VERSION;
         writeElement(&version, sizeof(version));
-        writeElement(&playerShip.type, sizeof(playerShip.type));
-        writeElement(&playerShip.hold, sizeof(playerShip.hold));
-        writeElement(&playerShip.fuel, sizeof(playerShip.fuel));
-        writeElement(&playerShip.hasAutodock, sizeof(playerShip.hasAutodock));
-        writeElement(&playerShip.weapon.type, sizeof(playerShip.weapon.type));
+
+        savePlayer(&player);
+
         writeElement(&currentSystem[0], sizeof(uint8_t));
         writeElement(&currentSystem[1], sizeof(uint8_t));
         writeElement(&currentContract, sizeof(currentContract));
@@ -90,51 +92,51 @@ bool loadGame()
     {
         uint16_t version = 0;
         readElement(&version, sizeof(version));
-        if((version / 100) == (SAVE_VERSION / 100)) //Check major version for save compatability
+        if((version / 100) != (SAVE_VERSION / 100)) //Check major version for save compatability
         {
-            readElement(&playerShip.type, sizeof(playerShip.type));
-            readElement(&playerShip.hold, sizeof(playerShip.hold));
-            readElement(&playerShip.fuel, sizeof(playerShip.fuel));
-            readElement(&playerShip.hasAutodock, sizeof(playerShip.hasAutodock));
-            readElement(&playerShip.weapon.type, sizeof(playerShip.weapon.type));
-            uint8_t savedSystem[2];
-            readElement(&savedSystem[0], sizeof(uint8_t));
-            readElement(&savedSystem[1], sizeof(uint8_t));
-            deleteStarSystem(&starSystem);
-            initSystem(currentSystem, &starSystem, npcShips);
-            readElement(&currentContract, sizeof(currentContract));
-            readElement(&completedContracts, sizeof(completedContracts));
             closeSave();
-            return true;
+            return false;
         }
+
+        loadPlayer(&player);
+
+        uint8_t savedSystem[2];
+        readElement(&savedSystem[0], sizeof(uint8_t));
+        readElement(&savedSystem[1], sizeof(uint8_t));
+        deleteStarSystem(&starSystem);
+        initSystem(currentSystem, &starSystem, npcShips);
+        readElement(&currentContract, sizeof(currentContract));
+        readElement(&completedContracts, sizeof(completedContracts));
         closeSave();
+        return true;
     }
     return false;
 }
 
 void newGame()
 {
-    //Initialize player ship
-    playerShip.type = 0;
-    playerShip.position.x = 150;
-    playerShip.position.y = 0;
-    playerShip.position.z = 100;
+    //Initialize player
+    player.wantedLevel = 0;
+    player.ship = (Ship) {.type = 0,
+                            .position = (vec3) {150, 0, 100},
+                            .weapon.type = 0,
+                            .shields = 2,
+                            .energy = 2};
+
     #ifdef DEBUG
-    playerShip.hold.money = 50000;
+    player.hold.money = 50000;
     #else
-    playerShip.hold.money = 150;
+    player.hold.money = 150;
     #endif
-    playerShip.hold.size = CARGO_HOLD_SIZE_NORM;
-    playerShip.weapon.type = 0;
-    playerShip.hasAutodock = 0;
-    playerShip.fuel = 3.5f;
-    playerShip.shields = 2;
-    playerShip.energy = 2;
+    player.hold.size = CARGO_HOLD_SIZE_NORM;
+    player.hasAutodock = false;
+    player.hasFuelScoops = false;
+    player.fuel = 3.5f;
     //Initialize system
     currentSystem[0] = 0;
     currentSystem[1] = 0;
     initSystem(currentSystem, &starSystem, npcShips);
-    setInitialSpawnPos(playerShip.position);
+    setInitialSpawnPos(player.ship.position);
 }
 
 bool checkClosePopup()
@@ -154,11 +156,11 @@ void calcShipControl(uint32_t ticks)
 {
     if(keyPressed(B_X))
     {
-        accelerateShip(&playerShip, 1, ticks);
+        accelerateShip(&player.ship, 1, ticks);
     }
     else if(keyPressed(B_Y))
     {
-        accelerateShip(&playerShip, -1, ticks);
+        accelerateShip(&player.ship, -1, ticks);
     }
     int8_t dirX = 0;
     int8_t dirY = 0;
@@ -178,7 +180,139 @@ void calcShipControl(uint32_t ticks)
     {
         dirY = 1;
     }
-    steerShip(&playerShip, dirX, dirY, ticks);
+    steerShip(&player.ship, dirX, dirY, ticks);
+}
+
+void calcSpace(uint32_t ticks)
+{
+    if(!autodock.active)
+    {
+        calcShipControl(ticks);
+
+        if(keyUp(B_SELECT) && player.hasAutodock)
+        {
+            preCalcAutodockShip(&autodock, &player.ship, &starSystem);
+            if(autodock.active)
+            {
+                playMusic(MUSIC_DOCKING, 250);
+            }
+        }
+    }
+    else
+    {
+        calcAutodockShip(&autodock, &player.ship, ticks);
+
+        if(keyUp(B_SELECT))
+        {
+            autodock.active = 0;
+        }
+
+        if(!autodock.active)
+        {
+            playMusic(MUSIC_MAIN, 250);
+        }
+    }
+
+    if(player.hasFuelScoops &&
+        hasSunFuelDistance(&starSystem, &player.ship.position) && player.fuel < MAX_FUEL)
+    {
+        player.fuelScoopsActive = true;
+        player.fuel += 0.5f * ticks / 1000.0f;
+    }
+    else
+    {
+        player.fuelScoopsActive = false;
+    }
+
+    calcShip(&player.ship, checkStarSystemCollision(&player.ship, &starSystem), ticks);
+    setCameraPos(player.ship.position);
+    setCameraRot(player.ship.rotation);
+    calcSpacedust(&player.ship, ticks);
+
+    if(keyUp(B_A))
+    {
+        if(fireWeapons(&player.ship))
+        {
+            if(!checkWeaponsShipHit(&player.ship, npcShips, MAX_NPC_SHIPS, DAMAGE_SOURCE_PLAYER))
+            {
+                checkWeaponsAsteroidHit(&player);
+            }
+        }
+    }
+
+    calcUniverse(&state, &starSystem, &player, npcShips, ticks);
+    if(shipIsDestroyed(&player.ship))
+    {
+        vec3 effectPos = scalev3(2.5f, anglesToDirection(&player.ship.rotation));
+        effectPos = addv3(player.ship.position, effectPos);
+        createEffect(effectPos, EXPLOSION);
+        state = GAME_OVER;
+    }
+
+    if(keyUp(B_START))
+    {
+        state = MAP;
+    }
+}
+
+void calcContracts()
+{
+    if(checkClosePopup())
+    {
+        return;
+    }
+
+    if(keyUp(B_UP))
+    {
+        moveCursorUp(&uiContractCursor, numStationContracts - 1);
+    }
+    else if(keyUp(B_DOWN))
+    {
+        moveCursorDown(&uiContractCursor, numStationContracts - 1);
+    }
+    else if(keyUp(B_A))
+    {
+        if(currentContract.type == CONTRACT_TYPE_NULL)
+        {
+            uint8_t contractCursor = uiContractCursor;
+            if(activateContract(&stationContracts[contractCursor], &player.hold))
+            {
+                currentContract = stationContracts[contractCursor];
+
+                //Shift contracts forward
+                for(uint8_t i = contractCursor; i < numStationContracts - 1; i++)
+                {
+                    stationContracts[i] = stationContracts[i + 1];
+                }
+                stationContracts[numStationContracts - 1].type = CONTRACT_TYPE_NULL;
+                numStationContracts--;
+            }
+            else
+            {
+                createPopup(POPUP_ATTENTION, "Cannot activate\ncontract.\nMake sure your\ncargo bay has\nspace!");
+            }
+        }
+        else
+        {
+            if(checkContract(&currentContract, &player.hold, currentSystem, npcShips))
+            {
+                uint8_t buffer[64];
+                sprintf(buffer, "Contract done.\n%d credits\nhave been\ntransferred.", currentContract.pay);
+                createPopup(POPUP_CHECKMARK, buffer);
+                completedContracts[currentSystem[0]][currentSystem[1]]++;
+                currentContract.type = CONTRACT_TYPE_NULL;
+                uiContractCursor = 0;
+            }
+        }
+    }
+    else if(keyUp(B_B))
+    {
+        state = STATION;
+    }
+    else if(keyUp(B_TL))
+    {
+        state = EQUIP;
+    }
 }
 
 void calcFrame(uint32_t ticks)
@@ -187,85 +321,30 @@ void calcFrame(uint32_t ticks)
     {
         case SPACE:
         {
-            if(!autodock.active)
-            {
-                calcShipControl(ticks);
-
-                if(keyUp(B_SELECT) && playerShip.hasAutodock)
-                {
-                    preCalcAutodockShip(&autodock, &playerShip, &starSystem);
-                    if(autodock.active)
-                    {
-                        playMusic(MUSIC_DOCKING, 250);
-                    }
-                }
-            }
-            else
-            {
-                calcAutodockShip(&autodock, &playerShip, ticks);
-
-                if(keyUp(B_SELECT))
-                {
-                    autodock.active = 0;
-                }
-
-                if(!autodock.active)
-                {
-                    playMusic(MUSIC_MAIN, 250);
-                }
-            }
-
-            if(playerShip.hasFuelScoops)
-            {
-                playerShip.fuelScoopsActive = hasSunFuelDistance(&starSystem, &playerShip.position);
-            }
-
-            calcShip(&playerShip, checkStarSystemCollision(&playerShip, &starSystem), ticks);
-            setCameraPos(playerShip.position);
-            setCameraRot(playerShip.rotation);
-            calcSpacedust(&playerShip, ticks);
-
-            if(keyUp(B_A))
-            {
-                fireWeapons(&playerShip, npcShips, MAX_NPC_SHIPS, DAMAGE_SOURCE_PLAYER);
-            }
-
-            calcUniverse(&state, &starSystem, &playerShip, npcShips, ticks);
-            if(shipIsDestroyed(&playerShip))
-            {
-                vec3 effectPos = scalev3(2.5f, anglesToDirection(&playerShip.rotation));
-                effectPos = addv3(playerShip.position, effectPos);
-                createEffect(effectPos, EXPLOSION);
-                state = GAME_OVER;
-            }
-
-            if(keyUp(B_START))
-            {
-                state = MAP;
-            }
+            calcSpace(ticks);
             break;
         }
         case STATION:
         {
             calcShipControl(ticks);
 
-            calcShip(&playerShip, checkStationCollision(&playerShip), ticks);
-            setCameraPos(playerShip.position);
-            setCameraRot(playerShip.rotation);
+            calcShip(&player.ship, checkStationCollision(&player.ship), ticks);
+            setCameraPos(player.ship.position);
+            setCameraRot(player.ship.rotation);
 
-            calcUniverse(&state, &starSystem, &playerShip, npcShips, ticks);
+            calcUniverse(&state, &starSystem, &player, npcShips, ticks);
             break;
         }
         case HYPERSPACE:
         {
             if(currentSystem[0] != uiMapCursor[0] || currentSystem[1] != uiMapCursor[1])
             {
-                playerShip.speed += (500.0f * ticks) / 1000.0f;
-                if(playerShip.speed > 500)
+                player.ship.speed += (500.0f * ticks) / 1000.0f;
+                if(player.ship.speed > 500)
                 {
                     switchSystem(currentSystem, uiMapCursor, &starSystem, npcShips);
-                    playerShip.position = getRandomFreePos(&starSystem, 20);
-                    setInitialSpawnPos(playerShip.position);
+                    player.ship.position = getRandomFreePos(&starSystem, 20);
+                    setInitialSpawnPos(player.ship.position);
                     //Generate contracts for this system
                     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
                     //Generate new station cargo hold for this system
@@ -276,17 +355,17 @@ void calcFrame(uint32_t ticks)
             }
             else
             {
-                playerShip.speed -= (500.0f * ticks) / 1000.0f;
-                if(playerShip.speed <= 0)
+                player.ship.speed -= (500.0f * ticks) / 1000.0f;
+                if(player.ship.speed <= 0)
                 {
-                    playerShip.speed = 0;
+                    player.ship.speed = 0;
                     state = SPACE;
                 }
             }
-            calcShip(&playerShip, 0, ticks);
-            setCameraPos(playerShip.position);
-            setCameraRot(playerShip.rotation);
-            calcSpacedust(&playerShip, ticks);
+            calcShip(&player.ship, 0, ticks);
+            setCameraPos(player.ship.position);
+            setCameraRot(player.ship.rotation);
+            calcSpacedust(&player.ship, ticks);
             break;
         }
         case SAVELOAD:
@@ -354,11 +433,11 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(B_LEFT))
             {
-                transferCargo(&playerShip.hold, &stationHold, uiTradeCursor, &starSystem.info, 1);
+                transferCargo(&player.hold, &stationHold, uiTradeCursor, &starSystem.info, 1);
             }
             else if(keyUp(B_RIGHT))
             {
-                transferCargo(&stationHold, &playerShip.hold, uiTradeCursor, &starSystem.info, 0);
+                transferCargo(&stationHold, &player.hold, uiTradeCursor, &starSystem.info, 0);
             }
             else if(keyUp(B_B))
             {
@@ -386,7 +465,7 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(B_A))
             {
-                buyEquipment(&playerShip, uiEquipCursor);
+                buyEquipment(&player, uiEquipCursor);
             }
             else if(keyUp(B_B))
             {
@@ -404,62 +483,7 @@ void calcFrame(uint32_t ticks)
         }
         case CONTRACTS:
         {
-            if(checkClosePopup())
-            {
-                break;
-            }
-
-            if(keyUp(B_UP))
-            {
-                moveCursorUp(&uiContractCursor, numStationContracts - 1);
-            }
-            else if(keyUp(B_DOWN))
-            {
-                moveCursorDown(&uiContractCursor, numStationContracts - 1);
-            }
-            else if(keyUp(B_A))
-            {
-                if(currentContract.type == CONTRACT_TYPE_NULL)
-                {
-                    uint8_t contractCursor = uiContractCursor;
-                    if(activateContract(&stationContracts[contractCursor], &playerShip.hold))
-                    {
-                        currentContract = stationContracts[contractCursor];
-
-                        //Shift contracts forward
-                        for(uint8_t i = contractCursor; i < numStationContracts - 1; i++)
-                        {
-                            stationContracts[i] = stationContracts[i + 1];
-                        }
-                        stationContracts[numStationContracts - 1].type = CONTRACT_TYPE_NULL;
-                        numStationContracts--;
-                    }
-                    else
-                    {
-                        createPopup(POPUP_ATTENTION, "Cannot activate\ncontract.\nMake sure your\ncargo bay has\nspace!");
-                    }
-                }
-                else
-                {
-                    if(checkContract(&currentContract, &playerShip.hold, currentSystem, npcShips))
-                    {
-                        uint8_t buffer[64];
-                        sprintf(buffer, "Contract done.\n%d credits\nhave been\ntransferred.", currentContract.pay);
-                        createPopup(POPUP_CHECKMARK, buffer);
-                        completedContracts[currentSystem[0]][currentSystem[1]]++;
-                        currentContract.type = CONTRACT_TYPE_NULL;
-                        uiContractCursor = 0;
-                    }
-                }
-            }
-            else if(keyUp(B_B))
-            {
-                state = STATION;
-            }
-            else if(keyUp(B_TL))
-            {
-                state = EQUIP;
-            }
+            calcContracts();
             break;
         }
         case MAP:
@@ -500,12 +524,12 @@ void calcFrame(uint32_t ticks)
             else if(keyUp(B_A))
             {
                 float distance = getDistanceToSystem(currentSystem, uiMapCursor);
-                if(playerShip.fuel >= distance)
+                if(player.fuel >= distance)
                 {
                     state = HYPERSPACE;
-                    playerShip.fuel -= distance;
-                    playerShip.turnSpeedX = 0;
-                    playerShip.turnSpeedY = 0;
+                    player.fuel -= distance;
+                    player.ship.turnSpeedX = 0;
+                    player.ship.turnSpeedY = 0;
                 }
             }
             break;
@@ -557,12 +581,12 @@ void calcFrame(uint32_t ticks)
             {
                 state = TITLE;
                 //Clear player ship fields
-                playerShip.speed = 0;
-                playerShip.turnSpeedX = 0;
-                playerShip.turnSpeedY = 0;
+                player.ship.speed = 0;
+                player.ship.turnSpeedX = 0;
+                player.ship.turnSpeedY = 0;
                 for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
                 {
-                    playerShip.hold.cargo[i] = 0;
+                    player.hold.cargo[i] = 0;
                 }
             }
             break;
@@ -617,7 +641,7 @@ void drawFrame()
         case STATION:
         case HYPERSPACE:
         {
-            drawUI(state, &playerShip, npcShips, starSystem.station.position, playerShip.hasAutodock && isAutodockPossible(&playerShip, &starSystem));
+            drawUI(state, &player, npcShips, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
             break;
         }
         case SAVELOAD:
@@ -628,12 +652,12 @@ void drawFrame()
         }
         case TRADING:
         {
-            drawTradingUI(uiTradeCursor, &playerShip.hold, &stationHold, &starSystem.info);
+            drawTradingUI(uiTradeCursor, &player.hold, &stationHold, &starSystem.info);
             break;
         }
         case EQUIP:
         {
-            drawEquipUI(uiEquipCursor, &playerShip);
+            drawEquipUI(uiEquipCursor, &player);
             break;
         }
         case CONTRACTS:
@@ -644,7 +668,7 @@ void drawFrame()
         }
         case MAP:
         {
-            drawMap(uiMapCursor, currentSystem, playerShip.fuel);
+            drawMap(uiMapCursor, currentSystem, player.fuel);
             break;
         }
         case TITLE:
@@ -656,7 +680,7 @@ void drawFrame()
         case GAME_OVER:
         {
             //Keep drawing game UI
-            drawUI(state, &playerShip, npcShips, starSystem.station.position, isAutodockPossible(&playerShip, &starSystem));
+            drawUI(state, &player, npcShips, starSystem.station.position, isAutodockPossible(&player.ship, &starSystem));
             drawGameOverScreen();
             break;
         }
@@ -686,6 +710,8 @@ int main(int argc, char **argv)
 
     //Initialize main systems
     initUI();
+    initPopup();
+
     initUniverse(currentSystem, &starSystem, npcShips);
     initShip();
     initSpacedust();
@@ -713,7 +739,6 @@ int main(int argc, char **argv)
         #ifndef NO_FPS_LIMIT
 		while((1000 / MAX_FPS) > (SDL_GetTicks() - tNow + 1))
         {
-			//SDL_Delay((1000 / MAX_FPS) - (SDL_GetTicks() - tNow)); //Yay stable framerate!
 			SDL_Delay(1); //Yay stable framerate!
 		}
         #endif
@@ -733,7 +758,6 @@ int main(int argc, char **argv)
 
     //Cleanup
     quitAudio();
-    
 	quitVideo();
 
 	return 0;

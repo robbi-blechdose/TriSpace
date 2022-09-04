@@ -1,24 +1,18 @@
 #include "ui.h"
-#include "engine/model.h"
-#include "engine/image.h"
-#include "engine/includes/3dMath.h"
-#include "cargo.h"
-#include "universe/universe.h"
-#include "universe/generator.h"
-#include "equipment.h"
-#include "universe/satellites.h"
+#include "../engine/model.h"
+#include "../engine/image.h"
+#include "../engine/includes/3dMath.h"
+#include "../cargo.h"
+#include "../universe/generator.h"
+#include "../equipment.h"
+#include "../universe/satellites.h"
 
 //UI Base Height
 #define UIBH 10
 //UI Top Height
 #define UITH 11
-//UI Popup Height
-#define UIPH 12
-//UI Popup Top Height
-#define UIPTH 13
 
 GLuint mainTexture;
-GLuint popupTexture;
 GLuint firingTexture;
 GLuint stationUITexture;
 GLuint mapTexture;
@@ -28,66 +22,14 @@ GLuint equipmentTexture;
 uint8_t mapScrollX;
 uint8_t mapScrollY;
 
-//Popup
-bool popupActive;
-uint8_t popupIcon;
-char popupText[15 * 6];
-
 void initUI()
 {
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
-    popupTexture = loadRGBTexture("res/UI/popup.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
     mapTexture = loadRGBTexture("res/UI/map.png");
     equipmentTexture = loadRGBTexture("res/UI/equipment.png");
-}
-
-void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,
-                    float texX1, float texY1, float texX2, float texY2)
-{
-    glTexCoord2f(texX1, texY2);
-    glVertex3f(posX, posY, z);
-    glTexCoord2f(texX2, texY2);
-    glVertex3f(posX + sizeX, posY, z);
-    glTexCoord2f(texX2, texY1);
-    glVertex3f(posX + sizeX, posY + sizeY - 1, z);
-    glTexCoord2f(texX1, texY1);
-    glVertex3f(posX, posY + sizeY - 1, z);
-}
-
-void drawPopupIfActive()
-{
-    if(!popupActive)
-    {
-        return;
-    }
-
-    glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, popupTexture);
-    glBegin(GL_QUADS);
-    drawTexQuad(40, 80, 160, 80, UIPH, 0, 0, PTC(160), PTC(79));
-    drawTexQuad(48, 136, 16, 16, UIPTH, PTC(16 * popupIcon), PTC(80), PTC(16 + 16 * popupIcon), PTC(96));
-    glDrawText(popupText, 72, 88, 0xFFFFFF);
-    glEnd();
-}
-
-void createPopup(uint8_t icon, char* text)
-{
-    popupActive = true;
-    popupIcon = icon;
-    strcpy(popupText, text);
-}
-
-void closePopup()
-{
-    popupActive = false;
-}
-
-bool isPopupOpen()
-{
-    return popupActive;
 }
 
 void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
@@ -117,56 +59,56 @@ void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
     drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
 }
 
-void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible)
+void drawUI(State state, Player* player, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
     glBegin(GL_QUADS);
     //Draw main UI background
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-    uint8_t speedTemp = (playerShip->speed / shipTypes[playerShip->type].maxSpeed) * 16;
+    uint8_t speedTemp = (player->ship.speed / shipTypes[player->ship.type].maxSpeed) * 16;
     if(speedTemp > 0)
     {
-        drawTexQuad(171, 26, speedTemp * 4, 4, UITH, 0, PTC(249), PTC(4) * speedTemp, PTC(251));
+        drawTexQuad(170, 26, speedTemp * 4, 4, UITH, 0, PTC(249), PTC(4) * speedTemp, PTC(251));
     }
 
-    int8_t turnXTemp = (playerShip->turnSpeedX / shipTypes[playerShip->type].maxTurnSpeed) * 30 + 30;
+    int8_t turnXTemp = (player->ship.turnSpeedX / shipTypes[player->ship.type].maxTurnSpeed) * 30 + 30;
     drawTexQuad(170 + turnXTemp, 56, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
-    int8_t turnYTemp = (playerShip->turnSpeedY / shipTypes[playerShip->type].maxTurnSpeed) * 30 + 30;
+    int8_t turnYTemp = (player->ship.turnSpeedY / shipTypes[player->ship.type].maxTurnSpeed) * 30 + 30;
     drawTexQuad(170 + turnYTemp, 41, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
-    uint8_t shieldsTemp = (playerShip->shields / shipTypes[playerShip->type].maxShields) * 16;
+    uint8_t shieldsTemp = (player->ship.shields / shipTypes[player->ship.type].maxShields) * 16;
     if(shieldsTemp > 0)
     {
         drawTexQuad(7, 57, shieldsTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * shieldsTemp, 1);
     }
 
-    uint8_t energyTemp = (playerShip->energy / shipTypes[playerShip->type].maxEnergy) * 16;
+    uint8_t energyTemp = (player->ship.energy / shipTypes[player->ship.type].maxEnergy) * 16;
     if(energyTemp > 0)
     {
         drawTexQuad(7, 42, energyTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * energyTemp, 1);
     }
 
-    uint8_t fuelTemp = ((float) playerShip->fuel / MAX_FUEL) * 16;
+    uint8_t fuelTemp = ((float) player->fuel / MAX_FUEL) * 16;
     if(fuelTemp > 0)
     {
         drawTexQuad(7, 27, fuelTemp * 4, 4, UITH, 0, PTC(246), PTC(4) * fuelTemp, PTC(248));
     }
 
     //Damage indicator
-    if(playerShip->damaged)
+    if(player->ship.damaged)
     {
-        playerShip->damaged++;
-        if(playerShip->damaged > 25) //25 frames @ 50fps, ~1/2 second
+        player->ship.damaged++;
+        if(player->ship.damaged > 25) //25 frames @ 50fps, ~1/2 second
         {
-            playerShip->damaged = 0;
+            player->ship.damaged = 0;
         }
         drawTexQuad(229, 11, 4, 4, UITH, PTC(252), PTC(20), 1, PTC(23));
     }
 
     //Fuel scoop indicator
-    if(playerShip->fuelScoopsActive)
+    if(player->fuelScoopsActive)
     {
         drawTexQuad(185, 11, 4, 4, UITH, PTC(252), PTC(28), 1, PTC(31));
     }
@@ -179,32 +121,32 @@ void drawUI(State state, Ship* playerShip, Ship npcShips[], vec3 stationPos, uin
             drawTexQuad(171, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
         }
 
-        drawRadarDot(playerShip->position, playerShip->rotation, stationPos, 1);
+        drawRadarDot(player->ship.position, player->ship.rotation, stationPos, 1);
 
         for(uint8_t i = 0; i < NUM_NORM_NPC_SHIPS; i++)
         {
             if(npcShips[i].type != SHIP_TYPE_NULL)
             {
-                if(distance3d(&playerShip->position, &npcShips[i].position) < RADAR_RANGE)
+                if(distance3d(&player->ship.position, &npcShips[i].position) < RADAR_RANGE)
                 {
-                    drawRadarDot(playerShip->position, playerShip->rotation, npcShips[i].position, 0);
+                    drawRadarDot(player->ship.position, player->ship.rotation, npcShips[i].position, 0);
                 }
             }
         }
         //Contract ship
         if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL)
         {
-            drawRadarDot(playerShip->position, playerShip->rotation, npcShips[NPC_SHIP_CONTRACT].position, 3);
+            drawRadarDot(player->ship.position, player->ship.rotation, npcShips[NPC_SHIP_CONTRACT].position, 3);
         }
         //Next contract satellite to visit
         else if(hasSatellites() && !checkAllSatellitesVisited())
         {
-            drawRadarDot(playerShip->position, playerShip->rotation, getSatellitePosition(), 3);
+            drawRadarDot(player->ship.position, player->ship.rotation, getSatellitePosition(), 3);
         }
     }
 
     //Draw effect if firing
-    if(playerShip->weapon.timer)
+    if(player->ship.weapon.timer)
     {
         glBindTexture(GL_TEXTURE_2D, firingTexture);
         drawTexQuad(2, 72, 237, 167, UIBH, 0, 0, PTC(235), PTC(165));
@@ -276,7 +218,7 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
 
-void drawEquipUI(uint8_t cursor, Ship* playerShip)
+void drawEquipUI(uint8_t cursor, Player* player)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
@@ -293,7 +235,7 @@ void drawEquipUI(uint8_t cursor, Ship* playerShip)
     for(uint8_t i = 0; i < NUM_EQUIPMENT_TYPES; i++)
     {
         printNameForEquipment(name, i);
-        printEquipmentStatusForShip(status, playerShip, i);
+        printEquipmentStatusForShip(status, player, i);
         sprintf(buffer, "%-20s %4d %3s", name, getPriceForEquipment(i), status);
 
         if(i == cursor)
@@ -349,7 +291,7 @@ void drawEquipUI(uint8_t cursor, Ship* playerShip)
     drawTexQuad(120 - 48, 32, 24 * 4, 24 * 2, UITH, PTC(x), PTC(y), PTC(x + 24 * 4), PTC(y + 24 * 2));
     glEnd();
     
-    sprintf(buffer, "%d credits", playerShip->hold.money);
+    sprintf(buffer, "%d credits", player->hold.money);
     glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
 
     glDrawText("Trading", 12, 240 - 10, 0xFFFFFF);

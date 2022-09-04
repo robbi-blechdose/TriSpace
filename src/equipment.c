@@ -42,52 +42,52 @@ void printOwn(char* str, bool own)
     }
 }
 
-void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type)
+void printEquipmentStatusForShip(char* str, Player* player, EquipmentType type)
 {
     switch(type)
     {
         case Fuel:
         {
-            sprintf(str, "%1.1f", ship->fuel / 10.0f);
+            sprintf(str, "%1.1f", player->fuel);
             break;
         }
         case Cargo30:
         {
-            printOwn(str, ship->hold.size >= 30);
+            printOwn(str, player->hold.size >= 30);
             break;
         }
         case LaserMkII:
         {
-            printOwn(str, ship->weapon.type == 1);
+            printOwn(str, player->ship.weapon.type == 1);
             break;
         }
         case LaserMkIII:
         {
-            printOwn(str, ship->weapon.type == 2);
+            printOwn(str, player->ship.weapon.type == 2);
             break;
         }
         case MiningLaser:
         {
-            printOwn(str, ship->weapon.type == 3);
+            printOwn(str, player->ship.weapon.type == 3);
             break;
         }
         case DockingComputer:
         {
-            printOwn(str, ship->hasAutodock);
+            printOwn(str, player->hasAutodock);
             break;
         }
         case FuelScoops:
         {
-            printOwn(str, ship->hasFuelScoops);
+            printOwn(str, player->hasFuelScoops);
             break;
         }
     }
 }
 
-bool buyEquipment(Ship* ship, EquipmentType type)
+bool buyEquipment(Player* player, EquipmentType type)
 {
     uint16_t price = equipmentPrices[type];
-    if(ship->hold.money < price)
+    if(player->hold.money < price)
     {
         return false;
     }
@@ -100,7 +100,7 @@ bool buyEquipment(Ship* ship, EquipmentType type)
         case LaserMkIII:
         case MiningLaser:
         {
-            switch(ship->weapon.type)
+            switch(player->ship.weapon.type)
             {
                 //Laser Mk II
                 case 1:
@@ -124,66 +124,66 @@ bool buyEquipment(Ship* ship, EquipmentType type)
             break;
         }
     }
-    ship->hold.money += sellPrice;
+    player->hold.money += sellPrice;
     
     //Buy new equipment
     switch(type)
     {
         case Fuel:
         {
-            if(ship->fuel < MAX_FUEL)
+            if(player->fuel < MAX_FUEL)
             {
-                ship->fuel += 5;
-                if(ship->fuel > MAX_FUEL)
+                player->fuel += 5;
+                if(player->fuel > MAX_FUEL)
                 {
-                    ship->fuel = MAX_FUEL;
+                    player->fuel = MAX_FUEL;
                 }
-                ship->hold.money -= price;
+                player->hold.money -= price;
             }
             break;
         }
         case Cargo30:
         {
-            if(ship->hold.size != 30)
+            if(player->hold.size != 30)
             {
-                ship->hold.size = 30;
-                ship->hold.money -= price;
+                player->hold.size = 30;
+                player->hold.money -= price;
             }
             break;
         }
         case LaserMkII:
         {
-            ship->weapon.type = 1;
-            ship->hold.money -= price;
+            player->ship.weapon.type = 1;
+            player->hold.money -= price;
             break;
         }
         case LaserMkIII:
         {
-            ship->weapon.type = 2;
-            ship->hold.money -= price;
+            player->ship.weapon.type = 2;
+            player->hold.money -= price;
             break;
         }
         case MiningLaser:
         {
-            ship->weapon.type = 3;
-            ship->hold.money -= price;
+            player->ship.weapon.type = 3;
+            player->hold.money -= price;
             break;
         }
         case DockingComputer:
         {
-            if(!ship->hasAutodock)
+            if(!player->hasAutodock)
             {
-                ship->hasAutodock = true;
-                ship->hold.money -= price;
+                player->hasAutodock = true;
+                player->hold.money -= price;
             }
             break;
         }
         case FuelScoops:
         {
-            if(!ship->hasFuelScoops)
+            if(!player->hasFuelScoops)
             {
-                ship->hasFuelScoops = true;
-                ship->hold.money -= price;
+                player->hasFuelScoops = true;
+                player->hold.money -= price;
             }
             break;
         }

@@ -1,8 +1,10 @@
 #ifndef _SHIPAI_H
 #define _SHIPAI_H
 
-#include "ship.h"
 #include "engine/util.h"
+
+#include "ship.h"
+#include "player.h"
 
 #define AI_RANGE               75
 #define AI_RANGE_CIRCLE_INNER  25
@@ -21,6 +23,6 @@
 
 #define AI_FIRING_CHANCE 75
 
-void calcNPCAi(Ship* playerShip, Ship* npcShip, Ship* npcShips, uint32_t ticks);
+void calcNPCAi(Player* player, Ship* npcShip, Ship* npcShips, uint32_t ticks);
 
 #endif

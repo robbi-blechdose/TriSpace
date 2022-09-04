@@ -1,7 +1,10 @@
 #include "asteroids.h"
+
 #include "../engine/model.h"
 #include "../engine/image.h"
 #include "../engine/effects.h"
+
+#include "../cargo.h"
 
 GLuint asteroidMesh;
 GLuint asteroidTexture;
@@ -83,4 +86,34 @@ bool checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t min
 Asteroid* getAsteroids()
 {
     return asteroids;
+}
+
+void checkWeaponsAsteroidHit(Player* player)
+{
+    vec3 dir = anglesToDirection(&player->ship.rotation);
+    if(!checkAsteroidHit(&player->ship.position, &dir, weaponTypes[player->ship.weapon.type].damage, weaponTypes[player->ship.weapon.type].mineChance))
+    {
+        return;
+    }
+
+    //Determine what we mined
+    uint8_t type = randr(100);
+    if(type < 33)
+    {
+        type = Gold;
+    }
+    else if(type < 66)
+    {
+        type = Dilithium;
+    }
+    else
+    {
+        type = Platinum;
+    }
+    //Do we have enough space?
+    uint8_t amount = 1 + randr(2);
+    if(getCargoHoldSize(&player->hold) + amount <= player->hold.size)
+    {
+        player->hold.cargo[type] += amount;
+    }
 }

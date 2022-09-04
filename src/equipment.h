@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "ship.h"
+#include "player.h"
 
 #define NUM_EQUIPMENT_TYPES 7
 
@@ -19,7 +19,7 @@ typedef enum {
 
 uint16_t getPriceForEquipment(EquipmentType type);
 void printNameForEquipment(char* str, EquipmentType type);
-void printEquipmentStatusForShip(char* str, Ship* ship, EquipmentType type);
-bool buyEquipment(Ship* ship, EquipmentType type);
+void printEquipmentStatusForShip(char* str, Player* player, EquipmentType type);
+bool buyEquipment(Player* player, EquipmentType type);
 
 #endif

@@ -2,6 +2,8 @@
 #define _SPACE_H
 
 #include "../ship.h"
+#include "starsystem.h"
+#include "../player.h"
 
 typedef enum {
     NONE,
@@ -38,7 +40,7 @@ void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* star
 
 void setInitialSpawnPos(vec3 playerPos);
 
-void calcUniverse(State* state, StarSystem* starSystem, Ship* playerShip, Ship npcShips[], uint32_t ticks);
+void calcUniverse(State* state, StarSystem* starSystem, Player* player, Ship npcShips[], uint32_t ticks);
 void drawUniverse(State* state, StarSystem* starSystem, Ship npcShips[]);
 
 uint32_t getSeedForSystem(uint8_t x, uint8_t y);
