@@ -32,17 +32,14 @@ void initUI()
     equipmentTexture = loadRGBTexture("res/UI/equipment.png");
 }
 
-void drawRadarDot(vec3 playerPos, vec3 playerRot, vec3 target, uint8_t color)
+void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
 {
     vec3 diff = subv3(playerPos, target);
-    vec3 axis = {.d = {0, 1, 0}};
-    vec3 rot = rotatev3(diff, axis, playerRot.y);
-    axis.d[0] = 1;
-    axis.d[1] = 0;
-    rot = rotatev3(rot, axis, playerRot.x);
+    quat qr = multQuat(QUAT_INITIAL, inverseQuat(playerRot));
+    vec3 rot = multQuatVec3(qr, diff);
     rot = normalizev3(rot);
 
-    if(rot.d[2] > 0)
+    if(rot.z > 0)
     {
         rot.x = -rot.x * 30;
         rot.y = -rot.y * 30;

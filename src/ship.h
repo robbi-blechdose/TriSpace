@@ -6,6 +6,7 @@
 
 #include "engine/includes/3dMath.h"
 #include "engine/util.h"
+#include "engine/quaternion.h"
 
 typedef struct {
     uint8_t maxShields;
@@ -38,7 +39,7 @@ typedef struct {
     float energy;
 
     vec3 position;
-    vec3 rotation;
+    quat rotation;
     float speed;
     float turnSpeedX;
     float turnSpeedY;

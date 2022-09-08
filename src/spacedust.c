@@ -61,15 +61,27 @@ void calcSpacedust(Ship* playerShip, uint32_t ticks)
             spacedust[i].x += spacedust[i].rotX * playerShip->speed * ticks / 1000.0f;
             spacedust[i].y += spacedust[i].rotY * playerShip->speed * ticks / 1000.0f;
             //TODO: Adjust directions (e.g. a point that was going down should go up if the ship turns downwards)
+
+            //Move spacedust in the direction opposite the ship's rotation
             if(playerShip->turnSpeedY != 0)
             {
-                //- because we have to move the points in the opposite direction
-                spacedust[i].x -= playerShip->turnSpeedY * 128 * ticks / 1000.0f;
+                float angle = playerShip->turnSpeedY * ticks / 1000.0f;
+
+                //Move to origin
+                spacedust[i].x -= WINX / 2;
+                spacedust[i].y -= WINY_3D / 2;
+
+                //Rotate
+                spacedust[i].x = spacedust[i].x * cosf(angle) - spacedust[i].y * sinf(angle);
+                spacedust[i].y = spacedust[i].x * sinf(angle) + spacedust[i].y * cosf(angle);
+
+                //Move back
+                spacedust[i].x += WINX / 2;
+                spacedust[i].y += WINY_3D / 2;
             }
             if(playerShip->turnSpeedX != 0)
             {
-                //- because we have to move the points in the opposite direction
-                spacedust[i].y -= playerShip->turnSpeedX * 128 * ticks / 1000.0f;
+                spacedust[i].y += playerShip->turnSpeedX * 128 * ticks / 1000.0f;
             }
         }
     }

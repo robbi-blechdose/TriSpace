@@ -3,9 +3,10 @@
 
 #include "util.h"
 #include "includes/3dMath.h"
+#include "quaternion.h"
 
 void drawCamera();
 void setCameraPos(vec3 pos);
-void setCameraRot(vec3 rot);
+void setCameraRot(quat rot);
 
 #endif

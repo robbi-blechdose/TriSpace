@@ -63,16 +63,20 @@ void drawShip(Ship* ship)
 
 void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
 {
-    ship->rotation.x += (ship->turnSpeedX * ticks) / 1000.0f;
-    ship->rotation.y += (ship->turnSpeedY * ticks) / 1000.0f;
-    //Keep rotation in bounds
-    clampAngle(&ship->rotation.x);
-    clampAngle(&ship->rotation.y);
+    //Update rotation
+    float pitch = (ship->turnSpeedX * ticks) / 1000.0f;
+    float roll = (ship->turnSpeedY * ticks) / 1000.0f;
+    quat temp = quatFromAngles((vec3) {pitch, 0, roll});
+    ship->rotation = multQuat(ship->rotation, temp);
 
+    //Update position
     float diff = (ship->speed * ticks) / 1000.0f;
-    ship->position.z -= cos(ship->rotation.y) * cos(ship->rotation.x) * diff;
-    ship->position.x += sin(ship->rotation.y) * cos(ship->rotation.x) * diff;
-    ship->position.y -= sin(ship->rotation.x) * diff;
+    if(diff > 0)
+    {
+        vec3 posDiff = multQuatVec3(ship->rotation, (vec3) {0, 0, -1});
+        posDiff = scalev3(diff, posDiff);
+        ship->position = addv3(ship->position, posDiff);
+    }
 
     if(collided)
     {
@@ -190,7 +194,7 @@ bool fireWeapons(Ship* ship)
 bool checkWeaponsShipHit(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t source)
 {
     //Calculate ray direction vector
-    vec3 dir = anglesToDirection(&ship->rotation);
+    vec3 dir = multQuatVec3(ship->rotation, (vec3) {0, 0, -1});
 
     //Check ship hits
     for(uint8_t i = 0; i < numTargets; i++)

@@ -119,6 +119,7 @@ void newGame()
     player.wantedLevel = 0;
     player.ship = (Ship) {.type = 0,
                             .position = (vec3) {150, 0, 100},
+                            .rotation = QUAT_INITIAL,
                             .weapon.type = 0,
                             .shields = 2,
                             .energy = 2};
@@ -166,19 +167,19 @@ void calcShipControl(uint32_t ticks)
     int8_t dirY = 0;
     if(keyPressed(B_UP))
     {
-        dirX = 1;
+        dirX = -1;
     }
     else if(keyPressed(B_DOWN))
     {
-        dirX = -1;
+        dirX = 1;
     }
     if(keyPressed(B_LEFT))
     {
-        dirY = -1;
+        dirY = 1;
     }
     else if(keyPressed(B_RIGHT))
     {
-        dirY = 1;
+        dirY = -1;
     }
     steerShip(&player.ship, dirX, dirY, ticks);
 }
