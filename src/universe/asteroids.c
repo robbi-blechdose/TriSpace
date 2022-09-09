@@ -90,7 +90,7 @@ Asteroid* getAsteroids()
 
 void checkWeaponsAsteroidHit(Player* player)
 {
-    vec3 dir = anglesToDirection(&player->ship.rotation);
+    vec3 dir = multQuatVec3(player->ship.rotation, (vec3) {0, 0, -1});
     if(!checkAsteroidHit(&player->ship.position, &dir, weaponTypes[player->ship.weapon.type].damage, weaponTypes[player->ship.weapon.type].mineChance))
     {
         return;

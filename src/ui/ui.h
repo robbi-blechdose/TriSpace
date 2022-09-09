@@ -7,6 +7,7 @@
 #include "../universe/universe.h"
 #include "../contracts.h"
 #include "../player.h"
+#include "../npcs/npc.h"
 
 #define RADAR_RANGE 120
 
@@ -17,7 +18,7 @@
 
 void initUI();
 
-void drawUI(State state, Player* player, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible);
+void drawUI(State state, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible);
 
 void drawSaveLoadUI(uint8_t cursor);
 

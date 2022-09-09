@@ -28,12 +28,12 @@ uint8_t sampleShoot;
 
 void initShip()
 {
-    shipMeshes[0] = loadModelList("res/obj/Ship.obj");
-    shipTextures[0] = loadRGBTexture("res/tex/PirateShip.png");
-    shipMeshes[1] = loadModelList("res/obj/CruiseShip.obj");
-    shipTextures[1] = loadRGBTexture("res/tex/CruiseShip.png");
-    shipMeshes[2] = loadModelList("res/obj/PoliceShip.obj");
-    shipTextures[2] = loadRGBTexture("res/tex/PoliceShip.png");
+    shipMeshes[0] = loadModelList("res/obj/ships/Ship.obj");
+    shipTextures[0] = loadRGBTexture("res/tex/ships/PirateShip.png");
+    shipMeshes[1] = loadModelList("res/obj/ships/CruiseShip.obj");
+    shipTextures[1] = loadRGBTexture("res/tex/ships/CruiseShip.png");
+    shipMeshes[2] = loadModelList("res/obj/ships/PoliceShip.obj");
+    shipTextures[2] = loadRGBTexture("res/tex/ships/PoliceShip.png");
     sampleShoot = loadSample("res/sfx/flaunch.wav");
 }
 
@@ -218,37 +218,4 @@ bool checkWeaponsShipHit(Ship* ship, Ship* targetShips, uint8_t numTargets, uint
     }
 
     return false;
-}
-
-float getTurnSpeedForRotation(float current, float target, float maxSpeed)
-{
-    clampAngle(&target);
-    if(fabs(current - target) < 0.05f)
-    {
-        return 0;
-    }
-    
-    float turnY = 0;
-    if(current < target)
-    {
-        if(fabs(current - target) < M_PI)
-        {
-            return maxSpeed;
-        }
-        else
-        {
-            return -maxSpeed;
-        }
-    }
-    else
-    {
-        if(fabs(current - target) < M_PI)
-        {
-            return -maxSpeed;
-        }
-        else
-        {
-            return maxSpeed;
-        }
-    }
 }

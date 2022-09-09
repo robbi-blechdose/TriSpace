@@ -22,6 +22,9 @@
 #include "ui/popup.h"
 #include "ui/ui.h"
 
+#include "npcs/npc.h"
+#include "npcs/ai.h"
+
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
 
@@ -52,7 +55,7 @@ Contract stationContracts[MAX_STATION_CONTRACTS];
 uint8_t numStationContracts;
 
 Player player;
-Ship npcShips[MAX_NPC_SHIPS];
+Npc npcs[MAX_NPCS];
 
 Contract currentContract;
 
@@ -104,7 +107,7 @@ bool loadGame()
         readElement(&savedSystem[0], sizeof(uint8_t));
         readElement(&savedSystem[1], sizeof(uint8_t));
         deleteStarSystem(&starSystem);
-        initSystem(currentSystem, &starSystem, npcShips);
+        initSystem(currentSystem, &starSystem, npcs);
         readElement(&currentContract, sizeof(currentContract));
         readElement(&completedContracts, sizeof(completedContracts));
         closeSave();
@@ -136,7 +139,7 @@ void newGame()
     //Initialize system
     currentSystem[0] = 0;
     currentSystem[1] = 0;
-    initSystem(currentSystem, &starSystem, npcShips);
+    initSystem(currentSystem, &starSystem, npcs);
     setInitialSpawnPos(player.ship.position);
 }
 
@@ -234,14 +237,19 @@ void calcSpace(uint32_t ticks)
     {
         if(fireWeapons(&player.ship))
         {
-            if(!checkWeaponsShipHit(&player.ship, npcShips, MAX_NPC_SHIPS, DAMAGE_SOURCE_PLAYER))
+            Ship npcShips[MAX_NPCS];
+            for(uint8_t i = 0; i < MAX_NPCS; i++)
+            {
+                npcShips[i] = npcs[i].ship;
+            }
+            if(!checkWeaponsShipHit(&player.ship, npcShips, MAX_NPCS, DAMAGE_SOURCE_PLAYER))
             {
                 checkWeaponsAsteroidHit(&player);
             }
         }
     }
 
-    calcUniverse(&state, &starSystem, &player, npcShips, ticks);
+    calcUniverse(&state, &starSystem, &player, npcs, ticks);
     if(shipIsDestroyed(&player.ship))
     {
         vec3 effectPos = scalev3(2.5f, anglesToDirection(&player.ship.rotation));
@@ -295,7 +303,7 @@ void calcContracts()
         }
         else
         {
-            if(checkContract(&currentContract, &player.hold, currentSystem, npcShips))
+            if(checkContract(&currentContract, &player.hold, currentSystem, npcs))
             {
                 uint8_t buffer[64];
                 sprintf(buffer, "Contract done.\n%d credits\nhave been\ntransferred.", currentContract.pay);
@@ -333,7 +341,7 @@ void calcFrame(uint32_t ticks)
             setCameraPos(player.ship.position);
             setCameraRot(player.ship.rotation);
 
-            calcUniverse(&state, &starSystem, &player, npcShips, ticks);
+            calcUniverse(&state, &starSystem, &player, npcs, ticks);
             break;
         }
         case HYPERSPACE:
@@ -343,7 +351,7 @@ void calcFrame(uint32_t ticks)
                 player.ship.speed += (500.0f * ticks) / 1000.0f;
                 if(player.ship.speed > 500)
                 {
-                    switchSystem(currentSystem, uiMapCursor, &starSystem, npcShips);
+                    switchSystem(currentSystem, uiMapCursor, &starSystem, npcs);
                     player.ship.position = getRandomFreePos(&starSystem, 20);
                     setInitialSpawnPos(player.ship.position);
                     //Generate contracts for this system
@@ -351,7 +359,7 @@ void calcFrame(uint32_t ticks)
                     //Generate new station cargo hold for this system
                     createStationHold(&stationHold);
                     //Set up the current contract (if necessary)
-                    contractStarSystemSetup(&currentContract, npcShips, currentSystem, &starSystem);
+                    contractStarSystemSetup(&currentContract, npcs, currentSystem, &starSystem);
                 }
             }
             else
@@ -616,7 +624,7 @@ void drawFrame()
         case STATION:
         case GAME_OVER:
         {
-            drawUniverse(&state, &starSystem, npcShips);
+            drawUniverse(&state, &starSystem, npcs);
             break;
         }
     }
@@ -642,7 +650,7 @@ void drawFrame()
         case STATION:
         case HYPERSPACE:
         {
-            drawUI(state, &player, npcShips, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
+            drawUI(state, &player, npcs, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
             break;
         }
         case SAVELOAD:
@@ -681,7 +689,7 @@ void drawFrame()
         case GAME_OVER:
         {
             //Keep drawing game UI
-            drawUI(state, &player, npcShips, starSystem.station.position, isAutodockPossible(&player.ship, &starSystem));
+            drawUI(state, &player, npcs, starSystem.station.position, isAutodockPossible(&player.ship, &starSystem));
             drawGameOverScreen();
             break;
         }
@@ -713,7 +721,7 @@ int main(int argc, char **argv)
     initUI();
     initPopup();
 
-    initUniverse(currentSystem, &starSystem, npcShips);
+    initUniverse(currentSystem, &starSystem);
     initShip();
     initSpacedust();
     createStationHold(&stationHold);

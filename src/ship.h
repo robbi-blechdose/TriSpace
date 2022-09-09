@@ -44,13 +44,6 @@ typedef struct {
     float turnSpeedX;
     float turnSpeedY;
 
-    //AI data
-    struct {
-        uint8_t aiState;
-        float aiRotX;
-        float aiRotY;
-    };
-
     uint8_t damaged;
 } Ship;
 

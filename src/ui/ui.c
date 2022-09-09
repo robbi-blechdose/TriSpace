@@ -56,7 +56,7 @@ void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
     drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
 }
 
-void drawUI(State state, Player* player, Ship npcShips[], vec3 stationPos, uint8_t autodockPossible)
+void drawUI(State state, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
@@ -120,20 +120,20 @@ void drawUI(State state, Player* player, Ship npcShips[], vec3 stationPos, uint8
 
         drawRadarDot(player->ship.position, player->ship.rotation, stationPos, 1);
 
-        for(uint8_t i = 0; i < NUM_NORM_NPC_SHIPS; i++)
+        for(uint8_t i = 0; i < NUM_NORM_NPCS; i++)
         {
-            if(npcShips[i].type != SHIP_TYPE_NULL)
+            if(npcs[i].ship.type != SHIP_TYPE_NULL)
             {
-                if(distance3d(&player->ship.position, &npcShips[i].position) < RADAR_RANGE)
+                if(distance3d(&player->ship.position, &npcs[i].ship.position) < RADAR_RANGE)
                 {
-                    drawRadarDot(player->ship.position, player->ship.rotation, npcShips[i].position, 0);
+                    drawRadarDot(player->ship.position, player->ship.rotation, npcs[i].ship.position, 0);
                 }
             }
         }
         //Contract ship
-        if(npcShips[NPC_SHIP_CONTRACT].type != SHIP_TYPE_NULL)
+        if(npcs[NPC_CONTRACT].ship.type != SHIP_TYPE_NULL)
         {
-            drawRadarDot(player->ship.position, player->ship.rotation, npcShips[NPC_SHIP_CONTRACT].position, 3);
+            drawRadarDot(player->ship.position, player->ship.rotation, npcs[NPC_CONTRACT].ship.position, 3);
         }
         //Next contract satellite to visit
         else if(hasSatellites() && !checkAllSatellitesVisited())

@@ -8,6 +8,7 @@
 #include "cargo.h"
 #include "ship.h"
 #include "universe/universe.h"
+#include "npcs/npc.h"
 
 #define NUM_CONTRACT_TYPES      4
 #define CONTRACT_GET_ITEM       0
@@ -47,8 +48,8 @@ void generateContractsForSystem(Contract stationContracts[], uint8_t* numStation
                                     uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE]);
 
 bool activateContract(Contract* contract, CargoHold* playerHold);
-bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[]);
-void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2], StarSystem* starSystem);
+bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Npc npcs[]);
+void contractStarSystemSetup(Contract* contract, Npc npcs[], uint8_t currentSystem[2], StarSystem* starSystem);
 void printObjective(char* str, Contract* contract);
 
 #endif

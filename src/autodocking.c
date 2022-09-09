@@ -68,8 +68,8 @@ void calcAutodockShip(AutodockData* ad, Ship* ship, uint32_t ticks)
         }
     }
     //Apply target rotation and speed
-    ship->turnSpeedX = getTurnSpeedForRotation(ship->rotation.x, targetX, shipTypes[ship->type].maxTurnSpeed / 2);
-    ship->turnSpeedY = getTurnSpeedForRotation(ship->rotation.y, targetY, shipTypes[ship->type].maxTurnSpeed / 2);
+    //ship->turnSpeedX = getTurnSpeedForRotation(ship->rotation.x, targetX, shipTypes[ship->type].maxTurnSpeed / 2);
+    //ship->turnSpeedY = getTurnSpeedForRotation(ship->rotation.y, targetY, shipTypes[ship->type].maxTurnSpeed / 2);
 
     if(fabs(ship->speed - targetSpeed) > 0.1f)
     {

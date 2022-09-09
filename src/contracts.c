@@ -150,7 +150,7 @@ bool activateContract(Contract* contract, CargoHold* playerHold)
     return false;
 }
 
-bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Ship npcShips[])
+bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Npc npcs[])
 {
     if(currentSystem[0] != contract->targetSystem[0] || currentSystem[1] != contract->targetSystem[1])
     {
@@ -175,7 +175,7 @@ bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSys
         }
         case CONTRACT_DESTROY_SHIP:
         {
-            if(npcShips[NPC_SHIP_CONTRACT].type == SHIP_TYPE_NULL)
+            if(npcs[NPC_CONTRACT].ship.type == SHIP_TYPE_NULL)
             {
                 playerHold->money += contract->pay;
                 return true;
@@ -196,7 +196,7 @@ bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSys
     return false;
 }
 
-void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t currentSystem[2], StarSystem* starSystem)
+void contractStarSystemSetup(Contract* contract, Npc npcs[], uint8_t currentSystem[2], StarSystem* starSystem)
 {
     if(contract->type == CONTRACT_TYPE_NULL)
     {
@@ -212,21 +212,21 @@ void contractStarSystemSetup(Contract* contract, Ship npcShips[], uint8_t curren
         case CONTRACT_DESTROY_SHIP:
         {
             //Spawn the cruise liner
-            npcShips[NPC_SHIP_CONTRACT].type = SHIP_TYPE_CRUISELINER;
+            npcs[NPC_CONTRACT].ship.type = SHIP_TYPE_CRUISELINER;
             vec3 pos = getRandomFreePos(starSystem, 20);
-            npcShips[NPC_SHIP_CONTRACT].position.x = pos.x;
-            npcShips[NPC_SHIP_CONTRACT].position.z = pos.z;
-            npcShips[NPC_SHIP_CONTRACT].position.y = pos.y;
+            npcs[NPC_CONTRACT].ship.position.x = pos.x;
+            npcs[NPC_CONTRACT].ship.position.z = pos.z;
+            npcs[NPC_CONTRACT].ship.position.y = pos.y;
 
             //Spawn a few police ships to protect it
             uint8_t numPoliceShips = randr(5);
             for(uint8_t i = 0; i < numPoliceShips; i++)
             {
                 vec3 policePos = getRandomFreePosBounds(starSystem, pos, (vec3) {.x = 100, .y = 50, .z = 100}, 25, 25);
-                npcShips[i].type = SHIP_TYPE_POLICE;
-                npcShips[i].position.x = policePos.x;
-                npcShips[i].position.y = policePos.y;
-                npcShips[i].position.z = policePos.z;
+                npcs[i].ship.type = SHIP_TYPE_POLICE;
+                npcs[i].ship.position.x = policePos.x;
+                npcs[i].ship.position.y = policePos.y;
+                npcs[i].ship.position.z = policePos.z;
             }
             break;
         }
