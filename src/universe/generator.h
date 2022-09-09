@@ -22,7 +22,6 @@ typedef struct {
 uint8_t getNumStarsForSystem(uint32_t seed);
 void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed);
 void generateStarSystem(StarSystem* system, uint32_t seed);
-void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed);
 void generateSystemPos(vec2* systemPos, uint32_t seed, uint8_t i, uint8_t j);
 void generateSystemName(char* buffer);
 

@@ -18,7 +18,7 @@
 
 void initUI();
 
-void drawUI(State state, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible);
+void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible);
 
 void drawSaveLoadUI(uint8_t cursor);
 

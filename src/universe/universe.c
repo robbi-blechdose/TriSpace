@@ -1,13 +1,14 @@
 #include "universe.h"
 
-#include "starsystem.h"
-#include "spacestation.h"
-#include "asteroids.h"
-#include "generator.h"
 #include "../engine/effects.h"
 #include "../engine/audio.h"
 #include "../engine/util.h"
+
+#include "asteroids.h"
 #include "satellites.h"
+#include "generator.h"
+
+#include "../npcs/ai.h"
 
 uint32_t systemSeeds[UNIVERSE_SIZE][UNIVERSE_SIZE];
 
@@ -15,19 +16,18 @@ uint8_t sampleExplosion;
 
 vec3 lastPlayerPos;
 
-void initUniverse(uint8_t* currentSystem, StarSystem* starSystem)
+void initUniverse(StarSystem* starSystem)
 {
-    initEffects();
-    initStarSystem();
-    initSpaceStation();
-    initAsteroids();
-    initSatellites();
     sampleExplosion = loadSample("res/sfx/explosion.wav");
     //Generate system seeds
-    generateSystemSeeds(systemSeeds, BASE_SEED);
-    //Init starting star system
-    currentSystem[0] = 0;
-    currentSystem[1] = 0;
+    srand(BASE_SEED);
+    for(uint8_t i = 0; i < UNIVERSE_SIZE; i++)
+    {
+        for(uint8_t j = 0; j < UNIVERSE_SIZE; j++)
+        {
+            systemSeeds[i][j] = rand();
+        }
+    }
 }
 
 void initSystem(uint8_t* currentSystem, StarSystem* starSystem, Npc npcs[])
@@ -64,8 +64,7 @@ void calcNPCShips(StarSystem* starSystem, Player* player, Npc npcs[], uint32_t t
     {
         if(npcs[i].ship.type != SHIP_TYPE_NULL)
         {
-            //TODO
-            //calcNPCAi(player, &npcs[i], npcs, ticks);
+            calcNPCAi(&npcs[i], player, npcs, ticks);
             //TODO: Collisions?
             calcShip(&npcs[i].ship, 0, ticks);
             if(shipIsDestroyed(&npcs[i].ship))
@@ -130,79 +129,6 @@ void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Npc npc
         generateNPCShips(npcs, NUM_NORM_NPCS, starSystem, playerShip->position);
         //Store position for next run
         lastPlayerPos = playerShip->position;
-    }
-}
-
-void calcUniverse(State* state, StarSystem* starSystem, Player* player, Npc npcs[], uint32_t ticks)
-{
-    switch(*state)
-    {
-        case SPACE:
-        {
-            if(hasSatellites())
-            {
-                checkVisitSatellite(&player->ship.position);
-            }
-            calcUniverseSpawnNPCShips(starSystem, &player->ship, npcs, ticks);
-            calcNPCShips(starSystem, player, npcs, ticks);
-            calcEffects(ticks);
-            if(hasDockingDistance(&player->ship.position, &starSystem->station.dockingPosition))
-            {
-                *state = STATION;
-                player->ship.position.x = 2;
-                player->ship.position.y = 0;
-                player->ship.position.z = 0;
-                player->ship.speed *= 0.5f;
-            }
-            break;
-        }
-        case STATION:
-        {
-            if(hasLeavingDistance(player->ship.position))
-            {
-                *state = SPACE;
-                player->ship.position = starSystem->station.exitPosition;
-            }
-            else if(hasLandingDistance(player->ship.position))
-            {
-                *state = TRADING;
-                player->ship.position.y = 0;
-                player->ship.speed = 0;
-            }
-            break;
-        }
-    }
-}
-
-void drawUniverse(State* state, StarSystem* starSystem, Npc npcs[])
-{
-    switch(*state)
-    {
-        case SPACE:
-        case HYPERSPACE:
-        case GAME_OVER:
-        {
-            drawStarSystem(starSystem);
-            if(starSystem->hasAsteroidField)
-            {
-                drawAsteroids();
-            }
-            for(uint8_t i = 0; i < MAX_NPCS; i++)
-            {
-                if(npcs[i].ship.type != SHIP_TYPE_NULL)
-                {
-                    drawShip(&npcs[i].ship);
-                }
-            }
-            drawSatellites();
-            drawEffects();
-            break;
-        }
-        case STATION:
-        {
-            drawSpaceStation();
-            break;
-        }
     }
 }
 

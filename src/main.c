@@ -8,16 +8,19 @@
 #include "engine/savegame.h"
 #include "engine/audio.h"
 
+#include "universe/starsystem.h"
+#include "universe/spacestation.h"
+#include "universe/asteroids.h"
+#include "universe/universe.h"
+#include "universe/satellites.h"
+
 #include "ship.h"
 #include "ship_collisions.h"
-#include "universe/universe.h"
-#include "universe/starsystem.h"
 #include "contracts.h"
 #include "spacedust.h"
 #include "autodocking.h"
 #include "equipment.h"
 #include "player.h"
-#include "universe/asteroids.h"
 
 #include "ui/popup.h"
 #include "ui/ui.h"
@@ -35,17 +38,35 @@ uint32_t counterFrames = 0;
 uint32_t counterTime = 0;
 #endif
 
+typedef enum {
+    NONE,
+    //World states
+    SPACE,
+    STATION,
+    //PLANET,
+    HYPERSPACE,
+    //GUI states
+    SAVELOAD,
+    TRADING,
+    EQUIP,
+    CONTRACTS,
+    MAP,
+    //Special states
+    TITLE,
+    GAME_OVER
+} State;
+
 #define SAVE_VERSION 500
 
 #define MUSIC_DOCKING 0
 #define MUSIC_MAIN    1
 
+//---------- Main game stuff ----------//
 bool running = true;
 
-//---------- Main game stuff ----------//
 State state;
 
-uint8_t currentSystem[2];
+uint8_t currentSystem[2] = {0, 0};
 StarSystem starSystem;
 
 uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE];
@@ -249,11 +270,23 @@ void calcSpace(uint32_t ticks)
         }
     }
 
-    calcUniverse(&state, &starSystem, &player, npcs, ticks);
+    if(hasSatellites())
+    {
+        checkVisitSatellite(&player.ship.position);
+    }
+    calcUniverseSpawnNPCShips(&starSystem, &player.ship, npcs, ticks);
+    calcNPCShips(&starSystem, &player, npcs, ticks);
+    calcEffects(ticks);
+    if(hasDockingDistance(&player.ship.position, &starSystem.station.dockingPosition))
+    {
+        state = STATION;
+        player.ship.position = (vec3) {2, 0, 0};
+        player.ship.speed *= 0.5f;
+    }
+
     if(shipIsDestroyed(&player.ship))
     {
-        vec3 effectPos = scalev3(2.5f, anglesToDirection(&player.ship.rotation));
-        effectPos = addv3(player.ship.position, effectPos);
+        vec3 effectPos = addv3(player.ship.position, scalev3(2.5f, multQuatVec3(player.ship.rotation, (vec3) {0, 0, -1})));
         createEffect(effectPos, EXPLOSION);
         state = GAME_OVER;
     }
@@ -341,7 +374,17 @@ void calcFrame(uint32_t ticks)
             setCameraPos(player.ship.position);
             setCameraRot(player.ship.rotation);
 
-            calcUniverse(&state, &starSystem, &player, npcs, ticks);
+            if(hasLeavingDistance(player.ship.position))
+            {
+                state = SPACE;
+                player.ship.position = starSystem.station.exitPosition;
+            }
+            else if(hasLandingDistance(player.ship.position))
+            {
+                state = TRADING;
+                player.ship.position.y = 0;
+                player.ship.speed = 0;
+            }
             break;
         }
         case HYPERSPACE:
@@ -621,10 +664,27 @@ void drawFrame()
     {
         case SPACE:
         case HYPERSPACE:
-        case STATION:
         case GAME_OVER:
         {
-            drawUniverse(&state, &starSystem, npcs);
+            drawStarSystem(&starSystem);
+            if(starSystem.hasAsteroidField)
+            {
+                drawAsteroids();
+            }
+            for(uint8_t i = 0; i < MAX_NPCS; i++)
+            {
+                if(npcs[i].ship.type != SHIP_TYPE_NULL)
+                {
+                    drawShip(&npcs[i].ship);
+                }
+            }
+            drawSatellites();
+            drawEffects();
+            break;
+        }
+        case STATION:
+        {
+            drawSpaceStation();
             break;
         }
     }
@@ -650,7 +710,7 @@ void drawFrame()
         case STATION:
         case HYPERSPACE:
         {
-            drawUI(state, &player, npcs, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
+            drawUI(state == STATION, &player, npcs, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
             break;
         }
         case SAVELOAD:
@@ -689,7 +749,7 @@ void drawFrame()
         case GAME_OVER:
         {
             //Keep drawing game UI
-            drawUI(state, &player, npcs, starSystem.station.position, isAutodockPossible(&player.ship, &starSystem));
+            drawUI(state == STATION, &player, npcs, starSystem.station.position, isAutodockPossible(&player.ship, &starSystem));
             drawGameOverScreen();
             break;
         }
@@ -717,11 +777,17 @@ int main(int argc, char **argv)
     uiMapCursor[1] = 0;
     uiTitleCursor = 0;
 
-    //Initialize main systems
+    //Initialize game systems
+    //UI
     initUI();
     initPopup();
-
-    initUniverse(currentSystem, &starSystem);
+    //Main game
+    initEffects();
+    initStarSystem();
+    initSpaceStation();
+    initAsteroids();
+    initSatellites();
+    initUniverse(&starSystem);
     initShip();
     initSpacedust();
     createStationHold(&stationHold);

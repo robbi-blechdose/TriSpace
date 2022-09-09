@@ -56,7 +56,7 @@ void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
     drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
 }
 
-void drawUI(State state, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible)
+void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, mainTexture);
@@ -111,7 +111,7 @@ void drawUI(State state, Player* player, Npc npcs[], vec3 stationPos, uint8_t au
     }
 
     //Radar
-    if(state != STATION)
+    if(!onStation)
     {
         if(autodockPossible)
         {

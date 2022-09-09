@@ -335,15 +335,6 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     }
 }
 
-void generateSystemSeeds(uint32_t* systemSeeds, uint32_t baseSeed)
-{
-    srand(baseSeed);
-    for(uint16_t i = 0; i < 256; i++)
-    {
-        systemSeeds[i] = rand();
-    }
-}
-
 void generateSystemPos(vec2* systemPos, uint32_t seed, uint8_t i, uint8_t j)
 {
     srand(seed);
