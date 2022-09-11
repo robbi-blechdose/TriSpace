@@ -24,5 +24,6 @@ void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed);
 void generateStarSystem(StarSystem* system, uint32_t seed);
 void generateSystemPos(vec2* systemPos, uint32_t seed, uint8_t i, uint8_t j);
 void generateSystemName(char* buffer);
+void generateSystemDescription(char* buffer, SystemBaseData* sbd);
 
 #endif

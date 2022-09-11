@@ -464,3 +464,83 @@ void generateSystemName(char* buffer)
     }
     //printf("Prefix: %d Syllables: %d Number: %d\n", prefix, syllables, num);
 }
+
+#define NUM_SD_PREAMBLES 3
+const char* sdPreambles[NUM_SD_PREAMBLES] = {
+    "Popular with tourists, ",
+    "Long thought lost, ",
+    "The system "
+};
+
+#define NUM_SD_DESCRIPTIONS 5
+const char* sdDescriptions[NUM_SD_DESCRIPTIONS] = {
+    " is well known for its ",
+    " is famed for its ",
+    " is popular for its ",
+    " is plagued by ",
+    " is infamous for its "
+};
+
+#define NUM_SD_ADJECTIVES 9
+const char* sdAdjectives[NUM_SD_ADJECTIVES] = {
+    "wonderful ",
+    "interesting ",
+    "pretty ",
+    "horrible ",
+    "harmless ",
+    "boring ",
+    "robotic ",
+    "colorful ",
+    "illegal "
+};
+
+#define NUM_SD_NOUNS 9
+const char* sdNouns[NUM_SD_NOUNS] = {
+    "wildlife",
+    "politicans",
+    "musicians",
+    "scientists",
+    "insect people",
+    "aliens",
+    "lizards",
+    "cities",
+    "drugs"
+};
+
+void generateSystemDescription(char* buffer, SystemBaseData* sbd)
+{
+    //Preamble (optional) and name
+    if(randr(100) < 40)
+    {
+        strcpy(buffer, sdPreambles[randr(NUM_SD_PREAMBLES - 1)]);
+        strcat(buffer, sbd->info.name);
+    }
+    else
+    {
+        strcpy(buffer, sbd->info.name);
+    }
+
+    //Description beginning
+    strcat(buffer, sdDescriptions[randr(NUM_SD_DESCRIPTIONS - 1)]);
+
+    //Add adjective and noun
+    strcat(buffer, sdAdjectives[randr(NUM_SD_ADJECTIVES - 1)]);
+    strcat(buffer, sdNouns[randr(NUM_SD_NOUNS - 1)]);
+
+    strcat(buffer, ". ");
+
+    //Add linebreaks where necessary
+    uint8_t index = 0;
+    for(int8_t i = 0; i < 3; i++)
+    {
+        for(uint8_t j = index + 29 - 1; j > index; j--)
+        {
+            if(buffer[j] == ' ')
+            {
+                buffer[j] = '\n';
+                index = j + 1;
+                break;
+            }
+        }
+    }
+}
