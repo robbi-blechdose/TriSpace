@@ -137,14 +137,9 @@ uint32_t getSeedForSystem(uint8_t x, uint8_t y)
     return systemSeeds[x][y];
 }
 
-//Converts from menu distances (64 units between systems on average) to light years
-#define MENU_TO_LIGHTYEARS(X) ((X) / (64.0f / 3.0f))
-
 float getDistanceToSystem(uint8_t currentSystem[2], uint8_t targetSystem[2])
 {
-    vec2 currentPos;
-    vec2 targetPos;
-    generateSystemPos(&currentPos, systemSeeds[currentSystem[0]][currentSystem[1]], currentSystem[0], currentSystem[1]);
-    generateSystemPos(&targetPos, systemSeeds[targetSystem[0]][targetSystem[1]], targetSystem[0], targetSystem[1]);
-    return MENU_TO_LIGHTYEARS(distance2d(&currentPos, &targetPos));
+    vec2 currentPos = generateSystemPos(systemSeeds[currentSystem[0]][currentSystem[1]], currentSystem[0], currentSystem[1]);
+    vec2 targetPos = generateSystemPos(systemSeeds[targetSystem[0]][targetSystem[1]], targetSystem[0], targetSystem[1]);
+    return distance2d(&currentPos, &targetPos);
 }

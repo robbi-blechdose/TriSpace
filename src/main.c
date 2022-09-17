@@ -24,6 +24,7 @@
 
 #include "ui/popup.h"
 #include "ui/ui.h"
+#include "ui/starmap.h"
 
 #include "npcs/npc.h"
 #include "npcs/ai.h"
@@ -86,7 +87,6 @@ uint8_t uiSaveLoadCursor;
 uint8_t uiTradeCursor;
 uint8_t uiEquipCursor;
 uint8_t uiContractCursor;
-uint8_t uiMapCursor[2];
 uint8_t uiTitleCursor;
 
 //-------------------------------------//
@@ -156,7 +156,7 @@ void newGame()
     player.hold.size = CARGO_HOLD_SIZE_NORM;
     player.hasAutodock = false;
     player.hasFuelScoops = false;
-    player.fuel = 3.5f;
+    player.fuel = MAX_FUEL;
     //Initialize system
     currentSystem[0] = 0;
     currentSystem[1] = 0;
@@ -242,7 +242,7 @@ void calcSpace(uint32_t ticks)
         hasSunFuelDistance(&starSystem, &player.ship.position) && player.fuel < MAX_FUEL)
     {
         player.fuelScoopsActive = true;
-        player.fuel += 0.5f * ticks / 1000.0f;
+        player.fuel += 0.8f * ticks / 1000.0f;
     }
     else
     {
@@ -389,12 +389,12 @@ void calcFrame(uint32_t ticks)
         }
         case HYPERSPACE:
         {
-            if(currentSystem[0] != uiMapCursor[0] || currentSystem[1] != uiMapCursor[1])
+            if(currentSystem[0] != getStarmapCursor()[0] || currentSystem[1] != getStarmapCursor()[1])
             {
                 player.ship.speed += (500.0f * ticks) / 1000.0f;
                 if(player.ship.speed > 500)
                 {
-                    switchSystem(currentSystem, uiMapCursor, &starSystem, npcs);
+                    switchSystem(currentSystem, getStarmapCursor(), &starSystem, npcs);
                     player.ship.position = getRandomFreePos(&starSystem, 20);
                     setInitialSpawnPos(player.ship.position);
                     //Generate contracts for this system
@@ -540,34 +540,25 @@ void calcFrame(uint32_t ticks)
         }
         case MAP:
         {
+            int8_t dirX = 0;
+            int8_t dirY = 0;
             if(keyUp(B_UP))
             {
-                if(uiMapCursor[1] < UNIVERSE_SIZE - 1)
-                {
-                    uiMapCursor[1]++;
-                }
+                dirY = -1;
             }
             else if(keyUp(B_DOWN))
             {
-                if(uiMapCursor[1] > 0)
-                {
-                    uiMapCursor[1]--;
-                }
+                dirY = 1;
             }
             if(keyUp(B_LEFT))
             {
-                if(uiMapCursor[0] > 0)
-                {
-                    uiMapCursor[0]--;
-                }
+                dirX = -1;
             }
             else if(keyUp(B_RIGHT))
             {
-                if(uiMapCursor[0] < UNIVERSE_SIZE - 1)
-                {
-                    uiMapCursor[0]++;
-                }
+                dirX = 1;
             }
+            moveStarmapCursor(dirX, dirY);
 
             if(keyUp(B_START))
             {
@@ -575,7 +566,7 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(B_A))
             {
-                float distance = getDistanceToSystem(currentSystem, uiMapCursor);
+                float distance = getDistanceToSystem(currentSystem, getStarmapCursor());
                 if(player.fuel >= distance)
                 {
                     state = HYPERSPACE;
@@ -584,6 +575,9 @@ void calcFrame(uint32_t ticks)
                     player.ship.turnSpeedY = 0;
                 }
             }
+
+            calcStarmap(ticks);
+
             break;
         }
         case TITLE:
@@ -687,6 +681,10 @@ void drawFrame()
             drawSpaceStation();
             break;
         }
+        case MAP:
+        {
+            drawStarmap3d(currentSystem, player.fuel);
+        }
     }
     if(state == HYPERSPACE)
     {
@@ -737,7 +735,7 @@ void drawFrame()
         }
         case MAP:
         {
-            drawMap(uiMapCursor, currentSystem, player.fuel);
+            drawSystemInfoBox();
             break;
         }
         case TITLE:
@@ -773,8 +771,6 @@ int main(int argc, char **argv)
     uiTradeCursor = 0;
     uiEquipCursor = 0;
     uiContractCursor = 0;
-    uiMapCursor[0] = 0;
-    uiMapCursor[1] = 0;
     uiTitleCursor = 0;
 
     //Initialize game systems
@@ -790,6 +786,7 @@ int main(int argc, char **argv)
     initUniverse(&starSystem);
     initShip();
     initSpacedust();
+    initStarmap();
     createStationHold(&stationHold);
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;

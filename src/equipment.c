@@ -48,7 +48,7 @@ void printEquipmentStatusForShip(char* str, Player* player, EquipmentType type)
     {
         case Fuel:
         {
-            sprintf(str, "%1.1f", player->fuel);
+            sprintf(str, "%2.1f", player->fuel);
             break;
         }
         case Cargo30:
@@ -133,7 +133,7 @@ bool buyEquipment(Player* player, EquipmentType type)
         {
             if(player->fuel < MAX_FUEL)
             {
-                player->fuel += 5;
+                player->fuel += 1;
                 if(player->fuel > MAX_FUEL)
                 {
                     player->fuel = MAX_FUEL;

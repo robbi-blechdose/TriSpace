@@ -142,3 +142,15 @@ float checkHitSphere(vec3* position, vec3* direction, vec3* center, float radius
     return -1;
     **/
 }
+
+float lerpf(float a, float b, float step)
+{
+    return a + step * (b - a);
+}
+
+vec3 lerpv3(vec3 a, vec3 b, float step)
+{
+    return (vec3) {.x = lerpf(a.x, b.x, step),
+                   .y = lerpf(a.y, b.y, step),
+                   .z = lerpf(a.z, b.z, step)};
+}

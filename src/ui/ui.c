@@ -15,7 +15,6 @@
 GLuint mainTexture;
 GLuint firingTexture;
 GLuint stationUITexture;
-GLuint mapTexture;
 GLuint equipmentTexture;
 
 //Map
@@ -28,12 +27,13 @@ void initUI()
     mainTexture = loadRGBTexture("res/UI/main.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
-    mapTexture = loadRGBTexture("res/UI/map.png");
     equipmentTexture = loadRGBTexture("res/UI/equipment.png");
 }
 
 void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
 {
+    //Project vector from player to target to 2d (z component is before/behind player)
+    //Also rotate it properly
     vec3 diff = subv3(playerPos, target);
     quat qr = multQuat(QUAT_INITIAL, inverseQuat(playerRot));
     vec3 rot = multQuatVec3(qr, diff);
@@ -63,10 +63,10 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     glBegin(GL_QUADS);
     //Draw main UI background
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-    uint8_t speedTemp = (player->ship.speed / shipTypes[player->ship.type].maxSpeed) * 16;
+    uint8_t speedTemp = (player->ship.speed / shipTypes[player->ship.type].maxSpeed) * 32;
     if(speedTemp > 0)
     {
-        drawTexQuad(170, 26, speedTemp * 4, 4, UITH, 0, PTC(249), PTC(4) * speedTemp, PTC(251));
+        drawTexQuad(170, 26, speedTemp * 2, 4, UITH, 0, PTC(249), PTC(2) * speedTemp, PTC(251));
     }
 
     int8_t turnXTemp = (player->ship.turnSpeedX / shipTypes[player->ship.type].maxTurnSpeed) * 30 + 30;
@@ -75,22 +75,22 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     int8_t turnYTemp = (player->ship.turnSpeedY / shipTypes[player->ship.type].maxTurnSpeed) * 30 + 30;
     drawTexQuad(170 + turnYTemp, 41, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
-    uint8_t shieldsTemp = (player->ship.shields / shipTypes[player->ship.type].maxShields) * 16;
+    uint8_t shieldsTemp = (player->ship.shields / shipTypes[player->ship.type].maxShields) * 32;
     if(shieldsTemp > 0)
     {
-        drawTexQuad(7, 57, shieldsTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * shieldsTemp, 1);
+        drawTexQuad(7, 57, shieldsTemp * 2, 4, UITH, 0, PTC(253), PTC(2) * shieldsTemp, 1);
     }
 
-    uint8_t energyTemp = (player->ship.energy / shipTypes[player->ship.type].maxEnergy) * 16;
+    uint8_t energyTemp = (player->ship.energy / shipTypes[player->ship.type].maxEnergy) * 32;
     if(energyTemp > 0)
     {
-        drawTexQuad(7, 42, energyTemp * 4, 4, UITH, 0, PTC(253), PTC(4) * energyTemp, 1);
+        drawTexQuad(7, 42, energyTemp * 2, 4, UITH, 0, PTC(253), PTC(2) * energyTemp, 1);
     }
 
-    uint8_t fuelTemp = ((float) player->fuel / MAX_FUEL) * 16;
+    uint8_t fuelTemp = ((float) player->fuel / MAX_FUEL) * 32;
     if(fuelTemp > 0)
     {
-        drawTexQuad(7, 27, fuelTemp * 4, 4, UITH, 0, PTC(246), PTC(4) * fuelTemp, PTC(248));
+        drawTexQuad(7, 27, fuelTemp * 2, 4, UITH, 0, PTC(246), PTC(2) * fuelTemp, PTC(248));
     }
 
     //Damage indicator
@@ -141,6 +141,21 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
             drawRadarDot(player->ship.position, player->ship.rotation, getSatellitePosition(), 3);
         }
     }
+
+    //--------------------------------------------------------------------------------------------------
+    vec3 diff = subv3(npcs[0].ship.position, player->ship.position);
+    quat qr = multQuat(QUAT_INITIAL, npcs[0].ship.rotation);
+    vec3 rot = multQuatVec3(qr, diff);
+    rot = normalizev3(rot);
+    if(rot.z > 0)
+    {
+        rot.x = -rot.x * 30;
+        rot.y = -rot.y * 30;
+    }
+    float texY1 = PTC(4 + 0 * 4);
+    float texY2 = PTC(7 + 0 * 4);
+    drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
+    //--------------------------------------------------------------------------------------------------
 
     //Draw effect if firing
     if(player->ship.weapon.timer)
@@ -228,12 +243,12 @@ void drawEquipUI(uint8_t cursor, Player* player)
     char name[21];
     char status[4];
 
-    glDrawText("ITEM                PRICE QTY", 4, 16, 0xFFFFFF);
+    glDrawText("ITEM               PRICE  QTY", 4, 16, 0xFFFFFF);
     for(uint8_t i = 0; i < NUM_EQUIPMENT_TYPES; i++)
     {
         printNameForEquipment(name, i);
         printEquipmentStatusForShip(status, player, i);
-        sprintf(buffer, "%-20s %4d %3s", name, getPriceForEquipment(i), status);
+        sprintf(buffer, "%-19s %4d %4s", name, getPriceForEquipment(i), status);
 
         if(i == cursor)
         {
@@ -348,77 +363,6 @@ void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contract
     }
 
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
-}
-
-const char* governmentLevels[5] = {
-    "Anarchy",
-    "Feudal",
-    "Dictatorship",
-    "Corporate state",
-    "Democracy"
-};
-
-void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel)
-{
-    //Recalculate scroll values
-    if(cursor[0] >= 2)
-    {
-        mapScrollX = cursor[0] - 2;
-    }
-    if(cursor[1] >= 2)
-    {
-        mapScrollY = cursor[1] - 2;
-    }
-
-    glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, mapTexture);
-    glBegin(GL_QUADS);
-    //Draw background
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-
-    vec2 systemPos;
-    for(uint8_t i = mapScrollX; i < mapScrollX + 4; i++)
-    {
-        for(uint8_t j = mapScrollY; j < mapScrollY + 3; j++)
-        {
-            uint8_t numStars = getNumStarsForSystem(getSeedForSystem(i, j)) - 1;
-            generateSystemPos(&systemPos, getSeedForSystem(i, j), i, j);
-            drawTexQuad(24 + systemPos.x - (mapScrollX * 64),
-                        80 + systemPos.y - (mapScrollY * 64),
-                        15, 16, UITH, PTC(241), PTC(numStars * 16), 1, PTC(15 + numStars * 16));
-        }
-    }
-    generateSystemPos(&systemPos, getSeedForSystem(cursor[0], cursor[1]), cursor[0], cursor[1]);
-    if(getDistanceToSystem(currentSystem, cursor) <= fuel)
-    {
-        //Green, we can go there
-        drawTexQuad(24 + systemPos.x - (mapScrollX * 64),
-                    80 + systemPos.y - (mapScrollY * 64), 15, 16, UITH, PTC(241), PTC(48), 1, PTC(63));
-    }
-    else
-    {
-        //Red, too far away
-        drawTexQuad(24 + systemPos.x - (mapScrollX * 64),
-                    80 + systemPos.y - (mapScrollY * 64), 15, 16, UITH, PTC(241), PTC(64), 1, PTC(80));
-    }
-
-    //System info box
-    SystemBaseData sbd;
-    generateSystemBaseData(&sbd, getSeedForSystem(cursor[0], cursor[1]));
-    char buffer[29];
-    glDrawText("System information", 48, 195, 0xFFFFFF);
-    glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 204, 0xFFFFFF);
-    sprintf(buffer, "Tech level: %d", sbd.info.techLevel);
-    glDrawText(buffer, 8, 213, 0xFFFFFF);
-    sprintf(buffer, "Government: %s", governmentLevels[sbd.info.government]);
-    glDrawText(buffer, 8, 222, 0xFFFFFF);
-    glDrawText("Planets:", 8, 231, 0xFFFFFF);
-    for(uint8_t i = 0; i < sbd.numPlanets; i++)
-    {
-        drawTexQuad(80 + i * 12, 1, 7, 8, UITH,
-                    PTC(241), PTC(80 + sbd.paletteIndices[i] * 8), PTC(248), PTC(87 + sbd.paletteIndices[i] * 8));
-    }
-    glEnd();
 }
 
 //TODO: Title screen texture

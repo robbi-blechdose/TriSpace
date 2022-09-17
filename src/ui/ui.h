@@ -28,8 +28,6 @@ void drawEquipUI(uint8_t cursor, Player* player);
 
 void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contracts, uint8_t numContracts);
 
-void drawMap(uint8_t cursor[2], uint8_t currentSystem[2], float fuel);
-
 void drawTitleScreen(uint8_t cursor);
 
 void drawGameOverScreen();

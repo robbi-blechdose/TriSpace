@@ -221,7 +221,7 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
 {
     info->techLevel = 1 + randr(MAX_TECH_LEVEL - 1);
-    info->government = ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 2);
+    info->government = ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 3);
     info->treeDiff = planetTradeDiffs[paletteIndex][0];
     info->rockDiff = planetTradeDiffs[paletteIndex][1];
     info->waterDiff = planetTradeDiffs[paletteIndex][2];
@@ -335,11 +335,11 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     }
 }
 
-void generateSystemPos(vec2* systemPos, uint32_t seed, uint8_t i, uint8_t j)
+vec2 generateSystemPos(uint32_t seed, uint8_t i, uint8_t j)
 {
     srand(seed);
-    systemPos->x = (float) i * 64 + (randf(48) - 24);
-    systemPos->y = (float) j * 64 + (randf(48) - 24);
+    //TODO: improve
+    return (vec2) {i * 10, j * 10};
 }
 
 const char* greekLetters[] = {

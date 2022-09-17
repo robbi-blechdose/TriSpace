@@ -17,6 +17,8 @@ float squaref(float a);
 float distance3d(vec3* a, vec3* b);
 float distance2d(vec2* a, vec2* b);
 
+#define distance3(a, b) (lengthv3(subv3(a, b)))
+
 void clampAngle(float* angle);
 
 /**
@@ -34,5 +36,8 @@ void calcRotToTarget(vec3* pos, vec3* target, float* yRot, float* xRot);
 
 vec3 anglesToDirection(vec3* rotation);
 float checkHitSphere(vec3* position, vec3* direction, vec3* center, float radius);
+
+float lerpf(float a, float b, float step);
+vec3 lerpv3(vec3 a, vec3 b, float step);
 
 #endif
