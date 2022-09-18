@@ -11,11 +11,6 @@
 
 #define RADAR_RANGE 120
 
-//Macro for centering text
-//X is the size of the text in characters
-//X * 8 / 2 = X * 4
-#define CENTER(X) (120 - (X) * 4)
-
 void initUI();
 
 void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible);
@@ -23,8 +18,6 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
 void drawSaveLoadUI(uint8_t cursor);
 
 void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info);
-
-void drawEquipUI(uint8_t cursor, Player* player);
 
 void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contracts, uint8_t numContracts);
 

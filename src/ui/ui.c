@@ -1,21 +1,17 @@
 #include "ui.h"
+
 #include "../engine/model.h"
 #include "../engine/image.h"
 #include "../engine/includes/3dMath.h"
 #include "../cargo.h"
 #include "../universe/generator.h"
-#include "../equipment.h"
 #include "../universe/satellites.h"
 
-//UI Base Height
-#define UIBH 10
-//UI Top Height
-#define UITH 11
+#include "uiutils.h"
 
 GLuint mainTexture;
 GLuint firingTexture;
 GLuint stationUITexture;
-GLuint equipmentTexture;
 
 //Map
 uint8_t mapScrollX;
@@ -27,7 +23,6 @@ void initUI()
     mainTexture = loadRGBTexture("res/UI/main.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
-    equipmentTexture = loadRGBTexture("res/UI/equipment.png");
 }
 
 void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
@@ -228,86 +223,6 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
 
     glDrawText("Save & Load", 12, 240 - 10, 0xFFFFFF);
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
-}
-
-void drawEquipUI(uint8_t cursor, Player* player)
-{
-    glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, stationUITexture);
-    glBegin(GL_QUADS);
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-    glEnd();
-    glDrawText("Equip ship", CENTER(10), 2, 0xFFFFFF);
-
-    char buffer[29];
-    char name[21];
-    char status[4];
-
-    glDrawText("ITEM               PRICE  QTY", 4, 16, 0xFFFFFF);
-    for(uint8_t i = 0; i < NUM_EQUIPMENT_TYPES; i++)
-    {
-        printNameForEquipment(name, i);
-        printEquipmentStatusForShip(status, player, i);
-        sprintf(buffer, "%-19s %4d %4s", name, getPriceForEquipment(i), status);
-
-        if(i == cursor)
-        {
-            glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
-        }
-        else
-        {
-            glDrawText(buffer, 4, 24 + i * 8, 0xFFFFFF);
-        }
-    }
-
-    //Draw ship with highlight for selected component
-    glBindTexture(GL_TEXTURE_2D, equipmentTexture);
-    glBegin(GL_QUADS);
-    drawTexQuad(120 - 48, 32, 24 * 4, 24 * 2, UITH, 0, 0, PTC(24 * 4), PTC(24 * 2));
-    uint8_t x, y;
-    switch(cursor)
-    {
-        case Fuel:
-        {
-            x = 24 * 4;
-            y = 0;
-            break;
-        }
-        case Cargo30:
-        {
-            x = 0;
-            y = 24 * 2;
-            break;
-        }
-        case LaserMkII:
-        case LaserMkIII:
-        case MiningLaser:
-        {
-            x = 24 * 4;
-            y = 24 * 2;
-            break;
-        }
-        case DockingComputer:
-        {
-            x = 0;
-            y = 24 * 4;
-            break;
-        }
-        case FuelScoops:
-        {
-            x = 24 * 4;
-            y = 24 * 4;
-            break;
-        }
-    }
-    drawTexQuad(120 - 48, 32, 24 * 4, 24 * 2, UITH, PTC(x), PTC(y), PTC(x + 24 * 4), PTC(y + 24 * 2));
-    glEnd();
-    
-    sprintf(buffer, "%d credits", player->hold.money);
-    glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
-
-    glDrawText("Trading", 12, 240 - 10, 0xFFFFFF);
-    glDrawText("Contracts", 240 - 9 * 8 - 12, 240 - 10, 0xFFFFFF);
 }
 
 void drawContract(Contract* contract, uint8_t cursor, uint8_t numContracts)

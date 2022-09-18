@@ -25,6 +25,7 @@
 #include "ui/popup.h"
 #include "ui/ui.h"
 #include "ui/starmap.h"
+#include "ui/equipui.h"
 
 #include "npcs/npc.h"
 #include "npcs/ai.h"
@@ -85,7 +86,6 @@ AutodockData autodock;
 
 uint8_t uiSaveLoadCursor;
 uint8_t uiTradeCursor;
-uint8_t uiEquipCursor;
 uint8_t uiContractCursor;
 uint8_t uiTitleCursor;
 
@@ -509,15 +509,15 @@ void calcFrame(uint32_t ticks)
         {
             if(keyUp(B_UP))
             {
-                moveCursorUp(&uiEquipCursor, NUM_EQUIPMENT_TYPES - 1);
+                moveEquipUICursor(-1);
             }
             else if(keyUp(B_DOWN))
             {
-                uiEquipCursor = (uiEquipCursor + 1) % NUM_EQUIPMENT_TYPES;
+                moveEquipUICursor(1);
             }
             else if(keyUp(B_A))
             {
-                buyEquipment(&player, uiEquipCursor);
+                buyEquipment(&player, getEquipUICursor());
             }
             else if(keyUp(B_B))
             {
@@ -531,6 +531,9 @@ void calcFrame(uint32_t ticks)
             {
                 state = CONTRACTS;
             }
+            
+            calcEquipUI(ticks);
+
             break;
         }
         case CONTRACTS:
@@ -684,6 +687,12 @@ void drawFrame()
         case MAP:
         {
             drawStarmap3d(currentSystem, player.fuel);
+            break;
+        }
+        case EQUIP:
+        {
+            drawEquipUI3d(&player);
+            break;
         }
     }
     if(state == HYPERSPACE)
@@ -724,7 +733,7 @@ void drawFrame()
         }
         case EQUIP:
         {
-            drawEquipUI(uiEquipCursor, &player);
+            drawEquipUI(&player);
             break;
         }
         case CONTRACTS:
@@ -769,7 +778,6 @@ int main(int argc, char **argv)
     //Init UI variables to zero
     uiSaveLoadCursor = 0;
     uiTradeCursor = 0;
-    uiEquipCursor = 0;
     uiContractCursor = 0;
     uiTitleCursor = 0;
 
@@ -777,6 +785,8 @@ int main(int argc, char **argv)
     //UI
     initUI();
     initPopup();
+    initStarmap();
+    initEquipUI();
     //Main game
     initEffects();
     initStarSystem();
@@ -786,7 +796,6 @@ int main(int argc, char **argv)
     initUniverse(&starSystem);
     initShip();
     initSpacedust();
-    initStarmap();
     createStationHold(&stationHold);
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;

@@ -7,23 +7,15 @@
 #include "../universe/generator.h"
 #include "../universe/universe.h"
 
-//UI Base Height
-#define UIBH 10
-//UI Top Height
-#define UITH 11
-
-//Macro for centering text
-//X is the size of the text in characters
-//X * 8 / 2 = X * 4
-#define CENTER(X) (120 - (X) * 4)
+#include "uiutils.h"
 
 GLuint starMesh;
 GLuint starTexture;
 
 GLuint systemInfoTexture;
 
-int8_t cursor[2];
-int8_t cursorNew[2];
+static int8_t cursor[2];
+static int8_t cursorNew[2];
 float lerpTemp = 0;
 
 void initStarmap()
