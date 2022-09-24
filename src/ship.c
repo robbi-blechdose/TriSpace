@@ -42,8 +42,12 @@ void drawShip(Ship* ship)
     glBindTexture(GL_TEXTURE_2D, shipTextures[ship->type]);
     glPushMatrix();
     glTranslatef(ship->position.x, ship->position.y, ship->position.z);
-    glRotatef(RAD_TO_DEG(M_PI - ship->rotation.y), 0, 1, 0);
-    glRotatef(RAD_TO_DEG(ship->rotation.x), 1, 0, 0);
+    
+    float rot[16];
+    quat temp = multQuat(quatFromAngles((vec3) {0, M_PI, 0}), inverseQuat(ship->rotation));
+    quatToMatrix(rot, temp);
+    glMultMatrixf(rot);
+
     glCallList(shipMeshes[ship->type]);
     if(ship->weapon.timer > (weaponTypes[ship->weapon.type].cooldown / 2))
     {

@@ -162,6 +162,10 @@ void newGame()
     currentSystem[1] = 0;
     initSystem(currentSystem, &starSystem, npcs);
     setInitialSpawnPos(player.ship.position);
+
+    npcs[0].ship = (Ship) {.type = SHIP_TYPE_SMALLPIRATE,
+                           .position = (vec3) {150, 0, 80},
+                           .rotation = QUAT_INITIAL};
 }
 
 bool checkClosePopup()

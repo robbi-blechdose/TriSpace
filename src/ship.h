@@ -47,7 +47,7 @@ typedef struct {
     uint8_t damaged;
 } Ship;
 
-#define MAX_FUEL 7
+#define MAX_FUEL 15
 
 #define NUM_SHIP_TYPES 3
 #define SHIP_TYPE_SMALLPIRATE 0

@@ -5,6 +5,7 @@
 #include "../player.h"
 
 #define AI_RANGE               75
+
 #define AI_RANGE_CIRCLE_INNER  25
 #define AI_RANGE_CIRCLE_OUTER  26
 #define AI_RANGE_TOONEAR       15

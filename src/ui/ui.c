@@ -137,21 +137,6 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
         }
     }
 
-    //--------------------------------------------------------------------------------------------------
-    vec3 diff = subv3(npcs[0].ship.position, player->ship.position);
-    quat qr = multQuat(QUAT_INITIAL, npcs[0].ship.rotation);
-    vec3 rot = multQuatVec3(qr, diff);
-    rot = normalizev3(rot);
-    if(rot.z > 0)
-    {
-        rot.x = -rot.x * 30;
-        rot.y = -rot.y * 30;
-    }
-    float texY1 = PTC(4 + 0 * 4);
-    float texY2 = PTC(7 + 0 * 4);
-    drawTexQuad(119.5f + rot.x - 2, 36.5f + rot.y - 2, 4, 4, UITH, PTC(252), texY1, 1, texY2);
-    //--------------------------------------------------------------------------------------------------
-
     //Draw effect if firing
     if(player->ship.weapon.timer)
     {
