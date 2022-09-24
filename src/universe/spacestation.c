@@ -20,10 +20,10 @@ void drawSpaceStation()
 
 bool hasLeavingDistance(vec3 pos)
 {
-    return pos.x > 2.1;
+    return pos.x > 2.6f;
 }
 
 bool hasLandingDistance(vec3 pos)
 {
-    return pos.y < -0.5f;
+    return pos.y < -0.85f;
 }

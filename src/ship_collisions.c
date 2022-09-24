@@ -43,7 +43,7 @@ bool checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
 
 bool checkStationCollision(Ship* ship)
 {
-    return ship->position.y > 0.6f || //We don't need this since it triggers the GUI: ship->position.y < -1.4f
-            ship->position.z < -1.8f || ship->position.z > 1.8f ||
-            ship->position.x < -2.4f; //The other direction is leaving the station, so we don't need it
+    return ship->position.y > 1.0f || //We don't need this since it triggers the GUI: ship->position.y < -1.4f
+            ship->position.z < -3.1f || ship->position.z > 3.1f ||
+            ship->position.x < -3.3f; //The other direction is leaving the station, so we don't need it
 }
