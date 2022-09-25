@@ -159,10 +159,15 @@ void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks)
     ship->turnSpeedY = clampf(ship->turnSpeedY, -shipTypes[ship->type].maxTurnSpeed, shipTypes[ship->type].maxTurnSpeed);
 }
 
-void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
+void accelerateShipLimit(Ship* ship, int8_t dir, uint32_t ticks, float max)
 {
     ship->speed += (dir * (float) ticks) / 125.0f; //8 units per second
-    ship->speed = clampf(ship->speed, 0, shipTypes[ship->type].maxSpeed);
+    ship->speed = clampf(ship->speed, 0, shipTypes[ship->type].maxSpeed * max);
+}
+
+void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
+{
+    accelerateShipLimit(ship, dir, ticks, 1.0f);
 }
 
 uint8_t damageShip(Ship* ship, uint8_t damage, uint8_t source)

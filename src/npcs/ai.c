@@ -24,7 +24,8 @@
     //--------------------------------------------------------------------------------------------------
  **/
 
-void turnTowardsPoint(Npc* npc, vec3 point)
+//Returns the distance to the radar center (how close the npc is to looking at the point)
+float turnTowardsPoint(Npc* npc, vec3 point)
 {
     //Project vector from npc to target to 2d (z component is before/behind npc)
     //Also rotate it properly
@@ -32,26 +33,32 @@ void turnTowardsPoint(Npc* npc, vec3 point)
     quat qr = multQuat(QUAT_INITIAL, inverseQuat(npc->ship.rotation));
     vec3 rot = multQuatVec3(qr, diff);
     rot = normalizev3(rot);
+    //printf("%f | %f\n", rot.y, dotv3(normalizev3(diff), multQuatVec3(npc->ship.rotation, (vec3) {0, 1, 0})));
 
     if(rot.z > 0)
     {
         //Turn towards point
-        float angle = atan2f(-rot.y, -rot.x);
 
-        rot.x = -rot.x * 30;
-        rot.y = -rot.y * 30;
+        float angle = atan2f(rot.y, rot.x) + M_PI_2;
+        if(angle > M_PI)
+        {
+            angle -= M_PI;
+        }
+
+        //If the "radar dot" is below the y axis, invert roll direction (roll to lower half of radar)
+        if(angle < -M_PI_2 || angle > M_PI_2)
+        {
+            angle -= M_PI;
+            if(angle < -M_PI)
+            {
+                angle += M_PI;
+            }
+        }
 
         //Roll
-        if(fabsf(rot.x) > 0.05f)
+        if(fabsf(rot.x) > 0.0001f)
         {
-            if(rot.x < 0)
-            {
-                npc->ship.turnSpeedY = 0.2f;
-            }
-            else
-            {
-                npc->ship.turnSpeedY = -0.2f;
-            }
+            npc->ship.turnSpeedY = shipTypes[npc->ship.type].maxTurnSpeed * (angle / M_PI);
         }
         else
         {
@@ -59,56 +66,140 @@ void turnTowardsPoint(Npc* npc, vec3 point)
         }
 
         //Pitch
-        /**
-         * Restrict pitch to 2 "sections" of the radar circle (to prevent small "staircase" motions when very close to X axis of radar)
-         * Section 1: angle > pi/4, angle < 3*pi/4 (upper)
-         * Section 2: angle > 5*pi/4, angle < 7*pi/4 (lower)
-         **/
-        if(((angle > M_PI_4 && angle < 3 * M_PI_4) || (angle > 5 * M_PI_4 && angle < 7 * M_PI_4)) &&
-            fabsf(rot.y) > 0.05f )
+        if(fabsf(rot.y) > 0.0001f)
         {
-            if(rot.y < 0)
-            {
-                npc->ship.turnSpeedX = -0.2f;
-            }
-            else
-            {
-                npc->ship.turnSpeedX = 0.2f;
-            }
+            //Scale pitch by roll (reduce pitch when roll is high)
+            float pitch = (-rot.y) * (1 - sqrtf(fabsf(angle / M_PI)));
+            npc->ship.turnSpeedX = shipTypes[npc->ship.type].maxTurnSpeed * pitch;
         }
         else
         {
             npc->ship.turnSpeedX = 0;
         }
+
+        return sqrtf(squaref(rot.x) + squaref(rot.y));
     }
     else
     {
         //Turn until the point is in front of the npc
         float angle = atan2f(-rot.y, -rot.x);
-        rot.x = 32 * cosf(angle);
-        rot.y = 32 * sinf(angle);
 
-        if(rot.y < 0)
+        if(sinf(angle) < 0)
         {
-            npc->ship.turnSpeedX = -0.5f;
+            npc->ship.turnSpeedX = -shipTypes[npc->ship.type].maxTurnSpeed * 0.7f;
         }
         else
         {
-            npc->ship.turnSpeedX = 0.5f;
+            npc->ship.turnSpeedX = shipTypes[npc->ship.type].maxTurnSpeed * 0.7f;
         }
+
+        return 10; //We have no good value to return here, so return a large one since we're facing the wrong way
     }
+}
+
+vec3 getRandomSpherePoint(vec3 center, float radius)
+{
+    vec3 vec = {.x = randf(1), .y = randf(1), .z = randf(1)};
+    vec = normalizev3(vec);
+    vec = scalev3(radius, vec);
+    return vec;
 }
 
 void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
 {
     if(distanceToPlayer > AI_RANGE)
     {
+        //Out of range, do nothing
+        npc->state = STATE_IDLE;
+        accelerateShip(&npc->ship, -1, ticks);
         return;
     }
-    
-    turnTowardsPoint(npc, player->ship.position);
 
-    //TODO
+    switch(npc->state)
+    {
+        case STATE_IDLE:
+        {
+            if(distanceToPlayer > AI_RANGE_CIRCLE)
+            {
+                //Move toward player to get into range
+                turnTowardsPoint(npc, player->ship.position);
+                accelerateShipLimit(&npc->ship, 1, ticks, 0.5f);
+            }
+            else
+            {
+                npc->waypoint = npc->ship.position;
+                npc->state = STATE_CIRCLE;
+            }
+            break;
+        }
+        case STATE_CIRCLE:
+        {
+            //Move towards waypoint
+            turnTowardsPoint(npc, npc->waypoint);
+            accelerateShipLimit(&npc->ship, 1, ticks, 0.5f);
+
+            if(distance3d(&npc->waypoint, &npc->ship.position) < AI_RANGE_WAYPOINT)
+            {
+                //Calculate next waypoint
+                npc->waypoint = getRandomSpherePoint(player->ship.position, AI_RANGE_CIRCLE);
+            }
+            
+            //Flee if being chased by player
+            if(distanceToPlayer < AI_RANGE_FLEE)
+            {
+                npc->waypoint = npc->ship.position;
+                npc->state = STATE_FLEE;
+            }
+
+            //Randomly attack
+            if(rand() < RAND_MAX / 2048)
+            {
+                npc->state = STATE_ATTACK;
+            }
+            break;
+        }
+        case STATE_ATTACK:
+        {
+            float diff = turnTowardsPoint(npc, player->ship.position);
+            accelerateShip(&npc->ship, 1, ticks);
+
+            if(diff < 0.3f)
+            {
+                //Looking at the player closely enough to fire
+                if(fireWeapons(&npc->ship))
+                {
+                    checkWeaponsShipHit(&npc->ship, &player->ship, 1, DAMAGE_SOURCE_NPC);
+                }
+            }
+
+            if(distanceToPlayer < AI_RANGE_VEEROFF)
+            {
+                npc->waypoint = addv3(player->ship.position, (vec3) {0, randr(10) < 5 ? 20 : -20, 0});
+                npc->state = STATE_CIRCLE;
+            }
+            break;
+        }
+        case STATE_FLEE:
+        {
+            if(distance3d(&npc->waypoint, &npc->ship.position) < AI_RANGE_WAYPOINT)
+            {
+                vec3 toPlayer = addv3(npc->ship.position, subv3(npc->ship.position, player->ship.position));
+                npc->waypoint = toPlayer;
+            }
+
+            turnTowardsPoint(npc, npc->waypoint);
+            accelerateShip(&npc->ship, 1, ticks);
+
+            //Return to circle
+            if(distanceToPlayer > AI_RANGE_FLEE)
+            {
+                npc->waypoint = npc->ship.position;
+                npc->state = STATE_CIRCLE;
+            }
+
+            break;
+        }
+    }
 }
 
 void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)

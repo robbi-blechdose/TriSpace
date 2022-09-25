@@ -15,7 +15,7 @@ typedef struct {
     Ship ship;
 
     AiState state;
-    quat targetRot;
+    vec3 waypoint;
 } Npc;
 
 #endif
