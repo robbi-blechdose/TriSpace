@@ -104,13 +104,12 @@ void generateNPCShips(Npc npcs[], uint8_t maxShips, StarSystem* starSystem, vec3
 
             if(shipType != SHIP_TYPE_NULL)
             {
-                npcs[i].ship.type = shipType;
-                npcs[i].ship.weapon.type = 0; //TODO: Randomize a bit
-                npcs[i].ship.shields = shipTypes[shipType].maxShields;
                 vec3 pos = getRandomFreePosBounds(starSystem, center, (vec3) {.x = 80, .y = 50, .z = 80}, 10, 30);
-                npcs[i].ship.position.x = pos.x;
-                npcs[i].ship.position.z = pos.z;
-                npcs[i].ship.position.y = pos.y;
+                npcs[i].ship = (Ship) {.type = shipType,
+                                       .weapon.type = 0, //TODO: Randomize a bit
+                                       .shields = shipTypes[shipType].maxShields,
+                                       .position = pos,
+                                       .rotation = QUAT_INITIAL};
             }
         }
     }
