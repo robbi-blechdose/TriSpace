@@ -142,11 +142,11 @@ void newGame()
     //Initialize player
     player.wantedLevel = 0;
     player.ship = (Ship) {.type = 0,
-                            .position = (vec3) {150, 0, 100},
-                            .rotation = QUAT_INITIAL,
-                            .weapon.type = 0,
-                            .shields = 2,
-                            .energy = 2};
+                          .position = (vec3) {150, 0, 100},
+                          .rotation = QUAT_INITIAL,
+                          .weapon.type = 0,
+                          .shields = 2,
+                          .energy = 2};
 
     #ifdef DEBUG
     player.hold.money = 50000;
@@ -163,9 +163,11 @@ void newGame()
     initSystem(currentSystem, &starSystem, npcs);
     setInitialSpawnPos(player.ship.position);
 
-    npcs[0].ship = (Ship) {.type = SHIP_TYPE_SMALLPIRATE,
+    //Test ship, TODO: remove
+    npcs[0].ship = (Ship) {.type = SHIP_TYPE_POLICE,
                            .position = (vec3) {150, 0, 80},
                            .rotation = QUAT_INITIAL};
+    npcs[0].state = STATE_IDLE;
 }
 
 bool checkClosePopup()
@@ -262,10 +264,10 @@ void calcSpace(uint32_t ticks)
     {
         if(fireWeapons(&player.ship))
         {
-            Ship npcShips[MAX_NPCS];
+            Ship* npcShips[MAX_NPCS];
             for(uint8_t i = 0; i < MAX_NPCS; i++)
             {
-                npcShips[i] = npcs[i].ship;
+                npcShips[i] = &npcs[i].ship;
             }
             if(!checkWeaponsShipHit(&player.ship, npcShips, MAX_NPCS, DAMAGE_SOURCE_PLAYER))
             {

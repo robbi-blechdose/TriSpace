@@ -494,7 +494,7 @@ const char* sdAdjectives[NUM_SD_ADJECTIVES] = {
     "illegal "
 };
 
-#define NUM_SD_NOUNS 9
+#define NUM_SD_NOUNS 10
 const char* sdNouns[NUM_SD_NOUNS] = {
     "wildlife",
     "politicans",
@@ -504,7 +504,8 @@ const char* sdNouns[NUM_SD_NOUNS] = {
     "aliens",
     "lizards",
     "cities",
-    "drugs"
+    "drugs",
+    "landmarks"
 };
 
 void generateSystemDescription(char* buffer, SystemBaseData* sbd)

@@ -200,7 +200,7 @@ bool fireWeapons(Ship* ship)
     return true;
 }
 
-bool checkWeaponsShipHit(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t source)
+bool checkWeaponsShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, uint8_t source)
 {
     //Calculate ray direction vector
     vec3 dir = multQuatVec3(ship->rotation, (vec3) {0, 0, -1});
@@ -208,19 +208,19 @@ bool checkWeaponsShipHit(Ship* ship, Ship* targetShips, uint8_t numTargets, uint
     //Check ship hits
     for(uint8_t i = 0; i < numTargets; i++)
     {
-        if(targetShips[i].type == SHIP_TYPE_NULL)
+        if(targetShips[i]->type == SHIP_TYPE_NULL)
         {
             continue;
         }
 
-        float hit = checkHitSphere(&ship->position, &dir, &targetShips[i].position, shipTypes[targetShips[i].type].hitSphere);
+        float hit = checkHitSphere(&ship->position, &dir, &targetShips[i]->position, shipTypes[targetShips[i]->type].hitSphere);
         if(hit != -1)
         {
             ship->weapon.distanceToHit = hit;
-            uint8_t destroyed = damageShip(&targetShips[i], weaponTypes[ship->weapon.type].damage, source);
+            uint8_t destroyed = damageShip(targetShips[i], weaponTypes[ship->weapon.type].damage, source);
             if(!destroyed)
             {
-                createEffect(targetShips[i].position, SPARKS);
+                createEffect(targetShips[i]->position, SPARKS);
             }
             return true;
         }

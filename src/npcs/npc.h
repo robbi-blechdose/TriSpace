@@ -7,8 +7,7 @@ typedef enum {
     STATE_IDLE,
     STATE_CIRCLE,
     STATE_ATTACK,
-    STATE_FLEE,
-    STATE_POLICE_CHECK,
+    STATE_FLEE
 } AiState;
 
 typedef struct {

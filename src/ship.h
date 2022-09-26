@@ -70,7 +70,7 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks);
 bool shipIsDestroyed(Ship* ship);
 
 bool fireWeapons(Ship* ship);
-bool checkWeaponsShipHit(Ship* ship, Ship* targetShips, uint8_t numTargets, uint8_t source);
+bool checkWeaponsShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, uint8_t source);
 
 float getTurnSpeedForRotation(float current, float target, float maxSpeed);
 

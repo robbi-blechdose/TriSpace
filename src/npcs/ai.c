@@ -24,7 +24,11 @@
     //--------------------------------------------------------------------------------------------------
  **/
 
-//Returns the distance to the radar center (how close the npc is to looking at the point)
+/**
+ * Turns the NPC towards the point by setting the turn speed values
+ * Internally uses a radar similar to the player's
+ * Returns the distance of the target dot to the center of the radar (how close the npc is to looking at the point)
+ **/
 float turnTowardsPoint(Npc* npc, vec3 point)
 {
     //Project vector from npc to target to 2d (z component is before/behind npc)
@@ -105,6 +109,47 @@ vec3 getRandomSpherePoint(vec3 center, float radius)
     return vec;
 }
 
+void calcNPCAiStateCircle(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
+{
+    //Move towards waypoint
+    turnTowardsPoint(npc, npc->waypoint);
+    accelerateShipLimit(&npc->ship, 1, ticks, 0.5f);
+
+    if(distance3d(&npc->waypoint, &npc->ship.position) < AI_RANGE_WAYPOINT)
+    {
+        //Calculate next waypoint
+        npc->waypoint = getRandomSpherePoint(player->ship.position, AI_RANGE_CIRCLE);
+    }
+
+    //Randomly attack
+    if(rand() < RAND_MAX / 2048)
+    {
+        npc->state = STATE_ATTACK;
+    }
+}
+
+void calcNPCAiStateAttack(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
+{
+    float diff = turnTowardsPoint(npc, player->ship.position);
+    accelerateShip(&npc->ship, 1, ticks);
+
+    if(diff < 0.3f)
+    {
+        //Looking at the player closely enough to fire
+        if(fireWeapons(&npc->ship))
+        {
+            Ship* temp[1] = {&player->ship};
+            checkWeaponsShipHit(&npc->ship, temp, 1, DAMAGE_SOURCE_NPC);
+        }
+    }
+
+    if(distanceToPlayer < AI_RANGE_VEEROFF)
+    {
+        npc->waypoint = addv3(player->ship.position, (vec3) {0, randr(10) < 5 ? 20 : -20, 0});
+        npc->state = STATE_CIRCLE;
+    }
+}
+
 void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
 {
     if(distanceToPlayer > AI_RANGE)
@@ -134,49 +179,19 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
         }
         case STATE_CIRCLE:
         {
-            //Move towards waypoint
-            turnTowardsPoint(npc, npc->waypoint);
-            accelerateShipLimit(&npc->ship, 1, ticks, 0.5f);
-
-            if(distance3d(&npc->waypoint, &npc->ship.position) < AI_RANGE_WAYPOINT)
-            {
-                //Calculate next waypoint
-                npc->waypoint = getRandomSpherePoint(player->ship.position, AI_RANGE_CIRCLE);
-            }
-            
+            calcNPCAiStateCircle(npc, player, ticks, distanceToPlayer);
+    
             //Flee if being chased by player
             if(distanceToPlayer < AI_RANGE_FLEE)
             {
                 npc->waypoint = npc->ship.position;
                 npc->state = STATE_FLEE;
             }
-
-            //Randomly attack
-            if(rand() < RAND_MAX / 2048)
-            {
-                npc->state = STATE_ATTACK;
-            }
             break;
         }
         case STATE_ATTACK:
         {
-            float diff = turnTowardsPoint(npc, player->ship.position);
-            accelerateShip(&npc->ship, 1, ticks);
-
-            if(diff < 0.3f)
-            {
-                //Looking at the player closely enough to fire
-                if(fireWeapons(&npc->ship))
-                {
-                    checkWeaponsShipHit(&npc->ship, &player->ship, 1, DAMAGE_SOURCE_NPC);
-                }
-            }
-
-            if(distanceToPlayer < AI_RANGE_VEEROFF)
-            {
-                npc->waypoint = addv3(player->ship.position, (vec3) {0, randr(10) < 5 ? 20 : -20, 0});
-                npc->state = STATE_CIRCLE;
-            }
+            calcNPCAiStateAttack(npc, player, ticks, distanceToPlayer);
             break;
         }
         case STATE_FLEE:
@@ -202,6 +217,70 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
     }
 }
 
+void calcNPCAiPolice(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
+{
+    //Do police check
+    if(distanceToPlayer < AI_RANGE_POLICECHECK && rand() < RAND_MAX / 4096)
+    {
+        for(uint8_t i = 0; i < player->hold.size; i++)
+        {
+            if(player->hold.cargo[i] > 0 && isCargoIllegal(i))
+            {
+                //Found illegal cargo, attack
+                npc->state = STATE_CIRCLE;
+                break;
+            }
+        }
+    }
+
+    if(npc->ship.damaged == DAMAGE_SOURCE_PLAYER)
+    {
+        //Damaged by player, attack
+        npc->ship.damaged = 0;
+        npc->state = STATE_CIRCLE;
+    }
+
+    //TODO: check contract ship for damage?
+    //TODO: check player wanted level?
+
+    switch(npc->state)
+    {
+        case STATE_IDLE:
+        {
+            if(distanceToPlayer > AI_RANGE)
+            {
+                //Out of range, do nothing
+                accelerateShip(&npc->ship, -1, ticks);
+            }
+            break;
+        }
+        case STATE_CIRCLE:
+        {
+            calcNPCAiStateCircle(npc, player, ticks, distanceToPlayer);
+            break;
+        }
+        case STATE_ATTACK:
+        {
+            calcNPCAiStateAttack(npc, player, ticks, distanceToPlayer);
+            break;
+        }
+    }
+
+    //Increase player wanted level when destroyed
+    if(shipIsDestroyed(&npc->ship))
+    {
+        if(player->wantedLevel < MAX_WANTED_LEVEL)
+        {
+            player->wantedLevel++;
+        }
+    }
+}
+
+void calcNPCAiFriendly(Npc* npc, uint32_t ticks)
+{
+    //TODO
+}
+
 void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)
 {
     float distanceToPlayer = distance3(player->ship.position, npc->ship.position);
@@ -215,10 +294,12 @@ void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)
         }
         case SHIP_TYPE_CRUISELINER:
         {
+            calcNPCAiFriendly(npc, ticks);
             break;
         }
         case SHIP_TYPE_POLICE:
         {
+            calcNPCAiPolice(npc, player, ticks, distanceToPlayer);
             break;
         }
     }
