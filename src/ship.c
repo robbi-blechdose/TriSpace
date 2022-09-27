@@ -8,7 +8,7 @@
 GLuint shipMeshes[NUM_SHIP_TYPES];
 GLuint shipTextures[NUM_SHIP_TYPES];
 
-const ShipType shipTypes[NUM_SHIP_TYPES] = {
+const ShipTypeData shipTypes[NUM_SHIP_TYPES] = {
     //Enemy ships
     {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f},
     {.maxSpeed = 11, .maxTurnSpeed = 4, .maxShields = 6, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f},

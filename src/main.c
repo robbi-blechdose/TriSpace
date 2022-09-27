@@ -26,6 +26,7 @@
 #include "ui/ui.h"
 #include "ui/starmap.h"
 #include "ui/equipui.h"
+#include "ui/titlescreen.h"
 
 #include "npcs/npc.h"
 #include "npcs/ai.h"
@@ -87,7 +88,6 @@ AutodockData autodock;
 uint8_t uiSaveLoadCursor;
 uint8_t uiTradeCursor;
 uint8_t uiContractCursor;
-uint8_t uiTitleCursor;
 
 //-------------------------------------//
 
@@ -598,18 +598,11 @@ void calcFrame(uint32_t ticks)
 
             if(keyUp(B_UP) || keyUp(B_DOWN))
             {
-                if(uiTitleCursor)
-                {
-                    uiTitleCursor = 0;
-                }
-                else
-                {
-                    uiTitleCursor = 1;
-                }
+                toggleTitleScreenCursor();
             }
             else if(keyUp(B_A) || keyUp(B_START))
             {
-                if(uiTitleCursor == 0)
+                if(getTitleScreenCursor() == 0)
                 {
                     newGame();
                     state = SPACE;
@@ -626,6 +619,9 @@ void calcFrame(uint32_t ticks)
                     }
                 }
             }
+
+            calcTitleScreen(ticks);
+
             break;
         }
         case GAME_OVER:
@@ -700,6 +696,11 @@ void drawFrame()
             drawEquipUI3d(&player);
             break;
         }
+        case TITLE:
+        {
+            drawTitleScreen3d();
+            break;
+        }
     }
     if(state == HYPERSPACE)
     {
@@ -755,7 +756,7 @@ void drawFrame()
         }
         case TITLE:
         {
-            drawTitleScreen(uiTitleCursor);
+            drawTitleScreen();
             drawPopupIfActive();
             break;
         }
@@ -769,6 +770,26 @@ void drawFrame()
     }
 
     flipFrame();
+}
+
+void initGame()
+{
+    initUI();
+    initPopup();
+    initStarmap();
+    initEquipUI();
+    initTitleScreen();
+
+    initEffects();
+    initStarSystem();
+    initSpaceStation();
+    initAsteroids();
+    initSatellites();
+}
+
+void quitGame()
+{
+    //TODO: cleanup functions
 }
 
 int main(int argc, char **argv)
@@ -785,20 +806,10 @@ int main(int argc, char **argv)
     uiSaveLoadCursor = 0;
     uiTradeCursor = 0;
     uiContractCursor = 0;
-    uiTitleCursor = 0;
 
     //Initialize game systems
-    //UI
-    initUI();
-    initPopup();
-    initStarmap();
-    initEquipUI();
-    //Main game
-    initEffects();
-    initStarSystem();
-    initSpaceStation();
-    initAsteroids();
-    initSatellites();
+    initGame();
+
     initUniverse(&starSystem);
     initShip();
     initSpacedust();
@@ -843,7 +854,8 @@ int main(int argc, char **argv)
 		tLastFrame = tNow;
     }
 
-    //Cleanup
+    quitGame();
+
     quitAudio();
 	quitVideo();
 

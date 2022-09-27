@@ -16,7 +16,7 @@ typedef struct {
     float maxSpeed;
     float maxTurnSpeed;
     float hitSphere;
-} ShipType;
+} ShipTypeData;
 
 typedef struct {
     uint8_t damage;
@@ -31,8 +31,17 @@ typedef struct {
     float distanceToHit;
 } Weapon;
 
+#define NUM_SHIP_TYPES 4
+typedef enum {
+    SHIP_TYPE_SMALLPIRATE,
+    SHIP_TYPE_SMALLPIRATE2,
+    SHIP_TYPE_CRUISELINER,
+    SHIP_TYPE_POLICE,
+    SHIP_TYPE_NULL = 255
+} ShipType;
+
 typedef struct {
-    uint8_t type;
+    ShipType type;
     Weapon weapon;
 
     float shields;
@@ -49,13 +58,7 @@ typedef struct {
 
 #define MAX_FUEL 15
 
-#define NUM_SHIP_TYPES 3
-#define SHIP_TYPE_SMALLPIRATE  0
-#define SHIP_TYPE_SMALLPIRATE2 1
-#define SHIP_TYPE_CRUISELINER  2
-#define SHIP_TYPE_POLICE       3
-#define SHIP_TYPE_NULL 255
-extern const ShipType shipTypes[];
+extern const ShipTypeData shipTypes[];
 extern const WeaponType weaponTypes[];
 
 #define DAMAGE_SOURCE_PLAYER 1

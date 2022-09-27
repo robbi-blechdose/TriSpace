@@ -8,7 +8,7 @@
 
 #include "uiutils.h"
 
-static int8_t cursor;
+static int8_t cursor = 0;
 
 GLuint uiTexture;
 

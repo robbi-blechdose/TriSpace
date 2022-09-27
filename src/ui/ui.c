@@ -265,33 +265,6 @@ void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contract
     glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
 }
 
-//TODO: Title screen texture
-void drawTitleScreen(uint8_t cursor)
-{
-    glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, stationUITexture);
-    glBegin(GL_QUADS);
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-    glEnd();
-    glTextSize(GL_TEXT_SIZE16x16);
-    glDrawText("TriSpace", CENTER(8 * 2), 20, 0xFFFFFF);
-    glTextSize(GL_TEXT_SIZE8x8);
-
-    if(cursor == 0)
-    {
-        glDrawText("New game", CENTER(8), 64, 0x00FFFF);
-        glDrawText("Continue game", CENTER(13), 80, 0xFFFFFF);
-    }
-    else
-    {
-        glDrawText("New game", CENTER(8), 64, 0xFFFFFF);
-        glDrawText("Continue game", CENTER(13), 80, 0x00FFFF);
-    }
-
-    glDrawText("2021 - 2022", CENTER(11), 220, 0xFFFFFF);
-    glDrawText("Robbi Blechdose", CENTER(15), 230, 0xFFFFFF);
-}
-
 void drawGameOverScreen()
 {
     glLoadIdentity();

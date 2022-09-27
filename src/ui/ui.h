@@ -21,8 +21,6 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
 
 void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contracts, uint8_t numContracts);
 
-void drawTitleScreen(uint8_t cursor);
-
 void drawGameOverScreen();
 
 void moveCursorDown(uint8_t* i, uint8_t max);
