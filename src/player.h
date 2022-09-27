@@ -21,7 +21,8 @@ typedef struct {
     bool fuelScoopsActive;
 } Player;
 
-#define MAX_WANTED_LEVEL 10
+#define WANTED_LEVEL_DANGEROUS  7
+#define MAX_WANTED_LEVEL       10
 
 void savePlayer(Player* player);
 void loadPlayer(Player* player);

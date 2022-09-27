@@ -233,15 +233,14 @@ void calcNPCAiPolice(Npc* npc, Player* player, uint32_t ticks, float distanceToP
         }
     }
 
-    if(npc->ship.damaged == DAMAGE_SOURCE_PLAYER)
+    if(npc->ship.damaged == DAMAGE_SOURCE_PLAYER || player->wantedLevel >= WANTED_LEVEL_DANGEROUS)
     {
-        //Damaged by player, attack
+        //Damaged by player or wanted level high enough, attack
         npc->ship.damaged = 0;
         npc->state = STATE_CIRCLE;
     }
 
     //TODO: check contract ship for damage?
-    //TODO: check player wanted level?
 
     switch(npc->state)
     {
@@ -288,6 +287,7 @@ void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)
     switch(npc->ship.type)
     {
         case SHIP_TYPE_SMALLPIRATE:
+        case SHIP_TYPE_SMALLPIRATE2:
         {
             calcNPCAiEnemy(npc, player, ticks, distanceToPlayer);
             break;

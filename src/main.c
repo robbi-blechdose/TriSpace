@@ -164,7 +164,7 @@ void newGame()
     setInitialSpawnPos(player.ship.position);
 
     //Test ship, TODO: remove
-    npcs[0].ship = (Ship) {.type = SHIP_TYPE_POLICE,
+    npcs[0].ship = (Ship) {.type = SHIP_TYPE_SMALLPIRATE2,
                            .position = (vec3) {150, 0, 80},
                            .rotation = QUAT_INITIAL};
     npcs[0].state = STATE_IDLE;

@@ -50,9 +50,10 @@ typedef struct {
 #define MAX_FUEL 15
 
 #define NUM_SHIP_TYPES 3
-#define SHIP_TYPE_SMALLPIRATE 0
-#define SHIP_TYPE_CRUISELINER 1
-#define SHIP_TYPE_POLICE      2
+#define SHIP_TYPE_SMALLPIRATE  0
+#define SHIP_TYPE_SMALLPIRATE2 1
+#define SHIP_TYPE_CRUISELINER  2
+#define SHIP_TYPE_POLICE       3
 #define SHIP_TYPE_NULL 255
 extern const ShipType shipTypes[];
 extern const WeaponType weaponTypes[];
