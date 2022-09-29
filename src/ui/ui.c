@@ -71,7 +71,7 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     drawTexQuad(170 + turnYTemp, 41, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
     uint8_t shieldsTemp = (player->ship.shields / shipTypes[player->ship.type].maxShields) * 32;
-    if(shieldsTemp > 0)
+    if(player->ship.shields > 0 && shieldsTemp > 0)
     {
         drawTexQuad(7, 57, shieldsTemp * 2, 4, UITH, 0, PTC(253), PTC(2) * shieldsTemp, 1);
     }

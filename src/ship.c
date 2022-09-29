@@ -10,12 +10,12 @@ GLuint shipTextures[NUM_SHIP_TYPES];
 
 const ShipTypeData shipTypes[NUM_SHIP_TYPES] = {
     //Enemy ships
-    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f},
-    {.maxSpeed = 11, .maxTurnSpeed = 4, .maxShields = 6, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f},
+    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 5, .maxEnergy = 5, .shieldRegen = 0.5f, .energyRegen = 1, .hitSphere = 1.5f},
+    {.maxSpeed = 11, .maxTurnSpeed = 4, .maxShields = 6, .maxEnergy = 5, .shieldRegen = 0.5f, .energyRegen = 1, .hitSphere = 1.5f},
     //Cruise liner ship
-    {.maxSpeed = 5, .maxTurnSpeed = 2, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 5.0f},
+    {.maxSpeed = 5, .maxTurnSpeed = 2, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 0.5f, .energyRegen = 1, .hitSphere = 5.0f},
     //Police ship
-    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 1, .energyRegen = 1, .hitSphere = 1.5f}
+    {.maxSpeed = 10, .maxTurnSpeed = 5, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 0.5f, .energyRegen = 1, .hitSphere = 1.5f}
 };
 
 const WeaponType weaponTypes[] = {
@@ -70,7 +70,7 @@ void drawShip(Ship* ship)
     glPopMatrix();
 }
 
-void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
+void calcShip(Ship* ship, uint32_t ticks)
 {
     //Update rotation
     float pitch = (ship->turnSpeedX * ticks) / 1000.0f;
@@ -85,12 +85,6 @@ void calcShip(Ship* ship, uint8_t collided, uint32_t ticks)
         vec3 posDiff = multQuatVec3(ship->rotation, (vec3) {0, 0, -1});
         posDiff = scalev3(diff, posDiff);
         ship->position = addv3(ship->position, posDiff);
-    }
-
-    if(collided)
-    {
-        ship->speed = 0;
-        ship->shields /= 2;
     }
 
     if(ship->shields < shipTypes[ship->type].maxShields)

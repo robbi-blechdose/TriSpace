@@ -7,7 +7,7 @@
 #include "asteroids.h"
 #include "satellites.h"
 #include "generator.h"
-
+#include "../ship_collisions.h"
 #include "../npcs/ai.h"
 
 uint32_t systemSeeds[UNIVERSE_SIZE][UNIVERSE_SIZE];
@@ -65,8 +65,13 @@ void calcNPCShips(StarSystem* starSystem, Player* player, Npc npcs[], uint32_t t
         if(npcs[i].ship.type != SHIP_TYPE_NULL)
         {
             calcNPCAi(&npcs[i], player, npcs, ticks);
-            //TODO: Collisions?
-            calcShip(&npcs[i].ship, 0, ticks);
+            calcShip(&npcs[i].ship, ticks);
+
+            if(checkStarSystemCollision(&npcs[i].ship, starSystem))
+            {
+                npcs[i].ship.shields = -1;
+            }
+
             if(shipIsDestroyed(&npcs[i].ship))
             {
                 playSample(sampleExplosion);

@@ -255,7 +255,11 @@ void calcSpace(uint32_t ticks)
         player.fuelScoopsActive = false;
     }
 
-    calcShip(&player.ship, checkStarSystemCollision(&player.ship, &starSystem), ticks);
+    calcShip(&player.ship, ticks);
+    if(checkStarSystemCollision(&player.ship, &starSystem))
+    {
+        player.ship.shields = -1;
+    }
     setCameraPos(player.ship.position);
     setCameraRot(player.ship.rotation);
     calcSpacedust(&player.ship, ticks);
@@ -376,7 +380,13 @@ void calcFrame(uint32_t ticks)
         {
             calcShipControl(ticks);
 
-            calcShip(&player.ship, checkStationCollision(&player.ship), ticks);
+            calcShip(&player.ship, ticks);
+            if(checkStationCollision(&player.ship))
+            {
+                //TODO: smooth bounce-back?
+                player.ship.shields *= 0.5f;
+                player.ship.speed = 0;
+            }
             setCameraPos(player.ship.position);
             setCameraRot(player.ship.rotation);
 
@@ -420,7 +430,7 @@ void calcFrame(uint32_t ticks)
                     state = SPACE;
                 }
             }
-            calcShip(&player.ship, 0, ticks);
+            calcShip(&player.ship, ticks);
             setCameraPos(player.ship.position);
             setCameraRot(player.ship.rotation);
             calcSpacedust(&player.ship, ticks);
@@ -763,7 +773,7 @@ void drawFrame()
         case GAME_OVER:
         {
             //Keep drawing game UI
-            drawUI(state == STATION, &player, npcs, starSystem.station.position, isAutodockPossible(&player.ship, &starSystem));
+            drawUI(state == STATION, &player, npcs, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
             drawGameOverScreen();
             break;
         }
