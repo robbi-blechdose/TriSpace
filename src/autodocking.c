@@ -32,10 +32,16 @@ void preCalcAutodockShip(AutodockData* ad, Ship* ship, StarSystem* starSystem)
     }
 }
 
+const float targetSpeeds[NUM_POINTS] = {
+    [POINT_TURN] = 0.75f,
+    [POINT_APPROACH] = 0.5f,
+    [POINT_TARGET] = 0.25f
+};
+
 void calcAutodockShip(AutodockData* ad, Ship* ship, uint32_t ticks)
 {
-    float targetX, targetY;
-    float targetSpeed;
+    float targetSpeed = shipTypes[ship->type].maxSpeed * targetSpeeds[ad->pointIndex];
+
     //Check if we're close to the point
     if(distance3d(&ship->position, &ad->points[ad->pointIndex]) < 2.1f)
     {
@@ -46,30 +52,9 @@ void calcAutodockShip(AutodockData* ad, Ship* ship, uint32_t ticks)
         }
         ad->pointIndex++;
     }
+    
     //Turn towards point
-    calcRotToTarget(&ship->position, &ad->points[ad->pointIndex], &targetY, &targetX);
-    //Set target speed
-    switch(ad->pointIndex)
-    {
-        case POINT_TURN:
-        {
-            targetSpeed = shipTypes[ship->type].maxSpeed * 0.75f;
-            break;
-        }
-        case POINT_APPROACH:
-        {
-            targetSpeed = shipTypes[ship->type].maxSpeed * 0.5f;
-            break;
-        }
-        case POINT_TARGET:
-        {
-            targetSpeed = shipTypes[ship->type].maxSpeed * 0.25f;
-            break;
-        }
-    }
-    //Apply target rotation and speed
-    //ship->turnSpeedX = getTurnSpeedForRotation(ship->rotation.x, targetX, shipTypes[ship->type].maxTurnSpeed / 2);
-    //ship->turnSpeedY = getTurnSpeedForRotation(ship->rotation.y, targetY, shipTypes[ship->type].maxTurnSpeed / 2);
+    turnShipTowardsPoint(ship, ad->points[ad->pointIndex]);
 
     if(fabs(ship->speed - targetSpeed) > 0.1f)
     {

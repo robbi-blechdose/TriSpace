@@ -68,9 +68,19 @@ void initShip();
 
 void drawShip(Ship* ship);
 void calcShip(Ship* ship, uint32_t ticks);
+
 void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks);
+
+/**
+ * Turns the ship towards the point by setting the turn speed values
+ * Internally uses a radar similar to the player's
+ * Returns the distance of the target dot to the center of the radar (how close the ship is to looking at the point)
+ **/
+float turnShipTowardsPoint(Ship* ship, vec3 point);
+
 void accelerateShipLimit(Ship* ship, int8_t dir, uint32_t ticks, float max);
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks);
+
 bool shipIsDestroyed(Ship* ship);
 
 bool fireWeapons(Ship* ship);

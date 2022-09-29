@@ -154,7 +154,7 @@ void newGame()
     player.hold.money = 150;
     #endif
     player.hold.size = CARGO_HOLD_SIZE_NORM;
-    player.hasAutodock = false;
+    player.hasAutodock = true;
     player.hasFuelScoops = false;
     player.fuel = MAX_FUEL;
     //Initialize system

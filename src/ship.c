@@ -158,6 +158,77 @@ void steerShip(Ship* ship, int8_t dirX, int8_t dirY, uint32_t ticks)
     ship->turnSpeedY = clampf(ship->turnSpeedY, -shipTypes[ship->type].maxTurnSpeed, shipTypes[ship->type].maxTurnSpeed);
 }
 
+float turnShipTowardsPoint(Ship* ship, vec3 point)
+{
+    //Project vector from ship to target to 2d (z component is before/behind npc)
+    //Also rotate it properly
+    vec3 diff = subv3(ship->position, point);
+    quat qr = multQuat(QUAT_INITIAL, inverseQuat(ship->rotation));
+    vec3 rot = multQuatVec3(qr, diff);
+    rot = normalizev3(rot);
+
+    if(rot.z > 0)
+    {
+        //Turn towards point
+
+        float angle = atan2f(rot.y, rot.x) + M_PI_2;
+        if(angle > M_PI)
+        {
+            angle -= M_PI;
+        }
+
+        //If the "radar dot" is below the y axis, invert roll direction (roll to lower half of radar)
+        if(angle < -M_PI_2 || angle > M_PI_2)
+        {
+            angle -= M_PI;
+            if(angle < -M_PI)
+            {
+                angle += M_PI;
+            }
+        }
+
+        //Roll
+        if(fabsf(rot.x) > 0.0001f)
+        {
+            ship->turnSpeedY = shipTypes[ship->type].maxTurnSpeed * (angle / M_PI);
+        }
+        else
+        {
+            ship->turnSpeedY = 0;
+        }
+
+        //Pitch
+        if(fabsf(rot.y) > 0.0001f)
+        {
+            //Scale pitch by roll (reduce pitch when roll is high)
+            float pitch = (-rot.y) * (1 - sqrtf(fabsf(angle / M_PI)));
+            ship->turnSpeedX = shipTypes[ship->type].maxTurnSpeed * pitch;
+        }
+        else
+        {
+            ship->turnSpeedX = 0;
+        }
+
+        return sqrtf(squaref(rot.x) + squaref(rot.y));
+    }
+    else
+    {
+        //Turn until the point is in front of the ship
+        float angle = atan2f(-rot.y, -rot.x);
+
+        if(sinf(angle) < 0)
+        {
+            ship->turnSpeedX = -shipTypes[ship->type].maxTurnSpeed * 0.7f;
+        }
+        else
+        {
+            ship->turnSpeedX = shipTypes[ship->type].maxTurnSpeed * 0.7f;
+        }
+
+        return 10; //We have no good value to return here, so return a large one since we're facing the wrong way
+    }
+}
+
 void accelerateShipLimit(Ship* ship, int8_t dir, uint32_t ticks, float max)
 {
     ship->speed += (dir * (float) ticks) / 125.0f; //8 units per second
