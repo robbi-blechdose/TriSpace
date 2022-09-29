@@ -472,25 +472,33 @@ const char* sdPreambles[NUM_SD_PREAMBLES] = {
     "The system "
 };
 
-#define NUM_SD_DESCRIPTIONS 5
-const char* sdDescriptions[NUM_SD_DESCRIPTIONS] = {
+#define NUM_SD_DESCRIPTIONS_P 3
+const char* sdDescriptionsP[NUM_SD_DESCRIPTIONS_P] = {
     " is well known for its ",
     " is famed for its ",
-    " is popular for its ",
+    " is popular for its "
+};
+
+#define NUM_SD_DESCRIPTIONS_N 2
+const char* sdDescriptionsN[NUM_SD_DESCRIPTIONS_N] = {
     " is plagued by ",
     " is infamous for its "
 };
 
-#define NUM_SD_ADJECTIVES 9
-const char* sdAdjectives[NUM_SD_ADJECTIVES] = {
+#define NUM_SD_ADJECTIVES_P 6
+const char* sdAdjectivesP[NUM_SD_ADJECTIVES_P] = {
     "wonderful ",
     "interesting ",
     "pretty ",
-    "horrible ",
     "harmless ",
-    "boring ",
     "robotic ",
     "colorful ",
+};
+
+#define NUM_SD_ADJECTIVES_N 3
+const char* sdAdjectivesN[NUM_SD_ADJECTIVES_N] = {
+    "boring ",
+    "horrible ",
     "illegal "
 };
 
@@ -521,11 +529,20 @@ void generateSystemDescription(char* buffer, SystemBaseData* sbd)
         strcpy(buffer, sbd->info.name);
     }
 
-    //Description beginning
-    strcat(buffer, sdDescriptions[randr(NUM_SD_DESCRIPTIONS - 1)]);
+    //Description beginning, adjective
+    bool positive = randr(100) < 50;
+    if(positive)
+    {
+        strcat(buffer, sdDescriptionsP[randr(NUM_SD_DESCRIPTIONS_P - 1)]);
+        strcat(buffer, sdAdjectivesP[randr(NUM_SD_ADJECTIVES_P - 1)]);
+    }
+    else
+    {
+        strcat(buffer, sdDescriptionsN[randr(NUM_SD_DESCRIPTIONS_N - 1)]);
+        strcat(buffer, sdAdjectivesN[randr(NUM_SD_ADJECTIVES_N - 1)]);
+    }
 
-    //Add adjective and noun
-    strcat(buffer, sdAdjectives[randr(NUM_SD_ADJECTIVES - 1)]);
+    //Add noun
     strcat(buffer, sdNouns[randr(NUM_SD_NOUNS - 1)]);
 
     strcat(buffer, ". ");

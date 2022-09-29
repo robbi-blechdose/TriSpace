@@ -177,7 +177,7 @@ void drawSystemInfoBox()
 
     char description[29 * 3];
     generateSystemDescription(description, &sbd);
-    glDrawText(description, 8, 168 + 4 + 34, 0x707070);
+    glDrawText(description, 8, 168 + 4 + 36, 0x707070);
 
     glEnd();
 }
