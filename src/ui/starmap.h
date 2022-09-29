@@ -4,6 +4,8 @@
 #include <stdint.h>
 
 void initStarmap();
+void quitStarmap();
+
 void calcStarmap(uint32_t ticks);
 void drawStarmap3d(uint8_t* currentSystem, float fuel);
 void drawSystemInfoBox();

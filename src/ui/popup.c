@@ -18,6 +18,11 @@ void initPopup()
     popupTexture = loadRGBTexture("res/UI/popup.png");
 }
 
+void quitPopup()
+{
+    deleteRGBTexture(popupTexture);
+}
+
 void drawPopupIfActive()
 {
     if(!popupActive)

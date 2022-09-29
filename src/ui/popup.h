@@ -13,6 +13,8 @@
 #define POPUP_ATTENTION 1
 
 void initPopup();
+void quitPopup();
+
 void drawPopupIfActive();
 void createPopup(uint8_t icon, char* text);
 void closePopup();

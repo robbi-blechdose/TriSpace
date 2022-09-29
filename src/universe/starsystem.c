@@ -21,6 +21,17 @@ void initStarSystem()
     stationTexture = loadRGBTexture("res/tex/SpaceStation.png");
 }
 
+void quitStarSystem()
+{
+    glDeleteList(planetMesh);
+    glDeleteList(planetRingMesh);
+    deleteRGBTexture(planetRingTexture);
+    deleteRGBTexture(sunTexture);
+
+    glDeleteList(stationMesh);
+    deleteRGBTexture(stationTexture);
+}
+
 void deleteStarSystem(StarSystem* starSystem)
 {
     for(uint8_t i = 0; i < starSystem->numPlanets; i++)

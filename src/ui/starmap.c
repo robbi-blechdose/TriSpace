@@ -26,6 +26,14 @@ void initStarmap()
     systemInfoTexture = loadRGBTexture("res/UI/map.png");
 }
 
+void quitStarmap()
+{
+    glDeleteList(starMesh);
+    deleteRGBTexture(starTexture);
+
+    deleteRGBTexture(systemInfoTexture);
+}
+
 #define CAMERA_HEIGHT 15
 
 void calcStarmap(uint32_t ticks)

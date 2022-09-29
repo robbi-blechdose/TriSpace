@@ -7,6 +7,8 @@
 #include "../engine/includes/3dMath.h"
 
 void initSpaceStation();
+void quitSpaceStation();
+
 void drawSpaceStation();
 
 bool hasLeavingDistance(vec3 pos);

@@ -8,6 +8,11 @@ void initPNG()
     IMG_Init(IMG_INIT_PNG);
 }
 
+void quitPNG()
+{
+    IMG_Quit();
+}
+
 SDL_Surface* loadPNG(const char* path)
 {
     SDL_Surface* loaded = IMG_Load(path);

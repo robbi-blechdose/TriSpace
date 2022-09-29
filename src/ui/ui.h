@@ -12,6 +12,7 @@
 #define RADAR_RANGE 120
 
 void initUI();
+void quitUI();
 
 void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible);
 

@@ -18,6 +18,7 @@ typedef struct {
 #define ASTEROID_HEALTH 3
 
 void initAsteroids();
+void quitAsteroids();
 
 void createAsteroids(vec3 pos);
 void drawAsteroids();

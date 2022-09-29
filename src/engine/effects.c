@@ -13,6 +13,11 @@ void initEffects()
     }
 }
 
+void quitEffects()
+{
+    deleteRGBTexture(effectTexture);
+}
+
 //TODO: Since the data here is game-dependent, we should move it out of the engine code
 uint8_t createEffect(vec3 position, EffectType type)
 {

@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 void initTitleScreen();
+void quitTitleScreen();
 
 void calcTitleScreen(uint32_t ticks);
 

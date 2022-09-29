@@ -12,6 +12,12 @@ void initSpaceStation()
     stationInteriorTexture = loadRGBTexture("res/tex/SpaceStation_Interior.png");
 }
 
+void quitSpaceStation()
+{
+    glDeleteList(stationInteriorMesh);
+    deleteRGBTexture(stationInteriorTexture);
+}
+
 void drawSpaceStation()
 {
     glBindTexture(GL_TEXTURE_2D, stationInteriorTexture);

@@ -23,6 +23,8 @@ typedef enum {
 } EffectType;
 
 void initEffects();
+void quitEffects();
+
 uint8_t createEffect(vec3 position, EffectType type);
 void calcEffects(uint32_t ticks);
 void drawEffects();

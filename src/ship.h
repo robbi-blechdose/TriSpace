@@ -65,6 +65,7 @@ extern const WeaponType weaponTypes[];
 #define DAMAGE_SOURCE_NPC    2
 
 void initShip();
+void quitShip();
 
 void drawShip(Ship* ship);
 void calcShip(Ship* ship, uint32_t ticks);

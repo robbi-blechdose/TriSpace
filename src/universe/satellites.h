@@ -15,6 +15,7 @@ typedef struct {
 } Satellite;
 
 void initSatellites();
+void quitSatellites();
 
 void createSatellite(vec3 pos, float rotY);
 void clearSatellites();

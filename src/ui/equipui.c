@@ -39,6 +39,18 @@ void initEquipUI()
     equipmentMeshes[4] = loadModelList("res/obj/equipment/fuelscoops.obj");
 }
 
+void quitEquipUI()
+{
+    deleteRGBTexture(uiTexture);
+
+    glDeleteList(equipShipMesh);
+    glDeleteList(equipmentMeshes[0]);
+    glDeleteList(equipmentMeshes[1]);
+    glDeleteList(equipmentMeshes[2]);
+    glDeleteList(equipmentMeshes[3]);
+    glDeleteList(equipmentMeshes[4]);
+}
+
 void calcEquipUI(uint32_t ticks)
 {
     equipShipRot += (45 * ticks) / 1000.0f;

@@ -4,6 +4,7 @@
 #include "../player.h"
 
 void initEquipUI();
+void quitEquipUI();
 
 void calcEquipUI(uint32_t ticks);
 

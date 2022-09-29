@@ -42,6 +42,15 @@ void initShip()
     sampleShoot = loadSample("res/sfx/flaunch.wav");
 }
 
+void quitShip()
+{
+    for(uint8_t i = 0; i < NUM_SHIP_TYPES; i++)
+    {
+        glDeleteList(shipMeshes[i]);
+        deleteRGBTexture(shipTextures[i]);
+    }
+}
+
 void drawShip(Ship* ship)
 {
     glBindTexture(GL_TEXTURE_2D, shipTextures[ship->type]);

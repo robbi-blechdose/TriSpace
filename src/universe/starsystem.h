@@ -52,6 +52,8 @@ typedef struct {
 } StarSystem;
 
 void initStarSystem();
+void quitStarSystem();
+
 void deleteStarSystem(StarSystem* starSystem);
 void drawStarSystem(StarSystem* starSystem);
 

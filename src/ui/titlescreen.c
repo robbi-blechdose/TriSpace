@@ -20,6 +20,12 @@ void initTitleScreen()
     titleShipTexture = loadRGBTexture("res/tex/ships/Ship.png");
 }
 
+void quitTitleScreen()
+{
+    glDeleteList(titleShipMesh);
+    deleteRGBTexture(titleShipTexture);
+}
+
 void calcTitleScreen(uint32_t ticks)
 {
     titleShipRot += (45 * ticks) / 1000.0f;

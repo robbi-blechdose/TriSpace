@@ -18,6 +18,12 @@ void initAsteroids()
     asteroidTexture = loadRGBTexture("res/tex/Asteroid.png");
 }
 
+void quitAsteroids()
+{
+    glDeleteList(asteroidMesh);
+    deleteRGBTexture(asteroidTexture);
+}
+
 void createAsteroid(uint8_t i)
 {
     asteroids[i].size = 0.5f + randf(4.5f);

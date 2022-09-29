@@ -25,6 +25,14 @@ void initUI()
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
 }
 
+void quitUI()
+{
+    quitPNG();
+    deleteRGBTexture(mainTexture);
+    deleteRGBTexture(firingTexture);
+    deleteRGBTexture(stationUITexture);
+}
+
 void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
 {
     //Project vector from player to target to 2d (z component is before/behind player)

@@ -164,7 +164,7 @@ void newGame()
     setInitialSpawnPos(player.ship.position);
 
     //Test ship, TODO: remove
-    npcs[0].ship = (Ship) {.type = SHIP_TYPE_SMALLPIRATE2,
+    npcs[0].ship = (Ship) {.type = SHIP_TYPE_CRUISELINER,
                            .position = (vec3) {150, 0, 80},
                            .rotation = QUAT_INITIAL};
     npcs[0].state = STATE_IDLE;
@@ -791,15 +791,29 @@ void initGame()
     initTitleScreen();
 
     initEffects();
+
     initStarSystem();
     initSpaceStation();
     initAsteroids();
     initSatellites();
+    initShip();
 }
 
 void quitGame()
 {
-    //TODO: cleanup functions
+    quitUI();
+    quitPopup();
+    quitStarmap();
+    quitEquipUI();
+    quitTitleScreen();
+
+    quitEffects();
+
+    quitStarSystem();
+    quitSpaceStation();
+    quitAsteroids();
+    quitSatellites();
+    quitShip();
 }
 
 int main(int argc, char **argv)
@@ -821,7 +835,6 @@ int main(int argc, char **argv)
     initGame();
 
     initUniverse(&starSystem);
-    initShip();
     initSpacedust();
     createStationHold(&stationHold);
     state = TITLE;

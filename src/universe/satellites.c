@@ -17,6 +17,12 @@ void initSatellites()
     satelliteVisitIndex = 0;
 }
 
+void quitSatellites()
+{
+    glDeleteList(satelliteMesh);
+    deleteRGBTexture(satelliteTexture);
+}
+
 void createSatellite(vec3 pos, float rotY)
 {
     if(satelliteIndex < NUM_SATELLITES)
