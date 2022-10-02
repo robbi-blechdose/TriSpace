@@ -51,14 +51,15 @@ void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contr
     uint8_t possibleSystems[64][2];
     uint8_t possibleSystemsIndex = 0;
 
-    float maxDistance = 7.0f * contractDifficulty;
+    float maxDistance = 15 * contractDifficulty; //TODO: replace with MAX_FUEL constant
 
     for(uint8_t i = 0; i < UNIVERSE_SIZE; i++)
     {
         for(uint8_t j = 0; j < UNIVERSE_SIZE; j++)
         {
             uint8_t targetSystem[2] = {i, j};
-            if(getDistanceToSystem(currentStarSystem, targetSystem) <= maxDistance)
+            if(!(i == currentStarSystem[0] && j == currentStarSystem[1])
+                && getDistanceToSystem(currentStarSystem, targetSystem) <= maxDistance)
             {
                 possibleSystems[possibleSystemsIndex][0] = i;
                 possibleSystems[possibleSystemsIndex++][1] = j;
@@ -66,9 +67,19 @@ void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contr
         }
     }
 
-    uint8_t targetIndex = randr(possibleSystemsIndex - 1);
-    c->targetSystem[0] = possibleSystems[targetIndex][0];
-    c->targetSystem[1] = possibleSystems[targetIndex][1];
+    if(possibleSystemsIndex == 0)
+    {
+        //No systems found. Shouldn't happen, but just in case. Fallback: current system
+        c->targetSystem[0] = currentStarSystem[0];
+        c->targetSystem[1] = currentStarSystem[1];
+
+    }
+    else
+    {
+        uint8_t targetIndex = randr(possibleSystemsIndex - 1);
+        c->targetSystem[0] = possibleSystems[targetIndex][0];
+        c->targetSystem[1] = possibleSystems[targetIndex][1];
+    }
 }
 
 Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex)
