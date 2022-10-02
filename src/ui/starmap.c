@@ -160,23 +160,23 @@ void drawSystemInfoBox()
     glBindTexture(GL_TEXTURE_2D, systemInfoTexture);
     glBegin(GL_QUADS);
     //Background
-    drawTexQuad(0, 0, 240, 72, UIBH, 0, PTC(168), PTC(240), PTC(240));
+    drawTexQuad(0, 0, 240, 72, UIBH, 0, PTC(168), PTC(239), PTC(239));
     //Content
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, getSeedForSystem(cursor[0], cursor[1]));
 
     char buffer[29];
-    glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 168 + 4, 0x707070);
+    glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 168 + 4, TEXT_GREY);
 
-    glDrawText("Tech level:", 8, 168 + 4 + 10, 0x00FF00);
+    glDrawText("Tech level:", 8, 168 + 4 + 10, TEXT_GREEN);
     sprintf(buffer, "%d", sbd.info.techLevel);
-    glDrawText(buffer, 8 + 96, 168 + 4 + 10, 0x707070);
+    glDrawText(buffer, 8 + 96, 168 + 4 + 10, TEXT_GREY);
 
-    glDrawText("Government:", 8, 168 + 4 + 18, 0x00FF00);
+    glDrawText("Government:", 8, 168 + 4 + 18, TEXT_GREEN);
     sprintf(buffer, "%s", governmentLevels[sbd.info.government]);
-    glDrawText(buffer, 8 + 96, 168 + 4 + 18, 0x707070);
+    glDrawText(buffer, 8 + 96, 168 + 4 + 18, TEXT_GREY);
 
-    glDrawText("Planets:", 8, 168 + 4 + 26, 0x00FF00);
+    glDrawText("Planets:", 8, 168 + 4 + 26, TEXT_GREEN);
     for(uint8_t i = 0; i < sbd.numPlanets; i++)
     {
         drawTexQuad(80 + i * 12, 34, 8, 8, UITH,
@@ -185,7 +185,7 @@ void drawSystemInfoBox()
 
     char description[29 * 3];
     generateSystemDescription(description, &sbd);
-    glDrawText(description, 8, 168 + 4 + 36, 0x707070);
+    glDrawText(description, 8, 168 + 4 + 36, TEXT_GREY);
 
     glEnd();
 }

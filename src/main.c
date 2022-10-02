@@ -27,6 +27,7 @@
 #include "ui/starmap.h"
 #include "ui/equipui.h"
 #include "ui/titlescreen.h"
+#include "ui/contractui.h"
 
 #include "npcs/npc.h"
 #include "npcs/ai.h"
@@ -87,7 +88,6 @@ AutodockData autodock;
 
 uint8_t uiSaveLoadCursor;
 uint8_t uiTradeCursor;
-uint8_t uiContractCursor;
 
 //-------------------------------------//
 
@@ -154,7 +154,7 @@ void newGame()
     player.hold.money = 150;
     #endif
     player.hold.size = CARGO_HOLD_SIZE_NORM;
-    player.hasAutodock = true;
+    player.hasAutodock = false;
     player.hasFuelScoops = false;
     player.fuel = MAX_FUEL;
     //Initialize system
@@ -316,17 +316,17 @@ void calcContracts()
 
     if(keyUp(B_UP))
     {
-        moveCursorUp(&uiContractCursor, numStationContracts - 1);
+        moveContractUICursor(-1, stationContracts, numStationContracts);
     }
     else if(keyUp(B_DOWN))
     {
-        moveCursorDown(&uiContractCursor, numStationContracts - 1);
+        moveContractUICursor(1, stationContracts, numStationContracts);
     }
     else if(keyUp(B_A))
     {
         if(currentContract.type == CONTRACT_TYPE_NULL)
         {
-            uint8_t contractCursor = uiContractCursor;
+            uint8_t contractCursor = getContractUICursor();
             if(activateContract(&stationContracts[contractCursor], &player.hold))
             {
                 currentContract = stationContracts[contractCursor];
@@ -353,7 +353,7 @@ void calcContracts()
                 createPopup(POPUP_CHECKMARK, buffer);
                 completedContracts[currentSystem[0]][currentSystem[1]]++;
                 currentContract.type = CONTRACT_TYPE_NULL;
-                uiContractCursor = 0;
+                setContractUICursor(0);
             }
         }
     }
@@ -555,6 +555,7 @@ void calcFrame(uint32_t ticks)
         case CONTRACTS:
         {
             calcContracts();
+            calcContractUI(ticks, &currentContract, stationContracts);
             break;
         }
         case MAP:
@@ -711,6 +712,11 @@ void drawFrame()
             drawTitleScreen3d();
             break;
         }
+        case CONTRACTS:
+        {
+            drawContractUI3d(&currentContract, stationContracts);
+            break;
+        }
     }
     if(state == HYPERSPACE)
     {
@@ -755,7 +761,7 @@ void drawFrame()
         }
         case CONTRACTS:
         {
-            drawContractUI(uiContractCursor, &currentContract, stationContracts, numStationContracts);
+            drawContractUI(&currentContract, stationContracts, numStationContracts);
             drawPopupIfActive();
             break;
         }
@@ -789,6 +795,7 @@ void initGame()
     initStarmap();
     initEquipUI();
     initTitleScreen();
+    initContractUI();
 
     initEffects();
 
@@ -806,6 +813,7 @@ void quitGame()
     quitStarmap();
     quitEquipUI();
     quitTitleScreen();
+    quitContractUI();
 
     quitEffects();
 
@@ -829,7 +837,6 @@ int main(int argc, char **argv)
     //Init UI variables to zero
     uiSaveLoadCursor = 0;
     uiTradeCursor = 0;
-    uiContractCursor = 0;
 
     //Initialize game systems
     initGame();

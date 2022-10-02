@@ -11,4 +11,7 @@
 //X * 8 / 2 = X * 4
 #define CENTER(X) (120 - (X) * 4)
 
+#define TEXT_GREEN 0x00FF00
+#define TEXT_GREY  0x707070
+
 #endif

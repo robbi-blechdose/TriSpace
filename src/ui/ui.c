@@ -4,7 +4,6 @@
 #include "../engine/image.h"
 #include "../engine/includes/3dMath.h"
 #include "../cargo.h"
-#include "../universe/generator.h"
 #include "../universe/satellites.h"
 
 #include "uiutils.h"
@@ -65,11 +64,11 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     glBindTexture(GL_TEXTURE_2D, mainTexture);
     glBegin(GL_QUADS);
     //Draw main UI background
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(239), PTC(239));
     uint8_t speedTemp = (player->ship.speed / shipTypes[player->ship.type].maxSpeed) * 32;
     if(speedTemp > 0)
     {
-        drawTexQuad(170, 26, speedTemp * 2, 4, UITH, 0, PTC(249), PTC(2) * speedTemp, PTC(251));
+        drawTexQuad(170, 26, speedTemp * 2, 4, UITH, 0, PTC(249), PTC(2 * speedTemp), PTC(251));
     }
 
     int8_t turnXTemp = (player->ship.turnSpeedX / shipTypes[player->ship.type].maxTurnSpeed) * 30 + 30;
@@ -81,19 +80,19 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     uint8_t shieldsTemp = (player->ship.shields / shipTypes[player->ship.type].maxShields) * 32;
     if(player->ship.shields > 0 && shieldsTemp > 0)
     {
-        drawTexQuad(7, 57, shieldsTemp * 2, 4, UITH, 0, PTC(253), PTC(2) * shieldsTemp, 1);
+        drawTexQuad(7, 57, shieldsTemp * 2, 4, UITH, 0, PTC(253), PTC(2 * shieldsTemp), 1);
     }
 
     uint8_t energyTemp = (player->ship.energy / shipTypes[player->ship.type].maxEnergy) * 32;
     if(energyTemp > 0)
     {
-        drawTexQuad(7, 42, energyTemp * 2, 4, UITH, 0, PTC(253), PTC(2) * energyTemp, 1);
+        drawTexQuad(7, 42, energyTemp * 2, 4, UITH, 0, PTC(253), PTC(2 * energyTemp), 1);
     }
 
     uint8_t fuelTemp = ((float) player->fuel / MAX_FUEL) * 32;
     if(fuelTemp > 0)
     {
-        drawTexQuad(7, 27, fuelTemp * 2, 4, UITH, 0, PTC(246), PTC(2) * fuelTemp, PTC(248));
+        drawTexQuad(7, 27, fuelTemp * 2, 4, UITH, 0, PTC(244), PTC(2 * fuelTemp), PTC(247));
     }
 
     //Damage indicator
@@ -155,15 +154,16 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     glEnd();
 }
 
+//TODO: change to player info UI displaying wanted level etc. (and save+load buttons)
 void drawSaveLoadUI(uint8_t cursor)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
     glBegin(GL_QUADS);
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(239), PTC(239));
     //Save/Load icons
-    drawTexQuad(CENTER(13), 200, 8, 8, UITH, PTC(241), 0, PTC(249), PTC(8));
-    drawTexQuad(CENTER(13), 184, 8, 8, UITH, PTC(249), 0, PTC(256), PTC(8));
+    drawTexQuad(CENTER(13), 200, 8, 8, UITH, PTC(240), 0, PTC(247), PTC(7));
+    drawTexQuad(CENTER(13), 184, 8, 8, UITH, PTC(248), 0, 1, PTC(7));
     glEnd();
     glDrawText("Save & Load", CENTER(11), 2, 0xFFFFFF);
 
@@ -186,7 +186,7 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, stationUITexture);
     glBegin(GL_QUADS);
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
+    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(239), PTC(239));
     glEnd();
     glDrawText("Trading", CENTER(7), 2, 0xFFFFFF);
 
@@ -216,61 +216,6 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
 
     glDrawText("Save & Load", 12, 240 - 10, 0xFFFFFF);
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
-}
-
-void drawContract(Contract* contract, uint8_t cursor, uint8_t numContracts)
-{
-    glBegin(GL_QUADS);
-    drawTexQuad(4, 194, 32, 32, UITH, PTC(240), PTC(16 + contract->type * 16),
-                                        1, PTC(31 + contract->type * 16));
-    glEnd();
-    char buffer[29];
-    if(cursor)
-    {
-        sprintf(buffer, "%d/%d", cursor, numContracts);
-        glDrawText(buffer, 8, 48, 0xFFFFFF);
-    }
-    else
-    {
-        glDrawText("ACT", 8, 48, 0x00FF00);
-    }
-
-    glDrawText(contractTypes[contract->type], 40, 16, 0xFFFFFF);
-    sprintf(buffer, "Employer: %s\n          %s", contractFirstnames[contract->employerFirstname],
-                                                    contractLastnames[contract->employerLastname]);
-    glDrawText(buffer, 40, 32, 0xFFFFFF);
-    sprintf(buffer, "Pay: %d credits", contract->pay);
-    glDrawText(buffer, 40, 56, 0xFFFFFF);
-    glDrawText("Destination system:", 40, 72, 0xFFFFFF);
-
-    SystemBaseData sbd;
-    generateSystemBaseData(&sbd, getSeedForSystem(contract->targetSystem[0], contract->targetSystem[1]));
-    glDrawText(sbd.info.name, 40, 80, 0xFFFFFF);
-
-    glDrawText("Objective:", 40, 96, 0xFFFFFF);
-    printObjective(buffer, contract);
-    glDrawText(buffer, 40, 104, 0xFFFFFF);
-}
-
-void drawContractUI(uint8_t cursor, Contract* activeContract, Contract* contracts, uint8_t numContracts)
-{
-    glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, stationUITexture);
-    glBegin(GL_QUADS);
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(240), PTC(240));
-    glEnd();
-    glDrawText("Contracts", CENTER(9), 2, 0xFFFFFF);
-
-    if(activeContract->type != CONTRACT_TYPE_NULL)
-    {
-        drawContract(activeContract, 0, numContracts);
-    }
-    else
-    {
-        drawContract(&contracts[cursor], cursor + 1, numContracts);
-    }
-
-    glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
 }
 
 void drawGameOverScreen()

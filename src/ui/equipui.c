@@ -10,7 +10,7 @@
 
 static int8_t cursor = 0;
 
-GLuint uiTexture;
+static GLuint uiTexture;
 
 GLuint equipShipMesh;
 GLuint equipmentMeshes[5];
@@ -88,8 +88,8 @@ void drawEquipUI(Player* player)
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, uiTexture);
     glBegin(GL_QUADS);
-    drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(240), PTC(12));
-    drawTexQuad(0, 0, 240, 116, UIBH, 0, PTC(124), PTC(240), PTC(240));
+    drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(239), PTC(11));
+    drawTexQuad(0, 0, 240, 116, UIBH, 0, PTC(124), PTC(239), PTC(239));
     glEnd();
     glDrawText("Equip ship", CENTER(10), 2, 0xFFFFFF);
 
