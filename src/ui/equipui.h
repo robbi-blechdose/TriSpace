@@ -3,7 +3,7 @@
 
 #include "../player.h"
 
-void initEquipUI();
+void initEquipUI(GLuint uiTex);
 void quitEquipUI();
 
 void calcEquipUI(uint32_t ticks);

@@ -3,7 +3,7 @@
 
 #include "../contracts.h"
 
-void initContractUI();
+void initContractUI(GLuint uiTex);
 void quitContractUI();
 
 void calcContractUI(uint32_t ticks, Contract* activeContract, Contract* contracts);

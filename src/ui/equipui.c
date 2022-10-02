@@ -27,9 +27,9 @@ const uint8_t equipmentTypeMeshMapping[NUM_EQUIPMENT_TYPES] = {
     [FuelScoops] = 4
 };
 
-void initEquipUI()
+void initEquipUI(GLuint uiTex)
 {
-    uiTexture = loadRGBTexture("res/UI/StationUI.png");
+    uiTexture = uiTex;
 
     equipShipMesh = loadModelList("res/obj/ships/Ship.obj");
     equipmentMeshes[0] = loadModelList("res/obj/equipment/fuel.obj");
@@ -41,8 +41,6 @@ void initEquipUI()
 
 void quitEquipUI()
 {
-    deleteRGBTexture(uiTexture);
-
     glDeleteList(equipShipMesh);
     glDeleteList(equipmentMeshes[0]);
     glDeleteList(equipmentMeshes[1]);
@@ -89,15 +87,15 @@ void drawEquipUI(Player* player)
     glBindTexture(GL_TEXTURE_2D, uiTexture);
     glBegin(GL_QUADS);
     drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(239), PTC(11));
-    drawTexQuad(0, 0, 240, 116, UIBH, 0, PTC(124), PTC(239), PTC(239));
+    drawTexQuad(0, 0, 240, 116, UIBH, 0, PTC(26), PTC(239), PTC(141));
     glEnd();
-    glDrawText("Equip ship", CENTER(10), 2, 0xFFFFFF);
+    glDrawText("Equip ship", CENTER(10), 2, TEXT_DKGREY);
 
     char buffer[29];
     char name[21];
     char status[4];
 
-    glDrawText("ITEM               PRICE  QTY", 4, 128, 0xFFFFFF);
+    glDrawText("ITEM               PRICE  QTY", 4, 128, TEXT_GREEN);
     for(uint8_t i = 0; i < NUM_EQUIPMENT_TYPES; i++)
     {
         printNameForEquipment(name, i);
@@ -110,15 +108,15 @@ void drawEquipUI(Player* player)
         }
         else
         {
-            glDrawText(buffer, 4, 136 + i * 8, 0xFFFFFF);
+            glDrawText(buffer, 4, 136 + i * 8, TEXT_WHITE);
         }
     }
     
     sprintf(buffer, "%d credits", player->hold.money);
-    glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
+    glDrawText(buffer, CENTER(strlen(buffer)), 218, TEXT_DKGREY);
 
-    glDrawText("Trading", 12, 240 - 10, 0xFFFFFF);
-    glDrawText("Contracts", 240 - 9 * 8 - 12, 240 - 10, 0xFFFFFF);
+    glDrawText("Trading", 12, 240 - 10, TEXT_DKGREY);
+    glDrawText("Contracts", 240 - 9 * 8 - 12, 240 - 10, TEXT_DKGREY);
 }
 
 void moveEquipUICursor(int8_t dir)

@@ -14,24 +14,24 @@ GLuint starTexture;
 
 GLuint systemInfoTexture;
 
+static GLuint uiTexture;
+
 static int8_t cursor[2];
 static int8_t cursorNew[2];
-float lerpTemp = 0;
+static float lerpTemp = 0;
 
-void initStarmap()
+void initStarmap(GLuint uiTex)
 {
+    uiTexture = uiTex;
+
     starMesh = loadModelList("res/obj/Planet.obj");
     starTexture = loadRGBTexture("res/tex/Sun.png");
-
-    systemInfoTexture = loadRGBTexture("res/UI/map.png");
 }
 
 void quitStarmap()
 {
     glDeleteList(starMesh);
     deleteRGBTexture(starTexture);
-
-    deleteRGBTexture(systemInfoTexture);
 }
 
 #define CAMERA_HEIGHT 15
@@ -157,35 +157,35 @@ const char* governmentLevels[MAX_GOVERNMENT] = {
 void drawSystemInfoBox()
 {
     glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, systemInfoTexture);
+    glBindTexture(GL_TEXTURE_2D, uiTexture);
     glBegin(GL_QUADS);
     //Background
-    drawTexQuad(0, 0, 240, 72, UIBH, 0, PTC(168), PTC(239), PTC(239));
+    drawTexQuad(0, 0, 240, 72, UIBH, 0, PTC(12), PTC(239), PTC(83));
     //Content
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, getSeedForSystem(cursor[0], cursor[1]));
 
     char buffer[29];
-    glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 168 + 4, TEXT_GREY);
+    glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 168 + 4, TEXT_WHITE);
 
     glDrawText("Tech level:", 8, 168 + 4 + 10, TEXT_GREEN);
     sprintf(buffer, "%d", sbd.info.techLevel);
-    glDrawText(buffer, 8 + 96, 168 + 4 + 10, TEXT_GREY);
+    glDrawText(buffer, 8 + 96, 168 + 4 + 10, TEXT_WHITE);
 
     glDrawText("Government:", 8, 168 + 4 + 18, TEXT_GREEN);
     sprintf(buffer, "%s", governmentLevels[sbd.info.government]);
-    glDrawText(buffer, 8 + 96, 168 + 4 + 18, TEXT_GREY);
+    glDrawText(buffer, 8 + 96, 168 + 4 + 18, TEXT_WHITE);
 
     glDrawText("Planets:", 8, 168 + 4 + 26, TEXT_GREEN);
     for(uint8_t i = 0; i < sbd.numPlanets; i++)
     {
         drawTexQuad(80 + i * 12, 34, 8, 8, UITH,
-                    PTC(240), PTC(80 + sbd.paletteIndices[i] * 8), PTC(248), PTC(87 + sbd.paletteIndices[i] * 8));
+                    PTC(240), PTC(sbd.paletteIndices[i] * 8), PTC(248), PTC(7 + sbd.paletteIndices[i] * 8));
     }
 
     char description[29 * 3];
     generateSystemDescription(description, &sbd);
-    glDrawText(description, 8, 168 + 4 + 36, TEXT_GREY);
+    glDrawText(description, 8, 168 + 4 + 36, TEXT_WHITE);
 
     glEnd();
 }

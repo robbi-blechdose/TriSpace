@@ -1,8 +1,9 @@
 #ifndef _POPUP_H
 #define _POPUP_H
 
-#include "stdbool.h"
-#include "stdint.h"
+#include <stdbool.h>
+#include <stdint.h>
+#include "GL/gl.h"
 
 /**
  * Functions for a popup window
@@ -12,7 +13,7 @@
 #define POPUP_CHECKMARK 0
 #define POPUP_ATTENTION 1
 
-void initPopup();
+void initPopup(GLuint uiTex);
 void quitPopup();
 
 void drawPopupIfActive();

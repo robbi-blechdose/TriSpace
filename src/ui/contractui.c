@@ -39,9 +39,9 @@ static vec3 satelliteWaypoints[NUM_WAYPOINTS] = {
 static uint8_t waypointIndex;
 static vec3* waypoints;
 
-void initContractUI()
+void initContractUI(GLuint uiTex)
 {
-    uiTexture = loadRGBTexture("res/UI/StationUI.png");
+    uiTexture = uiTex;
 
     satelliteMesh = loadModelList("res/obj/Satellite.obj");
     
@@ -61,8 +61,6 @@ void initContractUI()
 
 void quitContractUI()
 {
-    deleteRGBTexture(uiTexture);
-
     glDeleteList(satelliteMesh);
 }
 
@@ -248,20 +246,20 @@ void drawContract(Contract* contract)
 
     glDrawText("Employer:", 2, 112, TEXT_GREEN);
     sprintf(buffer, "%s %s", contractFirstnames[contract->employerFirstname], contractLastnames[contract->employerLastname]);
-    glDrawText(buffer, 18, 120, TEXT_GREY);
+    glDrawText(buffer, 18, 120, TEXT_WHITE);
 
     glDrawText("Pay:", 2, 136, TEXT_GREEN);
     sprintf(buffer, "%d credits", contract->pay);
-    glDrawText(buffer, 42, 136, TEXT_GREY);
+    glDrawText(buffer, 42, 136, TEXT_WHITE);
 
     glDrawText("Destination system:", 2, 152, TEXT_GREEN);
     SystemBaseData sbd;
     generateSystemBaseData(&sbd, getSeedForSystem(contract->targetSystem[0], contract->targetSystem[1]));
-    glDrawText(sbd.info.name, 18, 160, TEXT_GREY);
+    glDrawText(sbd.info.name, 18, 160, TEXT_WHITE);
 
     glDrawText("Objective:", 2, 176, TEXT_GREEN);
     printObjective(buffer, contract);
-    glDrawText(buffer, 18, 184, TEXT_GREY);
+    glDrawText(buffer, 18, 184, TEXT_WHITE);
 }
 
 void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numContracts)
@@ -270,15 +268,15 @@ void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numCo
     glBindTexture(GL_TEXTURE_2D, uiTexture);
     glBegin(GL_QUADS);
     drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(239), PTC(11));
-    drawTexQuad(0, 0, 240, 130, UIBH, 0, PTC(240-130), PTC(239), PTC(239));
+    drawTexQuad(0, 0, 240, 130, UIBH, 0, PTC(12), PTC(239), PTC(141));
     glEnd();
-    glDrawText("Contracts", CENTER(9), 2, 0xFFFFFF);
+    glDrawText("Contracts", CENTER(9), 2, TEXT_DKGREY);
 
     if(activeContract->type != CONTRACT_TYPE_NULL)
     {
         drawContract(activeContract);
 
-        glDrawText("ACT", 214, 112, TEXT_GREY);
+        glDrawText("ACT", 214, 112, TEXT_WHITE);
     }
     else
     {
@@ -286,10 +284,10 @@ void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numCo
 
         char buffer[29];
         sprintf(buffer, "%d/%d", cursor + 1, numContracts);
-        glDrawText(buffer, 214, 112, TEXT_GREY);
+        glDrawText(buffer, 214, 112, TEXT_WHITE);
     }
 
-    glDrawText("Equip ship", 12, 240 - 10, 0xFFFFFF);
+    glDrawText("Equip ship", 12, 240 - 10, TEXT_DKGREY);
 }
 
 void moveContractUICursor(int8_t dir, Contract* contracts, uint8_t numContracts)

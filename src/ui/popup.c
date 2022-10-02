@@ -1,27 +1,21 @@
 #include "popup.h"
 
+#include <string.h>
 #include "../engine/image.h"
+#include "uiutils.h"
 
-//UI Popup Height
-#define UIPH 12
-//UI Popup Top Height
-#define UIPTH 13
-
-GLuint popupTexture;
+static GLuint uiTexture;
 
 bool popupActive;
 uint8_t popupIcon;
 char popupText[15 * 6];
 
-void initPopup()
+void initPopup(GLuint uiTex)
 {
-    popupTexture = loadRGBTexture("res/UI/popup.png");
+    uiTexture = uiTex;
 }
 
-void quitPopup()
-{
-    deleteRGBTexture(popupTexture);
-}
+void quitPopup() {}
 
 void drawPopupIfActive()
 {
@@ -31,11 +25,11 @@ void drawPopupIfActive()
     }
 
     glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, popupTexture);
+    glBindTexture(GL_TEXTURE_2D, uiTexture);
     glBegin(GL_QUADS);
-    drawTexQuad(40, 80, 160, 80, UIPH, 0, 0, PTC(160), PTC(79));
-    drawTexQuad(48, 136, 16, 16, UIPTH, PTC(16 * popupIcon), PTC(80), PTC(16 + 16 * popupIcon), PTC(96));
-    glDrawText(popupText, 72, 88, 0xFFFFFF);
+    drawTexQuad(40, 80, 160, 80, UIPH, 0, PTC(144), PTC(159), PTC(223));
+    drawTexQuad(48, 136, 16, 16, UIPTH, PTC(16 * popupIcon), PTC(224), PTC(16 + 16 * popupIcon), PTC(239));
+    glDrawText(popupText, 72, 88, TEXT_WHITE);
     glEnd();
 }
 

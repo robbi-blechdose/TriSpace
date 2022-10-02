@@ -12,16 +12,21 @@ GLuint mainTexture;
 GLuint firingTexture;
 GLuint stationUITexture;
 
+GLuint uiTexture;
+
 //Map
 uint8_t mapScrollX;
 uint8_t mapScrollY;
 
-void initUI()
+GLuint initUI()
 {
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
     stationUITexture = loadRGBTexture("res/UI/StationUI.png");
+
+    uiTexture = loadRGBTexture("res/UI/UI.png");
+    return uiTexture;
 }
 
 void quitUI()
@@ -30,6 +35,8 @@ void quitUI()
     deleteRGBTexture(mainTexture);
     deleteRGBTexture(firingTexture);
     deleteRGBTexture(stationUITexture);
+
+    deleteRGBTexture(uiTexture);
 }
 
 void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
@@ -165,20 +172,20 @@ void drawSaveLoadUI(uint8_t cursor)
     drawTexQuad(CENTER(13), 200, 8, 8, UITH, PTC(240), 0, PTC(247), PTC(7));
     drawTexQuad(CENTER(13), 184, 8, 8, UITH, PTC(248), 0, 1, PTC(7));
     glEnd();
-    glDrawText("Save & Load", CENTER(11), 2, 0xFFFFFF);
+    glDrawText("Save & Load", CENTER(11), 2, TEXT_DKGREY);
 
     if(cursor == 0)
     {
         glDrawText("Save game", CENTER(9), 32, 0x00FFFF);
-        glDrawText("Load game", CENTER(9), 48, 0xFFFFFF);
+        glDrawText("Load game", CENTER(9), 48, TEXT_WHITE);
     }
     else
     {
-        glDrawText("Save game", CENTER(9), 32, 0xFFFFFF);
+        glDrawText("Save game", CENTER(9), 32, TEXT_WHITE);
         glDrawText("Load game", CENTER(9), 48, 0x00FFFF);
     }
 
-    glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, 0xFFFFFF);
+    glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, TEXT_DKGREY);
 }
 
 void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
@@ -188,34 +195,26 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     glBegin(GL_QUADS);
     drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(239), PTC(239));
     glEnd();
-    glDrawText("Trading", CENTER(7), 2, 0xFFFFFF);
+    glDrawText("Trading", CENTER(7), 2, TEXT_DKGREY);
 
     char buffer[29];
     char name[15];
     char type[4];
 
-    glDrawText("ITEM        UNIT PRICE    QTY", 4, 16, 0xFFFFFF);
+    glDrawText("ITEM        UNIT PRICE    QTY", 4, 16, TEXT_GREEN);
     for(uint8_t i = 0; i < NUM_CARGO_TYPES; i++)
     {
         printNameForCargo(name, i);
         printUnitForCargo(type, i);
-        sprintf(buffer, "%-13s%3s %5d  %2d|%2d", name, type, getPriceForCargo(i, info),
-                                                    stationHold->cargo[i], playerHold->cargo[i]);
-        if(i == cursor)
-        {
-            glDrawText(buffer, 4, 24 + i * 8, 0x00FFFF);
-        }
-        else
-        {
-            glDrawText(buffer, 4, 24 + i * 8, 0xFFFFFF);
-        }
+        sprintf(buffer, "%-13s%3s %5d  %2d|%2d", name, type, getPriceForCargo(i, info), stationHold->cargo[i], playerHold->cargo[i]);
+        glDrawText(buffer, 4, 24 + i * 8, i == cursor ? 0x00FFFF : TEXT_WHITE);
     }
 
     sprintf(buffer, "%d credits", playerHold->money);
-    glDrawText(buffer, CENTER(strlen(buffer)), 218, 0xFFFFFF);
+    glDrawText(buffer, CENTER(strlen(buffer)), 218, TEXT_DKGREY);
 
-    glDrawText("Save & Load", 12, 240 - 10, 0xFFFFFF);
-    glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, 0xFFFFFF);
+    glDrawText("Save & Load", 12, 240 - 10, TEXT_DKGREY);
+    glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, TEXT_DKGREY);
 }
 
 void drawGameOverScreen()

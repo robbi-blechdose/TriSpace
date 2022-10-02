@@ -45,7 +45,7 @@ void calcNPCAiStateCircle(Npc* npc, Player* player, uint32_t ticks, float distan
     }
 
     //Randomly attack
-    if(rand() < RAND_MAX / 2048)
+    if(rand() < RAND_MAX / (1024 * ticks))
     {
         npc->state = STATE_ATTACK;
     }
@@ -122,6 +122,7 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
             if(distance3d(&npc->waypoint, &npc->ship.position) < AI_RANGE_WAYPOINT)
             {
                 vec3 toPlayer = addv3(npc->ship.position, subv3(npc->ship.position, player->ship.position));
+                toPlayer = scalev3(10, normalizev3(toPlayer));
                 npc->waypoint = toPlayer;
             }
 
@@ -143,7 +144,7 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
 void calcNPCAiPolice(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
 {
     //Do police check
-    if(distanceToPlayer < AI_RANGE_POLICECHECK && rand() < RAND_MAX / 4096)
+    if(distanceToPlayer < AI_RANGE_POLICECHECK && rand() < RAND_MAX / (2048 * ticks))
     {
         for(uint8_t i = 0; i < player->hold.size; i++)
         {
@@ -200,7 +201,15 @@ void calcNPCAiPolice(Npc* npc, Player* player, uint32_t ticks, float distanceToP
 
 void calcNPCAiFriendly(Npc* npc, uint32_t ticks)
 {
-    //TODO
+    if(distance3d(&npc->waypoint, &npc->ship.position) < AI_RANGE_WAYPOINT)
+    {
+        //Calculate next waypoint
+        npc->waypoint = getRandomSpherePoint(npc->ship.position, AI_RANGE_CIRCLE * 2);
+    }
+
+    //Move towards waypoint
+    turnShipTowardsPoint(&npc->ship, npc->waypoint);
+    accelerateShipLimit(&npc->ship, 1, ticks, 0.8f);
 }
 
 void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)

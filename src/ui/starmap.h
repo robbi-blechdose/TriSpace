@@ -2,8 +2,9 @@
 #define _STARMAP_H
 
 #include <stdint.h>
+#include "GL/gl.h"
 
-void initStarmap();
+void initStarmap(GLuint uiTex);
 void quitStarmap();
 
 void calcStarmap(uint32_t ticks);

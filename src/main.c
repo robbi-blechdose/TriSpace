@@ -419,6 +419,11 @@ void calcFrame(uint32_t ticks)
                     createStationHold(&stationHold);
                     //Set up the current contract (if necessary)
                     contractStarSystemSetup(&currentContract, npcs, currentSystem, &starSystem);
+                    //50% chance of decreasing wanted level
+                    if(player.wantedLevel > 0 && randr(100) < 50)
+                    {
+                        player.wantedLevel--;
+                    }
                 }
             }
             else
@@ -790,12 +795,12 @@ void drawFrame()
 
 void initGame()
 {
-    initUI();
-    initPopup();
-    initStarmap();
-    initEquipUI();
+    GLuint uiTexture = initUI();
+    initPopup(uiTexture);
+    initStarmap(uiTexture);
+    initEquipUI(uiTexture);
     initTitleScreen();
-    initContractUI();
+    initContractUI(uiTexture);
 
     initEffects();
 

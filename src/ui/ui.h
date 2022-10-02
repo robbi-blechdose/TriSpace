@@ -10,7 +10,7 @@
 
 #define RADAR_RANGE 120
 
-void initUI();
+GLuint initUI();
 void quitUI();
 
 void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible);
@@ -20,6 +20,8 @@ void drawSaveLoadUI(uint8_t cursor);
 void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info);
 
 void drawGameOverScreen();
+
+void bindUITexture();
 
 void moveCursorDown(uint8_t* i, uint8_t max);
 void moveCursorUp(uint8_t* i, uint8_t max);
