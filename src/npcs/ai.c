@@ -24,6 +24,15 @@
     //--------------------------------------------------------------------------------------------------
  **/
 
+bool randChance(uint32_t divisor, uint32_t ticks)
+{
+    if(ticks == 0)
+    {
+        ticks = 1;
+    }
+    return rand() < RAND_MAX / (divisor * ticks);
+}
+
 vec3 getRandomSpherePoint(vec3 center, float radius)
 {
     vec3 vec = {.x = randf(1), .y = randf(1), .z = randf(1)};
@@ -45,7 +54,7 @@ void calcNPCAiStateCircle(Npc* npc, Player* player, uint32_t ticks, float distan
     }
 
     //Randomly attack
-    if(rand() < RAND_MAX / (1024 * ticks))
+    if(randChance(1024, ticks))
     {
         npc->state = STATE_ATTACK;
     }
@@ -144,7 +153,7 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
 void calcNPCAiPolice(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
 {
     //Do police check
-    if(distanceToPlayer < AI_RANGE_POLICECHECK && rand() < RAND_MAX / (2048 * ticks))
+    if(distanceToPlayer < AI_RANGE_POLICECHECK && randChance(2048, ticks))
     {
         for(uint8_t i = 0; i < player->hold.size; i++)
         {

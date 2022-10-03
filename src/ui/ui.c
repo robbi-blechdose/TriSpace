@@ -10,7 +10,6 @@
 
 GLuint mainTexture;
 GLuint firingTexture;
-GLuint stationUITexture;
 
 GLuint uiTexture;
 
@@ -23,7 +22,6 @@ GLuint initUI()
     initPNG();
     mainTexture = loadRGBTexture("res/UI/main.png");
     firingTexture = loadRGBTexture("res/UI/firing.png");
-    stationUITexture = loadRGBTexture("res/UI/StationUI.png");
 
     uiTexture = loadRGBTexture("res/UI/UI.png");
     return uiTexture;
@@ -34,7 +32,6 @@ void quitUI()
     quitPNG();
     deleteRGBTexture(mainTexture);
     deleteRGBTexture(firingTexture);
-    deleteRGBTexture(stationUITexture);
 
     deleteRGBTexture(uiTexture);
 }
@@ -165,24 +162,28 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
 void drawSaveLoadUI(uint8_t cursor)
 {
     glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, stationUITexture);
+    glBindTexture(GL_TEXTURE_2D, uiTexture);
     glBegin(GL_QUADS);
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(239), PTC(239));
+    //Piece together fullscreen texture from the non-fullscreen UI texture
+    drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(239), PTC(11));
+    drawTexQuad(0, 216, 240, 12, UIBH, 0, PTC(14), PTC(239), PTC(25));
+    drawTexQuad(0, 112, 240, 104, UIBH, 0, PTC(14), PTC(239), PTC(117));
+    drawTexQuad(0, 0, 240, 128, UIBH, 0, PTC(14), PTC(239), PTC(141));
     //Save/Load icons
-    drawTexQuad(CENTER(13), 200, 8, 8, UITH, PTC(240), 0, PTC(247), PTC(7));
-    drawTexQuad(CENTER(13), 184, 8, 8, UITH, PTC(248), 0, 1, PTC(7));
+    drawTexQuad(CENTER(13), 196, 16, 16, UITH, PTC(32), PTC(224), PTC(47), PTC(239));
+    drawTexQuad(CENTER(13), 178, 16, 16, UITH, PTC(48), PTC(224), PTC(63), PTC(239));
     glEnd();
     glDrawText("Save & Load", CENTER(11), 2, TEXT_DKGREY);
 
     if(cursor == 0)
     {
         glDrawText("Save game", CENTER(9), 32, 0x00FFFF);
-        glDrawText("Load game", CENTER(9), 48, TEXT_WHITE);
+        glDrawText("Load game", CENTER(9), 50, TEXT_WHITE);
     }
     else
     {
         glDrawText("Save game", CENTER(9), 32, TEXT_WHITE);
-        glDrawText("Load game", CENTER(9), 48, 0x00FFFF);
+        glDrawText("Load game", CENTER(9), 50, 0x00FFFF);
     }
 
     glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, TEXT_DKGREY);
@@ -191,9 +192,13 @@ void drawSaveLoadUI(uint8_t cursor)
 void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
 {
     glLoadIdentity();
-    glBindTexture(GL_TEXTURE_2D, stationUITexture);
+    glBindTexture(GL_TEXTURE_2D, uiTexture);
     glBegin(GL_QUADS);
-    drawTexQuad(0, 0, 240, 240, UIBH, 0, 0, PTC(239), PTC(239));
+    //Piece together fullscreen texture from the non-fullscreen UI texture
+    drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(239), PTC(11));
+    drawTexQuad(0, 216, 240, 12, UIBH, 0, PTC(14), PTC(239), PTC(25));
+    drawTexQuad(0, 112, 240, 104, UIBH, 0, PTC(14), PTC(239), PTC(117));
+    drawTexQuad(0, 0, 240, 128, UIBH, 0, PTC(14), PTC(239), PTC(141));
     glEnd();
     glDrawText("Trading", CENTER(7), 2, TEXT_DKGREY);
 

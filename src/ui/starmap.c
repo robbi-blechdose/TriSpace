@@ -69,6 +69,16 @@ vec2 starDistSinCos(float angle)
                    cosf(angle) * STAR_DIST};
 }
 
+void drawCircle(float radius)
+{
+    glBegin(GL_LINES);
+    for(float angle = 0; angle <= 2 * M_PI; angle += 0.2f)
+    {
+        glVertex3f(sinf(angle) * radius, 0, cosf(angle) * radius);
+    }
+    glEnd();
+}
+
 void drawStarmap3d(uint8_t* currentSystem, float fuel)
 {
     glBindTexture(GL_TEXTURE_2D, starTexture);
@@ -138,12 +148,7 @@ void drawStarmap3d(uint8_t* currentSystem, float fuel)
     glTranslatef(currentPos.x, 0, currentPos.y);
 
     //Draw range circle
-    glBegin(GL_LINES);
-    for(float angle = 0; angle <= 2 * M_PI; angle += 0.2f)
-    {
-        glVertex3f(sinf(angle) * fuel, 0, cosf(angle) * fuel);
-    }
-    glEnd();
+    drawCircle(fuel);
 }
 
 const char* governmentLevels[MAX_GOVERNMENT] = {

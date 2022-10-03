@@ -106,7 +106,7 @@ void calcContractUIInternal(uint32_t ticks, Contract* contract)
             calcShip(&playerShip, ticks);
 
             firingTicks += ticks;
-            if(firingTicks > 1000)
+            if(firingTicks > 1200)
             {
                 fireWeapons(&playerShip);
                 playerShip.weapon.distanceToHit = distance3d(&playerShip.position, &cruiseShip.position);
@@ -329,6 +329,7 @@ void moveContractUICursor(int8_t dir, Contract* contracts, uint8_t numContracts)
             break;
         }
     }
+    waypointIndex = 0;
 }
 
 int8_t getContractUICursor()

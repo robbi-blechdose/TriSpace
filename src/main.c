@@ -60,7 +60,7 @@ typedef enum {
     GAME_OVER
 } State;
 
-#define SAVE_VERSION 500
+#define SAVE_VERSION 60
 
 #define MUSIC_DOCKING 0
 #define MUSIC_MAIN    1
@@ -116,12 +116,13 @@ bool loadGame()
     {
         uint16_t version = 0;
         readElement(&version, sizeof(version));
-        if((version / 100) != (SAVE_VERSION / 100)) //Check major version for save compatability
+        if(version / 10 != SAVE_VERSION / 10) //Check major version for save compatability
         {
             closeSave();
             return false;
         }
 
+        player.ship.rotation = QUAT_INITIAL;
         loadPlayer(&player);
 
         uint8_t savedSystem[2];
