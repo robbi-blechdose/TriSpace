@@ -47,6 +47,11 @@ void calcStarmap(uint32_t ticks)
         vec3 newCameraPos = {cursorSystem.x, CAMERA_HEIGHT, cursorSystem.y};
 
         lerpTemp += ticks / 500.0f;
+        //Prevent overruns
+        if(lerpTemp > 1)
+        {
+            lerpTemp = 1;
+        }
         cameraPos = lerpv3(cameraPos, newCameraPos, lerpTemp);
 
         if(distance3d(&cameraPos, &newCameraPos) < 0.1f)
