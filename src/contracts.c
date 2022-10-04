@@ -72,7 +72,6 @@ void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contr
         //No systems found. Shouldn't happen, but just in case. Fallback: current system
         c->targetSystem[0] = currentStarSystem[0];
         c->targetSystem[1] = currentStarSystem[1];
-
     }
     else
     {
@@ -95,7 +94,7 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
     {
         case CONTRACT_GET_ITEM:
         {
-            c.cargo = randr(NUM_CARGO_TYPES);
+            c.cargo = randr(NUM_CARGO_TYPES - 1);
             c.cargoAmount = 1 + randr(20);
             c.pay = getPriceForCargo(c.cargo, info) * c.cargoAmount + 50 + randr(400);
             break;
@@ -260,18 +259,20 @@ void printObjective(char* str, Contract* contract)
 {
     char name[15];
     char unit[4];
-    printNameForCargo(name, contract->cargo);
-    printUnitForCargo(unit, contract->cargo);
-    
+
     switch(contract->type)
     {
         case CONTRACT_GET_ITEM:
         {
+            printNameForCargo(name, contract->cargo);
+            printUnitForCargo(unit, contract->cargo);
             sprintf(str, "Deliver %d%s of %s.", contract->cargoAmount, unit, name);
             break;
         }
         case CONTRACT_SMUGGLE:
         {
+            printNameForCargo(name, contract->cargo);
+            printUnitForCargo(unit, contract->cargo);
             sprintf(str, "Smuggle %d%s %s.\nWatch out for police\nships!", contract->cargoAmount, unit, name);
             break;
         }
