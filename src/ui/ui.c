@@ -72,14 +72,14 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     uint8_t speedTemp = (player->ship.speed / shipTypes[player->ship.type].maxSpeed) * 32;
     if(speedTemp > 0)
     {
-        drawTexQuad(170, 26, speedTemp * 2, 4, UITH, 0, PTC(249), PTC(2 * speedTemp), PTC(251));
+        drawTexQuad(171, 26, speedTemp * 2, 4, UITH, 0, PTC(249), PTC(2 * speedTemp), PTC(251));
     }
 
     int8_t turnXTemp = (player->ship.turnSpeedX / shipTypes[player->ship.type].maxTurnSpeed) * 30 + 30;
-    drawTexQuad(170 + turnXTemp, 56, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
+    drawTexQuad(171 + turnXTemp, 56, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
     int8_t turnYTemp = (player->ship.turnSpeedY / shipTypes[player->ship.type].maxTurnSpeed) * 30 + 30;
-    drawTexQuad(170 + turnYTemp, 41, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
+    drawTexQuad(171 + turnYTemp, 41, 4, 4, UITH, PTC(252), 0, 1, PTC(3));
 
     uint8_t shieldsTemp = (player->ship.shields / shipTypes[player->ship.type].maxShields) * 32;
     if(player->ship.shields > 0 && shieldsTemp > 0)
