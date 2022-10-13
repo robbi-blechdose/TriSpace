@@ -82,7 +82,7 @@ uint8_t numStationContracts;
 Player player;
 Npc npcs[MAX_NPCS];
 
-Contract currentContract;
+Contract currentContract = (Contract) {.type = CONTRACT_TYPE_NULL};
 
 AutodockData autodock;
 
@@ -163,12 +163,6 @@ void newGame()
     currentSystem[1] = 0;
     initSystem(currentSystem, &starSystem, npcs);
     setInitialSpawnPos(player.ship.position);
-
-    //Test ship, TODO: remove
-    npcs[0].ship = (Ship) {.type = SHIP_TYPE_CRUISELINER,
-                           .position = (vec3) {150, 0, 80},
-                           .rotation = QUAT_INITIAL};
-    npcs[0].state = STATE_IDLE;
 }
 
 bool checkClosePopup()
@@ -705,7 +699,13 @@ void drawFrame()
         }
         case MAP:
         {
-            drawStarmap3d(currentSystem, player.fuel);
+            uint8_t contractSystem[2];
+            if(currentContract.type != CONTRACT_TYPE_NULL)
+            {
+                contractSystem[0] = currentContract.targetSystem[0];
+                contractSystem[1] = currentContract.targetSystem[1];
+            }
+            drawStarmap3d(currentSystem, player.fuel, contractSystem, currentContract.type != CONTRACT_TYPE_NULL);
             break;
         }
         case EQUIP:

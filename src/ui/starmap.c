@@ -84,7 +84,7 @@ void drawCircle(float radius)
     glEnd();
 }
 
-void drawStarmap3d(uint8_t* currentSystem, float fuel)
+void drawStarmap3d(uint8_t* currentSystem, float fuel, uint8_t contractSystem[2], bool contractActive)
 {
     glBindTexture(GL_TEXTURE_2D, starTexture);
 
@@ -149,11 +149,23 @@ void drawStarmap3d(uint8_t* currentSystem, float fuel)
         }
     }
     
+    //Draw range circle
+    glPushMatrix();
     vec2 currentPos = generateSystemPos(getSeedForSystem(currentSystem[0], currentSystem[1]), currentSystem[0], currentSystem[1]);
     glTranslatef(currentPos.x, 0, currentPos.y);
-
-    //Draw range circle
     drawCircle(fuel);
+    glPopMatrix();
+
+    //Draw contract system circle
+    if(contractActive)
+    {
+        uint8_t numStars = getNumStarsForSystem(getSeedForSystem(contractSystem[0], contractSystem[1]));
+        vec2 systemPos = generateSystemPos(getSeedForSystem(contractSystem[0], contractSystem[1]), contractSystem[0], contractSystem[1]);
+        glTranslatef(systemPos.x, 0, systemPos.y);
+        glColor3f(1, 1, 0);
+        drawCircle(3);
+        glColor3f(1, 1, 1);
+    }
 }
 
 const char* governmentLevels[MAX_GOVERNMENT] = {
