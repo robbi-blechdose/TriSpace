@@ -50,7 +50,7 @@ typedef enum {
     //PLANET,
     HYPERSPACE,
     //GUI states
-    SAVELOAD,
+    PLAYERINFO,
     TRADING,
     EQUIP,
     CONTRACTS,
@@ -86,7 +86,7 @@ Contract currentContract = (Contract) {.type = CONTRACT_TYPE_NULL};
 
 AutodockData autodock;
 
-uint8_t uiSaveLoadCursor;
+uint8_t uiPlayerInfoCursor;
 uint8_t uiTradeCursor;
 
 //-------------------------------------//
@@ -437,7 +437,7 @@ void calcFrame(uint32_t ticks)
             calcSpacedust(&player.ship, ticks);
             break;
         }
-        case SAVELOAD:
+        case PLAYERINFO:
         {
             if(checkClosePopup())
             {
@@ -446,18 +446,18 @@ void calcFrame(uint32_t ticks)
 
             if(keyUp(B_UP) || keyUp(B_DOWN))
             {
-                if(uiSaveLoadCursor)
+                if(uiPlayerInfoCursor)
                 {
-                    uiSaveLoadCursor = 0;
+                    uiPlayerInfoCursor = 0;
                 }
                 else
                 {
-                    uiSaveLoadCursor = 1;
+                    uiPlayerInfoCursor = 1;
                 }
             }
             else if(keyUp(B_A))
             {
-                if(uiSaveLoadCursor == 0)
+                if(uiPlayerInfoCursor == 0)
                 {
                     if(saveGame())
                     {
@@ -514,7 +514,7 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(B_TL))
             {
-                state = SAVELOAD;
+                state = PLAYERINFO;
             }
             else if(keyUp(B_TR))
             {
@@ -750,9 +750,9 @@ void drawFrame()
             drawUI(state == STATION, &player, npcs, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
             break;
         }
-        case SAVELOAD:
+        case PLAYERINFO:
         {
-            drawPlayerInfoUI(uiSaveLoadCursor, &player);
+            drawPlayerInfoUI(uiPlayerInfoCursor, &player);
             drawPopupIfActive();
             break;
         }
@@ -842,7 +842,7 @@ int main(int argc, char **argv)
     loadMusic(MUSIC_MAIN, "res/music/menuLoops_rock.ogg");
 
     //Init UI variables to zero
-    uiSaveLoadCursor = 0;
+    uiPlayerInfoCursor = 0;
     uiTradeCursor = 0;
 
     //Initialize game systems
