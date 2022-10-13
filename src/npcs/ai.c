@@ -2,10 +2,6 @@
 
 #include "../engine/util.h"
 
-//Friendly: set direction, move at half speed, randomly change direction (small chance)
-//Police: random checks for illegal cargo, attack if true, attack if contract ship is damaged by player, attack if shot by player, otherwise patrol
-//Enemy: attack when in range
-
 /**
  * UI test code to display npc radar dot:
     //--------------------------------------------------------------------------------------------------
@@ -65,7 +61,7 @@ void calcNPCAiStateAttack(Npc* npc, Player* player, uint32_t ticks, float distan
     float diff = turnShipTowardsPoint(&npc->ship, player->ship.position);
     accelerateShip(&npc->ship, 1, ticks);
 
-    if(diff < 0.3f)
+    if(diff < 0.3f && randChance(256, ticks))
     {
         //Looking at the player closely enough to fire
         if(fireWeapons(&npc->ship))

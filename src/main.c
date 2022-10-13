@@ -142,7 +142,7 @@ void newGame()
 {
     //Initialize player
     player.wantedLevel = 0;
-    player.ship = (Ship) {.type = 0,
+    player.ship = (Ship) {.type = SHIP_TYPE_PLAYER,
                           .position = (vec3) {150, 0, 100},
                           .rotation = QUAT_INITIAL,
                           .weapon.type = 0,
