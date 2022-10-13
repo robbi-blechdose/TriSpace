@@ -60,7 +60,7 @@ typedef enum {
     GAME_OVER
 } State;
 
-#define SAVE_VERSION 60
+#define SAVE_VERSION 70
 
 #define MUSIC_DOCKING 0
 #define MUSIC_MAIN    1
@@ -142,6 +142,7 @@ void newGame()
 {
     //Initialize player
     player.wantedLevel = 0;
+    player.killCount = 0;
     player.ship = (Ship) {.type = SHIP_TYPE_PLAYER,
                           .position = (vec3) {150, 0, 100},
                           .rotation = QUAT_INITIAL,
@@ -751,7 +752,7 @@ void drawFrame()
         }
         case SAVELOAD:
         {
-            drawSaveLoadUI(uiSaveLoadCursor);
+            drawPlayerInfoUI(uiSaveLoadCursor, &player);
             drawPopupIfActive();
             break;
         }

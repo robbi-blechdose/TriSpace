@@ -15,7 +15,7 @@ void quitUI();
 
 void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t autodockPossible);
 
-void drawSaveLoadUI(uint8_t cursor);
+void drawPlayerInfoUI(uint8_t cursor, Player* player);
 
 void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info);
 

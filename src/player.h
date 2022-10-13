@@ -10,6 +10,7 @@ typedef struct {
     Ship ship;
 
     uint8_t wantedLevel;
+    uint32_t killCount;
 
     float fuel;
 

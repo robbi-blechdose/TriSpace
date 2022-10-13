@@ -77,6 +77,7 @@ void calcNPCShips(StarSystem* starSystem, Player* player, Npc npcs[], uint32_t t
                 playSample(sampleExplosion);
                 createEffect(npcs[i].ship.position, EXPLOSION);
                 npcs[i].ship.type = SHIP_TYPE_NULL;
+                player->killCount++;
             }
         }
     }

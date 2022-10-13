@@ -8,6 +8,7 @@ void savePlayer(Player* player)
     writeElement(&player->ship.weapon.type, sizeof(player->ship.weapon.type));
 
     writeElement(&player->wantedLevel, sizeof(player->wantedLevel));
+    writeElement(&player->killCount, sizeof(player->killCount));
 
     writeElement(&player->fuel, sizeof(player->fuel));
     writeElement(&player->hold, sizeof(player->hold));
@@ -22,6 +23,7 @@ void loadPlayer(Player* player)
     readElement(&player->ship.weapon.type, sizeof(player->ship.weapon.type));
 
     readElement(&player->wantedLevel, sizeof(player->wantedLevel));
+    readElement(&player->killCount, sizeof(player->killCount));
 
     readElement(&player->fuel, sizeof(player->fuel));
     readElement(&player->hold, sizeof(player->hold));

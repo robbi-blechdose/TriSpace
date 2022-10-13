@@ -121,7 +121,6 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
         drawTexQuad(185, 11, 4, 4, UITH, PTC(252), PTC(28), 1, PTC(31));
     }
 
-    //Radar
     if(!onStation)
     {
         if(autodockPossible)
@@ -131,6 +130,7 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
 
         drawRadarDot(player->ship.position, player->ship.rotation, stationPos, DOT_BLUE);
 
+        //Enemy radar
         for(uint8_t i = 0; i < NUM_NORM_NPCS; i++)
         {
             if(npcs[i].ship.type != SHIP_TYPE_NULL)
@@ -164,7 +164,7 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
 }
 
 //TODO: change to player info UI displaying wanted level etc. (and save+load buttons)
-void drawSaveLoadUI(uint8_t cursor)
+void drawPlayerInfoUI(uint8_t cursor, Player* player)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, uiTexture);
@@ -175,20 +175,31 @@ void drawSaveLoadUI(uint8_t cursor)
     drawTexQuad(0, 112, 240, 104, UIBH, 0, PTC(14), PTC(239), PTC(117));
     drawTexQuad(0, 0, 240, 128, UIBH, 0, PTC(14), PTC(239), PTC(141));
     //Save/Load icons
-    drawTexQuad(CENTER(13), 196, 16, 16, UITH, PTC(32), PTC(224), PTC(47), PTC(239));
-    drawTexQuad(CENTER(13), 178, 16, 16, UITH, PTC(48), PTC(224), PTC(63), PTC(239));
+    drawTexQuad(CENTER(13), 100, 16, 16, UITH, PTC(32), PTC(224), PTC(47), PTC(239));
+    drawTexQuad(CENTER(13), 82, 16, 16, UITH, PTC(48), PTC(224), PTC(63), PTC(239));
     glEnd();
-    glDrawText("Save & Load", CENTER(11), 2, TEXT_DKGREY);
+    glDrawText("Player Info", CENTER(11), 2, TEXT_DKGREY);
 
+    //Info
+    char buffer[29];
+    glDrawText("Wanted level:", 18, 48, TEXT_GREEN);
+    sprintf(buffer, "%2d", player->wantedLevel);
+    glDrawText(buffer, 18 + 8 * 14, 48, TEXT_WHITE);
+
+    glDrawText("Kills:", 18, 64, TEXT_GREEN);
+    sprintf(buffer, "%d", player->killCount);
+    glDrawText(buffer, 18 + 8 * 7, 64, TEXT_WHITE);
+
+    //Save/Load
     if(cursor == 0)
     {
-        glDrawText("Save game", CENTER(9), 32, 0x00FFFF);
-        glDrawText("Load game", CENTER(9), 50, TEXT_WHITE);
+        glDrawText("Save game", CENTER(9), 128, 0x00FFFF);
+        glDrawText("Load game", CENTER(9), 146, TEXT_WHITE);
     }
     else
     {
-        glDrawText("Save game", CENTER(9), 32, TEXT_WHITE);
-        glDrawText("Load game", CENTER(9), 50, 0x00FFFF);
+        glDrawText("Save game", CENTER(9), 128, TEXT_WHITE);
+        glDrawText("Load game", CENTER(9), 146, 0x00FFFF);
     }
 
     glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, TEXT_DKGREY);
