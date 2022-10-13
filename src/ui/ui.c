@@ -36,6 +36,11 @@ void quitUI()
     deleteRGBTexture(uiTexture);
 }
 
+#define DOT_RED    0
+#define DOT_BLUE   1
+#define DOT_GREEN  2
+#define DOT_YELLOW 3
+
 void drawRadarDot(vec3 playerPos, quat playerRot, vec3 target, uint8_t color)
 {
     //Project vector from player to target to 2d (z component is before/behind player)
@@ -124,7 +129,7 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
             drawTexQuad(171, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
         }
 
-        drawRadarDot(player->ship.position, player->ship.rotation, stationPos, 1);
+        drawRadarDot(player->ship.position, player->ship.rotation, stationPos, DOT_BLUE);
 
         for(uint8_t i = 0; i < NUM_NORM_NPCS; i++)
         {
@@ -132,19 +137,19 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
             {
                 if(distance3d(&player->ship.position, &npcs[i].ship.position) < RADAR_RANGE)
                 {
-                    drawRadarDot(player->ship.position, player->ship.rotation, npcs[i].ship.position, 0);
+                    drawRadarDot(player->ship.position, player->ship.rotation, npcs[i].ship.position, DOT_RED);
                 }
             }
         }
         //Contract ship
         if(npcs[NPC_CONTRACT].ship.type != SHIP_TYPE_NULL)
         {
-            drawRadarDot(player->ship.position, player->ship.rotation, npcs[NPC_CONTRACT].ship.position, 3);
+            drawRadarDot(player->ship.position, player->ship.rotation, npcs[NPC_CONTRACT].ship.position, DOT_YELLOW);
         }
         //Next contract satellite to visit
         else if(hasSatellites() && !checkAllSatellitesVisited())
         {
-            drawRadarDot(player->ship.position, player->ship.rotation, getSatellitePosition(), 3);
+            drawRadarDot(player->ship.position, player->ship.rotation, getSatellitePosition(), DOT_YELLOW);
         }
     }
 
