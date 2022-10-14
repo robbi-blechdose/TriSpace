@@ -40,7 +40,7 @@ void calcSpacedust(Ship* playerShip, uint32_t ticks)
 {
     for(uint8_t i = 0; i < NUM_SPACEDUST; i++)
     {
-        if(spacedust[i].x < 0 || spacedust[i].y < 0 || spacedust[i].x > 239 || spacedust[i].y > 239 - 70)
+        if(spacedust[i].x < 0 || spacedust[i].y < 0 || spacedust[i].x >= WINX || spacedust[i].y >= WINY_3D)
         {
             //Generate angle
             float angle = randf(M_PI * 2);

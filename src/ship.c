@@ -31,9 +31,9 @@ uint8_t sampleShoot;
 
 void initShip()
 {
-    //The player ship should never be drawn, so setting this to NULL is okay
-    shipMeshes[0] = NULL;
-    shipTextures[0] = NULL;
+    //The player ship should never be drawn, so setting this to 0 is okay
+    shipMeshes[0] = 0;
+    shipTextures[0] = 0;
 
     shipMeshes[1] = loadModelList("res/obj/ships/Ship.obj");
     shipTextures[1] = loadRGBTexture("res/tex/ships/PirateShip.png");

@@ -413,9 +413,9 @@ void generateSystemName(char* buffer)
     char name[20];
     uint8_t nameIndex = 0;
     //Generate name
-    uint8_t syllables = 1 + randr(3);
+    uint8_t syllables = 1 + randr(2);
     uint8_t doubleVowelOccurred = 0;
-    //Syllable (x1 - x4)
+    //Syllable (x1 - x3)
     for(uint8_t i = 0; i < syllables; i++)
     {
         //Onset

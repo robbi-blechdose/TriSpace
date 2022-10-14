@@ -163,7 +163,6 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     glEnd();
 }
 
-//TODO: change to player info UI displaying wanted level etc. (and save+load buttons)
 void drawPlayerInfoUI(uint8_t cursor, Player* player)
 {
     glLoadIdentity();
