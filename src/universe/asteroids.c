@@ -27,13 +27,17 @@ void quitAsteroids()
 void createAsteroid(uint8_t i, vec3 playerPos)
 {
     vec3 pos;
-    do
+    while(true)
     {
-        asteroids[i].position.x = asteroidFieldPos.x + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
-        asteroids[i].position.y = asteroidFieldPos.y + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
-        asteroids[i].position.z = asteroidFieldPos.z + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
+        pos.x = asteroidFieldPos.x + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
+        pos.y = asteroidFieldPos.y + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
+        pos.z = asteroidFieldPos.z + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
+
+        if(distance3d(&pos, &playerPos) > 10)
+        {
+            break;
+        }
     }
-    while(distance3d(&pos, &playerPos) < 10);
 
     asteroids[i].position = pos;
     asteroids[i].size = 0.5f + randf(4.5f);
