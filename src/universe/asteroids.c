@@ -24,13 +24,19 @@ void quitAsteroids()
     deleteRGBTexture(asteroidTexture);
 }
 
-void createAsteroid(uint8_t i)
+void createAsteroid(uint8_t i, vec3 playerPos)
 {
+    vec3 pos;
+    do
+    {
+        asteroids[i].position.x = asteroidFieldPos.x + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
+        asteroids[i].position.y = asteroidFieldPos.y + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
+        asteroids[i].position.z = asteroidFieldPos.z + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
+    }
+    while(distance3d(&pos, &playerPos) < 10);
+
+    asteroids[i].position = pos;
     asteroids[i].size = 0.5f + randf(4.5f);
-    //TODO: Improve
-    asteroids[i].position.x = asteroidFieldPos.x + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
-    asteroids[i].position.y = asteroidFieldPos.y + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
-    asteroids[i].position.z = asteroidFieldPos.z + (randf(ASTEROID_FIELD_SIZE) - ASTEROID_FIELD_SIZE / 2);
     asteroids[i].health = ASTEROID_HEALTH;
 }
 
@@ -39,7 +45,7 @@ void createAsteroids(vec3 pos)
     asteroidFieldPos = pos;
     for(uint8_t i = 0; i < NUM_ASTEROIDS; i++)
     {
-        createAsteroid(i);
+        createAsteroid(i, (vec3) {0, 0, 0}); //The "player pos" isn't relevant here, and the asteroid field can never be in the system center (thus we use 0, 0, 0)
     }
 }
 
@@ -60,11 +66,11 @@ void drawAsteroids()
     }
 }
 
-bool checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance)
+bool checkAsteroidHit(vec3 playerPos, vec3 direction, float damage, uint8_t mineChance)
 {
     for(uint8_t i = 0; i < NUM_ASTEROIDS; i++)
     {
-        float hit = checkHitSphere(position, direction, &asteroids[i].position, asteroids[i].size);
+        float hit = checkHitSphere(&playerPos, &direction, &asteroids[i].position, asteroids[i].size);
         if(hit != -1)
         {
             asteroids[i].health -= damage;
@@ -72,7 +78,7 @@ bool checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t min
             {
                 createEffect(asteroids[i].position, EXPLOSION);
                 //Asteroid was destroyed, spawn a new one
-                createAsteroid(i);
+                createAsteroid(i, playerPos);
                 if(randr(100) < mineChance)
                 {
                     //We got mineable resources here
@@ -97,7 +103,7 @@ Asteroid* getAsteroids()
 void checkWeaponsAsteroidHit(Player* player)
 {
     vec3 dir = multQuatVec3(player->ship.rotation, (vec3) {0, 0, -1});
-    if(!checkAsteroidHit(&player->ship.position, &dir, weaponTypes[player->ship.weapon.type].damage, weaponTypes[player->ship.weapon.type].mineChance))
+    if(!checkAsteroidHit(player->ship.position, dir, weaponTypes[player->ship.weapon.type].damage, weaponTypes[player->ship.weapon.type].mineChance))
     {
         return;
     }
