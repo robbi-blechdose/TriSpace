@@ -23,8 +23,6 @@ void quitAsteroids();
 void createAsteroids(vec3 pos);
 void drawAsteroids();
 
-bool checkAsteroidHit(vec3* position, vec3* direction, float damage, uint8_t mineChance);
-
 Asteroid* getAsteroids();
 
 void checkWeaponsAsteroidHit(Player* player);
