@@ -163,6 +163,31 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     glEnd();
 }
 
+typedef struct {
+    uint32_t min;
+    const char* text;
+} Stat;
+
+#define NUM_WANTED_LEVELS 4
+const Stat wantedLevels[] = {
+    {.min = 0, .text = "Lawful"},
+    {.min = MAX_WANTED_LEVEL * 0.3f, .text = "Fugitive"},
+    {.min = MAX_WANTED_LEVEL * 0.5f, .text = "Dangerous"},
+    {.min = MAX_WANTED_LEVEL * 0.75f, .text ="Dead/alive"}
+};
+
+#define NUM_KILL_COUNTS 8
+const Stat killCounts[] = {
+    {.min =   0, .text = "Harmless"},
+    {.min =   8, .text = "Mostly harmless"},
+    {.min =  16, .text = "Below average"},
+    {.min =  32, .text = "Average"},
+    {.min =  64, .text = "Above average"},
+    {.min = 128, .text = "Hotshot"},
+    {.min = 256, .text = "Dangerous"},
+    {.min = 512, .text = "Legend"}
+};
+
 void drawPlayerInfoUI(uint8_t cursor, Player* player)
 {
     glLoadIdentity();
@@ -182,12 +207,34 @@ void drawPlayerInfoUI(uint8_t cursor, Player* player)
     //Info
     char buffer[29];
     glDrawText("Wanted level:", 18, 48, TEXT_GREEN);
-    sprintf(buffer, "%2d", player->wantedLevel);
-    glDrawText(buffer, 18 + 8 * 14, 48, TEXT_WHITE);
+    for(uint8_t i = 0; i < NUM_WANTED_LEVELS; i++)
+    {
+        if(player->wantedLevel >= wantedLevels[i].min)
+        {
+            continue;
+        }
+
+        //Else: we're one entry past the correct one. Draw and exit
+        glDrawText(wantedLevels[i - 1].text, 18 + 8 * 14, 48, TEXT_WHITE);
+        break;
+    }
 
     glDrawText("Kills:", 18, 64, TEXT_GREEN);
     sprintf(buffer, "%d", player->killCount);
     glDrawText(buffer, 18 + 8 * 7, 64, TEXT_WHITE);
+
+    glDrawText("Rating:", 18, 80, TEXT_GREEN);
+    for(uint8_t i = 0; i < NUM_KILL_COUNTS; i++)
+    {
+        if(player->killCount >= killCounts[i].min)
+        {
+            continue;
+        }
+
+        //Else: we're one entry past the correct one. Draw and exit
+        glDrawText(killCounts[i - 1].text, 18 + 8 * 8, 80, TEXT_WHITE);
+        break;
+    }
 
     //Save/Load
     if(cursor == 0)
