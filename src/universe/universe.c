@@ -114,6 +114,10 @@ void generateNPCShips(Npc npcs[], uint8_t maxShips, StarSystem* starSystem, vec3
             {
                 shipType = SHIP_TYPE_POLICE;
             }
+            else if(randr(100) < 5)
+            {
+                shipType = SHIP_TYPE_ALIEN;
+            }
 
             if(shipType != SHIP_TYPE_NULL)
             {

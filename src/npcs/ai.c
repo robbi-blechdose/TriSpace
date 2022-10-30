@@ -225,6 +225,7 @@ void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)
     {
         case SHIP_TYPE_SMALLPIRATE:
         case SHIP_TYPE_SMALLPIRATE2:
+        case SHIP_TYPE_ALIEN:
         {
             calcNPCAiEnemy(npc, player, ticks, distanceToPlayer);
             break;
