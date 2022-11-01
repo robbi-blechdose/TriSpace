@@ -647,6 +647,7 @@ void calcFrame(uint32_t ticks)
             {
                 state = TITLE;
                 //Clear player ship fields
+                player.ship.position = (vec3) {0, 0, 0};
                 player.ship.speed = 0;
                 player.ship.turnSpeedX = 0;
                 player.ship.turnSpeedY = 0;
