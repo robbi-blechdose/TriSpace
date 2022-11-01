@@ -1,6 +1,7 @@
 #include "ai.h"
 
 #include "../engine/util.h"
+#include "../comms.h"
 
 /**
  * UI test code to display npc radar dot:
@@ -78,6 +79,33 @@ void calcNPCAiStateAttack(Npc* npc, Player* player, uint32_t ticks, float distan
     }
 }
 
+void calcNPCDamageComm(Npc* npc, uint32_t ticks)
+{
+    if(!npc->ship.damaged)
+    {
+        return;
+    }
+    npc->ship.damaged = 0;
+
+    if(!randChance(8, ticks))
+    {
+        return;
+    }
+
+    if(npc->ship.type == SHIP_TYPE_ALIEN)
+    {
+        setCommMessage(SENDER_ALIEN, TYPE_DAMAGE);
+    }
+    else if(npc->ship.type == SHIP_TYPE_POLICE)
+    {
+        setCommMessage(SENDER_POLICE, TYPE_DAMAGE);
+    }
+    else
+    {
+        setCommMessage(SENDER_ENEMY, TYPE_DAMAGE);
+    }
+}
+
 void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
 {
     if(distanceToPlayer > AI_RANGE)
@@ -102,12 +130,26 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
             {
                 npc->waypoint = npc->ship.position;
                 npc->state = STATE_CIRCLE;
+
+                //Randomly send message
+                if(randChance(2, ticks))
+                {
+                    if(npc->ship.type == SHIP_TYPE_ALIEN)
+                    {
+                        setCommMessage(SENDER_ALIEN, TYPE_INTRO);
+                    }
+                    else
+                    {
+                        setCommMessage(SENDER_ENEMY, TYPE_INTRO);
+                    }
+                }
             }
             break;
         }
         case STATE_CIRCLE:
         {
             calcNPCAiStateCircle(npc, player, ticks, distanceToPlayer);
+            calcNPCDamageComm(npc, ticks);
     
             //Flee if being chased by player
             if(distanceToPlayer < AI_RANGE_FLEE)
@@ -120,6 +162,7 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
         case STATE_ATTACK:
         {
             calcNPCAiStateAttack(npc, player, ticks, distanceToPlayer);
+            calcNPCDamageComm(npc, ticks);
             break;
         }
         case STATE_FLEE:
@@ -130,6 +173,8 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
                 toPlayer = scalev3(10, normalizev3(toPlayer));
                 npc->waypoint = toPlayer;
             }
+
+            calcNPCDamageComm(npc, ticks);
 
             turnShipTowardsPoint(&npc->ship, npc->waypoint);
             accelerateShip(&npc->ship, 1, ticks);
@@ -148,33 +193,44 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
 
 void calcNPCAiPolice(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
 {
-    //Do police check
-    if(distanceToPlayer < AI_RANGE_POLICECHECK && randChance(2048, ticks))
-    {
-        for(uint8_t i = 0; i < player->hold.size; i++)
-        {
-            if(player->hold.cargo[i] > 0 && isCargoIllegal(i))
-            {
-                //Found illegal cargo, attack
-                npc->state = STATE_CIRCLE;
-                break;
-            }
-        }
-    }
-
-    if(npc->ship.damaged == DAMAGE_SOURCE_PLAYER || player->wantedLevel >= WANTED_LEVEL_DANGEROUS)
-    {
-        //Damaged by player or wanted level high enough, attack
-        npc->ship.damaged = 0;
-        npc->state = STATE_CIRCLE;
-    }
-
     //TODO: check contract ship for damage?
 
     switch(npc->state)
     {
         case STATE_IDLE:
         {
+            //Do police check
+            if(distanceToPlayer < AI_RANGE_POLICECHECK && randChance(2048, ticks))
+            {
+                for(uint8_t i = 0; i < player->hold.size; i++)
+                {
+                    if(player->hold.cargo[i] > 0 && isCargoIllegal(i))
+                    {
+                        //Found illegal cargo, attack
+                        npc->state = STATE_CIRCLE;
+                        //Randomly send message
+                        if(randChance(2, ticks))
+                        {
+                            setCommMessage(SENDER_POLICE, TYPE_SPECIAL);
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if(npc->ship.damaged == DAMAGE_SOURCE_PLAYER || player->wantedLevel >= WANTED_LEVEL_DANGEROUS)
+            {
+                //Damaged by player or wanted level high enough, attack
+                npc->ship.damaged = 0;
+                npc->state = STATE_CIRCLE;
+                
+                //Randomly send message
+                if(randChance(2, ticks))
+                {
+                    setCommMessage(SENDER_POLICE, TYPE_INTRO);
+                }
+            }
+            
             if(distanceToPlayer > AI_RANGE)
             {
                 //Out of range, do nothing
@@ -185,11 +241,13 @@ void calcNPCAiPolice(Npc* npc, Player* player, uint32_t ticks, float distanceToP
         case STATE_CIRCLE:
         {
             calcNPCAiStateCircle(npc, player, ticks, distanceToPlayer);
+            calcNPCDamageComm(npc, ticks);
             break;
         }
         case STATE_ATTACK:
         {
             calcNPCAiStateAttack(npc, player, ticks, distanceToPlayer);
+            calcNPCDamageComm(npc, ticks);
             break;
         }
     }

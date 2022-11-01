@@ -21,6 +21,7 @@
 #include "autodocking.h"
 #include "equipment.h"
 #include "player.h"
+#include "comms.h"
 
 #include "ui/popup.h"
 #include "ui/ui.h"
@@ -301,6 +302,8 @@ void calcSpace(uint32_t ticks)
     {
         state = MAP;
     }
+
+    calcComms(ticks);
 }
 
 void calcContracts()
@@ -407,7 +410,7 @@ void calcFrame(uint32_t ticks)
                 if(player.ship.speed > 500)
                 {
                     switchSystem(currentSystem, getStarmapCursor(), &starSystem, npcs);
-                    player.ship.position = getRandomFreePos(&starSystem, 20);
+                    player.ship.position = getRandomFreePos(&starSystem, 50);
                     setInitialSpawnPos(player.ship.position);
                     //Generate contracts for this system
                     generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
@@ -748,6 +751,7 @@ void drawFrame()
         case HYPERSPACE:
         {
             drawUI(state == STATION, &player, npcs, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
+            drawComms();
             break;
         }
         case PLAYERINFO:
