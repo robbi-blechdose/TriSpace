@@ -180,7 +180,7 @@ void calcNPCAiEnemy(Npc* npc, Player* player, uint32_t ticks, float distanceToPl
             accelerateShip(&npc->ship, 1, ticks);
 
             //Return to circle
-            if(distanceToPlayer > AI_RANGE_FLEE)
+            if(distanceToPlayer > AI_RANGE_FLEE || randChance(2048, ticks))
             {
                 npc->waypoint = npc->ship.position;
                 npc->state = STATE_CIRCLE;

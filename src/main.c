@@ -92,6 +92,12 @@ uint8_t uiTradeCursor;
 
 //-------------------------------------//
 
+
+//TODO: tutorial?
+//TODO: fix ships crashing into planets when being chased?
+//TODO: add missiles
+
+
 bool saveGame()
 {
     if(openSave(".trispace", "game.sav", 1))
@@ -289,6 +295,7 @@ void calcSpace(uint32_t ticks)
         state = STATION;
         player.ship.position = (vec3) {2, 0, 0};
         player.ship.speed *= 0.5f;
+        setStationCommMessage(STATION_LAND_CLEAR);
     }
 
     if(shipIsDestroyed(&player.ship))

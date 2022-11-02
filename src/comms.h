@@ -16,4 +16,8 @@ void drawComms();
 
 void setCommMessage(uint8_t sender, uint8_t type);
 
+#define STATION_LAND_CLEAR 0
+
+void setStationCommMessage(uint8_t index);
+
 #endif

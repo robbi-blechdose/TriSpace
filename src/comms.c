@@ -1,6 +1,8 @@
 #include "comms.h"
 
 #include <string.h>
+#include <stdio.h>
+#include "GL/gl.h"
 #include "engine/util.h"
 
 #include "ui/uiutils.h"
@@ -101,6 +103,23 @@ void setCommMessage(uint8_t sender, uint8_t type)
         {
             commMessage = specialComms[sender].list[randr(specialComms[sender].length - 1)];
             break;
+        }
+    }
+}
+
+static char buffer[30];
+
+void setStationCommMessage(uint8_t index)
+{
+    commTicks = 1;
+    commFlashIndex = 0;
+
+    switch(index)
+    {
+        case STATION_LAND_CLEAR:
+        {
+            sprintf(buffer, "Cleared to land in bay %d.", randr(5) + 1);
+            commMessage = buffer;
         }
     }
 }
