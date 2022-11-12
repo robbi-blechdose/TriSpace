@@ -121,6 +121,12 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
         drawTexQuad(185, 11, 4, 4, UITH, PTC(252), PTC(28), 1, PTC(31));
     }
 
+    //Missiles
+    if(player->ship.missiles)
+    {
+        drawTexQuad(3, 10, 10 * player->ship.missiles, 8, UITH, PTC(64), PTC(244), PTC(64 + 10 * player->ship.missiles), PTC(251));
+    }
+
     if(!onStation)
     {
         if(autodockPossible)

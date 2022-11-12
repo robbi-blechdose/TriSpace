@@ -129,3 +129,18 @@ quat inverseQuat(quat q)
 
     return q;
 }
+
+quat quatLookAt(vec3 pos, vec3 target, vec3 forward, vec3 up)
+{
+    vec3 diff = normalizev3(subv3(target, pos));
+
+    vec3 axis = normalizev3(crossv3(forward, diff));
+    if(lengthv3(axis) <= 0.000001f)
+    {
+        axis = up;
+    }
+
+    float angle = acosf(dotv3(forward, diff));
+
+    return quatFromAxisAngle(axis, angle);
+}

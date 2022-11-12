@@ -309,7 +309,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         float angle = randf(M_PI * 2);
         system->planets[i].position.x = orbitRadius * cos(angle);
         system->planets[i].position.z = orbitRadius * sin(angle);
-        system->planets[i].position.y = randf(20 * i) - 10 * i;
+        system->planets[i].position.y = randf(40 * i) - 20 * i;
     }
 
     //Space station generation

@@ -33,4 +33,6 @@ vec3 multQuatVec3(quat q, vec3 v);
 
 quat inverseQuat(quat q);
 
+quat quatLookAt(vec3 pos, vec3 target, vec3 forward, vec3 up);
+
 #endif

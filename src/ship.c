@@ -19,7 +19,7 @@ const ShipTypeData shipTypes[NUM_SHIP_TYPES] = {
 
 const WeaponType weaponTypes[] = {
     {.cooldown = 400, .damage = 2, .energyUsage = 1, .mineChance = 15}, //MkI laser
-    {.cooldown = 350, .damage = 2, .energyUsage = 1, .mineChance = 8},  //MkII laser
+    {.cooldown = 350, .damage = 3, .energyUsage = 1, .mineChance = 8},  //MkII laser
     {.cooldown = 300, .damage = 4, .energyUsage = 2, .mineChance = 8},  //MkIII military laser
     {.cooldown = 400, .damage = 2, .energyUsage = 3, .mineChance = 40}  //Mining laser
 };
@@ -253,7 +253,7 @@ void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks)
     accelerateShipLimit(ship, dir, ticks, 1.0f);
 }
 
-uint8_t damageShip(Ship* ship, uint8_t damage, uint8_t source)
+bool damageShip(Ship* ship, uint8_t damage, uint8_t source)
 {
     ship->damaged = source;
     ship->shields -= damage;
@@ -283,7 +283,7 @@ bool fireWeapons(Ship* ship)
     return true;
 }
 
-bool checkWeaponsShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, uint8_t source)
+float checkRayShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, Ship** hitShip)
 {
     //Calculate ray direction vector
     vec3 dir = multQuatVec3(ship->rotation, (vec3) {0, 0, -1});
@@ -299,14 +299,27 @@ bool checkWeaponsShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, ui
         float hit = checkHitSphere(&ship->position, &dir, &targetShips[i]->position, shipTypes[targetShips[i]->type].hitSphere);
         if(hit != -1)
         {
-            ship->weapon.distanceToHit = hit;
-            uint8_t destroyed = damageShip(targetShips[i], weaponTypes[ship->weapon.type].damage, source);
-            if(!destroyed)
-            {
-                createEffect(targetShips[i]->position, SPARKS);
-            }
-            return true;
+            *hitShip = targetShips[i];
+            return hit;
         }
+    }
+
+    return -1;
+}
+
+bool checkWeaponsShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, uint8_t source)
+{
+    Ship* hitShip;
+    float distance = checkRayShipHit(ship, targetShips, numTargets, &hitShip);
+    if(distance != -1)
+    {
+        ship->weapon.distanceToHit = distance;
+        bool destroyed = damageShip(hitShip, weaponTypes[ship->weapon.type].damage, source);
+        if(!destroyed)
+        {
+            createEffect(hitShip->position, SPARKS);
+        }
+        return true;
     }
 
     return false;

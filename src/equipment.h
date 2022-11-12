@@ -5,7 +5,7 @@
 
 #include "player.h"
 
-#define NUM_EQUIPMENT_TYPES 7
+#define NUM_EQUIPMENT_TYPES 8
 
 typedef enum {
     Fuel,
@@ -14,7 +14,8 @@ typedef enum {
     LaserMkIII,
     MiningLaser,
     DockingComputer,
-    FuelScoops
+    FuelScoops,
+    Missile
 } EquipmentType;
 
 uint16_t getPriceForEquipment(EquipmentType type);

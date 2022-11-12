@@ -7,7 +7,8 @@ uint16_t equipmentPrices[] = {
     [LaserMkIII] = 4000,
     [MiningLaser] = 2000,
     [DockingComputer] = 450,
-    [FuelScoops] = 800
+    [FuelScoops] = 800,
+    [Missile] = 100
 };
 
 const char* equipmentNames[] = {
@@ -17,7 +18,8 @@ const char* equipmentNames[] = {
     [LaserMkIII] = "Laser MkIII",
     [MiningLaser] = "Mining laser",
     [DockingComputer] = "Docking computer",
-    [FuelScoops] = "Fuel scoops"
+    [FuelScoops] = "Fuel scoops",
+    [Missile] = "Missile"
 };
 
 uint16_t getPriceForEquipment(EquipmentType type)
@@ -80,6 +82,10 @@ void printEquipmentStatusForShip(char* str, Player* player, EquipmentType type)
         {
             printOwn(str, player->hasFuelScoops);
             break;
+        }
+        case Missile:
+        {
+            sprintf(str, "%1d/%1d", player->ship.missiles, MAX_MISSILES);
         }
     }
 }
@@ -187,6 +193,15 @@ bool buyEquipment(Player* player, EquipmentType type)
             }
             break;
         }
+        case Missile:
+        {
+            if(player->ship.missiles < MAX_MISSILES)
+            {
+                player->ship.missiles++;
+                player->hold.money -= price;
+            }
+            break;
+        }
     }
-    return false;
+    return true;
 }

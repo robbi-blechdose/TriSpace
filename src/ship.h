@@ -45,6 +45,7 @@ typedef enum {
 typedef struct {
     ShipType type;
     Weapon weapon;
+    uint8_t missiles;
 
     float shields;
     float energy;
@@ -59,6 +60,7 @@ typedef struct {
 } Ship;
 
 #define MAX_FUEL 15
+#define MAX_MISSILES 7
 
 extern const ShipTypeData shipTypes[];
 extern const WeaponType weaponTypes[];
@@ -84,9 +86,11 @@ float turnShipTowardsPoint(Ship* ship, vec3 point);
 void accelerateShipLimit(Ship* ship, int8_t dir, uint32_t ticks, float max);
 void accelerateShip(Ship* ship, int8_t dir, uint32_t ticks);
 
+bool damageShip(Ship* ship, uint8_t damage, uint8_t source);
 bool shipIsDestroyed(Ship* ship);
 
 bool fireWeapons(Ship* ship);
+float checkRayShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, Ship** hitShip);
 bool checkWeaponsShipHit(Ship* ship, Ship* targetShips[], uint8_t numTargets, uint8_t source);
 
 float getTurnSpeedForRotation(float current, float target, float maxSpeed);

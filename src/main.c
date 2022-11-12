@@ -32,6 +32,7 @@
 
 #include "npcs/npc.h"
 #include "npcs/ai.h"
+#include "npcs/missiles.h"
 
 #define WINY_3D (WINY - 70)
 #define MAX_FPS 50
@@ -61,7 +62,7 @@ typedef enum {
     GAME_OVER
 } State;
 
-#define SAVE_VERSION 70
+#define SAVE_VERSION 80
 
 #define MUSIC_DOCKING 0
 #define MUSIC_MAIN    1
@@ -155,7 +156,8 @@ void newGame()
                           .rotation = QUAT_INITIAL,
                           .weapon.type = 0,
                           .shields = 2,
-                          .energy = 2};
+                          .energy = 2,
+                          .missiles = 0};
 
     #ifdef DEBUG
     player.hold.money = 50000;
@@ -171,6 +173,11 @@ void newGame()
     currentSystem[1] = 0;
     initSystem(currentSystem, &starSystem, npcs);
     setInitialSpawnPos(player.ship.position);
+
+    /**
+    npcs[0].ship.type = SHIP_TYPE_ALIEN;
+    npcs[0].ship.position = (vec3) {150, 0, 100};
+    npcs[0].ship.rotation = QUAT_INITIAL;**/
 }
 
 bool checkClosePopup()
@@ -267,21 +274,35 @@ void calcSpace(uint32_t ticks)
     setCameraRot(player.ship.rotation);
     calcSpacedust(&player.ship, ticks);
 
+    //Collect NPC ships into array
+    Ship* npcShips[MAX_NPCS];
+    for(uint8_t i = 0; i < MAX_NPCS; i++)
+    {
+        npcShips[i] = &npcs[i].ship;
+    }
+
     if(keyUp(B_A))
     {
         if(fireWeapons(&player.ship))
         {
-            Ship* npcShips[MAX_NPCS];
-            for(uint8_t i = 0; i < MAX_NPCS; i++)
-            {
-                npcShips[i] = &npcs[i].ship;
-            }
             if(!checkWeaponsShipHit(&player.ship, npcShips, MAX_NPCS, DAMAGE_SOURCE_PLAYER))
             {
                 checkWeaponsAsteroidHit(&player);
             }
         }
     }
+
+    if(keyUp(B_B) && player.ship.missiles)
+    {
+        Ship* targetShip;
+        if(checkRayShipHit(&player.ship, npcShips, MAX_NPCS, &targetShip) != -1)
+        {
+            createMissile(player.ship.position, player.ship.rotation, targetShip);
+            player.ship.missiles--;
+        }
+    }
+
+    calcMissiles(ticks);
 
     if(hasSatellites())
     {
@@ -395,6 +416,8 @@ void calcFrame(uint32_t ticks)
             }
             setCameraPos(player.ship.position);
             setCameraRot(player.ship.rotation);
+
+            calcComms(ticks);
 
             if(hasLeavingDistance(player.ship.position))
             {
@@ -700,6 +723,7 @@ void drawFrame()
                     drawShip(&npcs[i].ship);
                 }
             }
+            drawMissiles();
             drawSatellites();
             drawEffects();
             break;
@@ -823,6 +847,7 @@ void initGame()
     initAsteroids();
     initSatellites();
     initShip();
+    initMissiles();
 }
 
 void quitGame()
@@ -841,6 +866,7 @@ void quitGame()
     quitAsteroids();
     quitSatellites();
     quitShip();
+    quitMissiles();
 }
 
 int main(int argc, char **argv)

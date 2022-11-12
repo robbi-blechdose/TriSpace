@@ -13,7 +13,7 @@ static int8_t cursor = 0;
 static GLuint uiTexture;
 
 GLuint equipShipMesh;
-GLuint equipmentMeshes[5];
+GLuint equipmentMeshes[6];
 
 static float equipShipRot = 0;
 
@@ -24,7 +24,8 @@ const uint8_t equipmentTypeMeshMapping[NUM_EQUIPMENT_TYPES] = {
     [LaserMkIII] = 2,
     [MiningLaser] = 2,
     [DockingComputer] = 3,
-    [FuelScoops] = 4
+    [FuelScoops] = 4,
+    [Missile] = 5
 };
 
 void initEquipUI(GLuint uiTex)
@@ -37,6 +38,7 @@ void initEquipUI(GLuint uiTex)
     equipmentMeshes[2] = loadModelList("res/obj/equipment/weapons.obj");
     equipmentMeshes[3] = loadModelList("res/obj/equipment/dockingcomputer.obj");
     equipmentMeshes[4] = loadModelList("res/obj/equipment/fuelscoops.obj");
+    equipmentMeshes[5] = loadModelList("res/obj/Missile.obj");
 }
 
 void quitEquipUI()
@@ -47,6 +49,7 @@ void quitEquipUI()
     glDeleteList(equipmentMeshes[2]);
     glDeleteList(equipmentMeshes[3]);
     glDeleteList(equipmentMeshes[4]);
+    glDeleteList(equipmentMeshes[5]);
 }
 
 void calcEquipUI(uint32_t ticks)
