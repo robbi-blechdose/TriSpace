@@ -13,6 +13,12 @@ void drawStarmap3d(uint8_t* currentSystem, float fuel, uint8_t contractSystem[2]
 void drawSystemInfoBox();
 
 void moveStarmapCursor(int8_t dirX, int8_t dirY);
+
+/**
+ * Only used for loading to move the cursor to the newly loaded current system
+ */
+void setStarmapCursor(int8_t x, int8_t y);
+
 int8_t* getStarmapCursor();
 
 #endif

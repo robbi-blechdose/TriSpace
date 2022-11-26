@@ -96,7 +96,6 @@ uint8_t uiTradeCursor;
 
 //TODO: tutorial?
 //TODO: fix ships crashing into planets when being chased?
-//TODO: add missiles
 
 
 bool saveGame()
@@ -133,9 +132,10 @@ bool loadGame()
         player.ship.rotation = QUAT_INITIAL;
         loadPlayer(&player);
 
-        uint8_t savedSystem[2];
-        readElement(&savedSystem[0], sizeof(uint8_t));
-        readElement(&savedSystem[1], sizeof(uint8_t));
+        readElement(&currentSystem[0], sizeof(uint8_t));
+        readElement(&currentSystem[1], sizeof(uint8_t));
+        setStarmapCursor(currentSystem[0], currentSystem[1]);
+
         deleteStarSystem(&starSystem);
         initSystem(currentSystem, &starSystem, npcs);
         readElement(&currentContract, sizeof(currentContract));

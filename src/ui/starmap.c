@@ -240,6 +240,14 @@ void moveStarmapCursor(int8_t dirX, int8_t dirY)
     }
 }
 
+void setStarmapCursor(int8_t x, int8_t y)
+{
+    cursor[0] = x;
+    cursor[1] = y;
+    cursorNew[0] = x;
+    cursorNew[1] = y;
+}
+
 int8_t* getStarmapCursor()
 {
     return cursor;
