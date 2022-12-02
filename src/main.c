@@ -140,6 +140,12 @@ bool loadGame()
         initSystem(currentSystem, &starSystem, npcs);
         readElement(&currentContract, sizeof(currentContract));
         readElement(&completedContracts, sizeof(completedContracts));
+
+        //Generate contracts for now current system
+        generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
+        //Set up the current contract (if necessary)
+        contractStarSystemSetup(&currentContract, npcs, currentSystem, &starSystem);
+
         closeSave();
         return true;
     }

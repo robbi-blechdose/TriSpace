@@ -128,6 +128,8 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
 void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2],
                                     uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE])
 {
+    srand((currentSystem[0] + currentSystem[1] * UNIVERSE_SIZE) * 10);
+
     *numStationContracts = MIN_STATION_CONTRACTS + randr(MAX_STATION_CONTRACTS - MIN_STATION_CONTRACTS);
 
     for(uint8_t i = 0; i < *numStationContracts; i++)
