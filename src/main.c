@@ -878,7 +878,7 @@ int main(int argc, char **argv)
 
     initVideo((vec4) {.d = {0, 0, 0.1f, 0}}, (vec4) {.d = {0, 0, WINX, WINY_3D}}, 70, 1, 512);
 
-    initAudio(MIX_MAX_VOLUME, 2, 2);
+    initAudio(MIX_MAX_VOLUME, 2, 3);
     loadMusic(MUSIC_DOCKING, "res/music/Blue_Danube.ogg");
     loadMusic(MUSIC_MAIN, "res/music/menuLoops_rock.ogg");
 
