@@ -129,8 +129,10 @@ bool loadGame()
             return false;
         }
 
-        player.ship.rotation = QUAT_INITIAL;
         loadPlayer(&player);
+        //Reset ship rotation + position since we're inside a station
+        player.ship.rotation = quatFromAngles((vec3) {0, DEG_TO_RAD(-90), 0});
+        player.ship.position = (vec3) {-1.5f, 0, 0};
 
         readElement(&currentSystem[0], sizeof(uint8_t));
         readElement(&currentSystem[1], sizeof(uint8_t));
@@ -179,11 +181,6 @@ void newGame()
     currentSystem[1] = 0;
     initSystem(currentSystem, &starSystem, npcs);
     setInitialSpawnPos(player.ship.position);
-
-    /**
-    npcs[0].ship.type = SHIP_TYPE_ALIEN;
-    npcs[0].ship.position = (vec3) {150, 0, 100};
-    npcs[0].ship.rotation = QUAT_INITIAL;**/
 }
 
 bool checkClosePopup()

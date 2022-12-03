@@ -3,6 +3,7 @@
 #include "../engine/model.h"
 #include "../engine/image.h"
 #include "../engine/effects.h"
+#include "../engine/audio.h"
 
 typedef struct {
     vec3 position;
@@ -24,10 +25,14 @@ Missile missiles[NUM_MISSILES];
 GLuint missileMesh;
 GLuint missileTexture;
 
+uint8_t sampleMissile;
+
 void initMissiles()
 {
     missileMesh = loadModelList("res/obj/Missile.obj");
     missileTexture = loadRGBTexture("res/tex/Missile.png");
+
+    sampleMissile = loadSample("res/sfx/rlauncher.wav");
 }
 
 void quitMissiles()
@@ -49,6 +54,8 @@ void createMissile(vec3 pos, quat rot, Ship* targetShip)
             break;
         }
     }
+    
+    playSample(sampleMissile);
 }
 
 void calcMissiles(uint32_t ticks)
