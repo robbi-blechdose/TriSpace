@@ -59,7 +59,8 @@ typedef enum {
     MAP,
     //Special states
     TITLE,
-    GAME_OVER
+    GAME_OVER,
+    CREDITS
 } State;
 
 #define SAVE_VERSION 80
@@ -644,18 +645,18 @@ void calcFrame(uint32_t ticks)
                 break;
             }
 
-            if(keyUp(B_UP) || keyUp(B_DOWN))
+            if(keyUp(B_UP))
             {
-                toggleTitleScreenCursor();
+                scrollTitleScreenCursor(-1);
+            }
+            else if(keyUp(B_DOWN))
+            {
+                scrollTitleScreenCursor(1);
             }
             else if(keyUp(B_A) || keyUp(B_START))
             {
-                if(getTitleScreenCursor() == 0)
-                {
-                    newGame();
-                    state = SPACE;
-                }
-                else
+                uint8_t cursor = getTitleScreenCursor();
+                if(cursor == 0)
                 {
                     if(loadGame())
                     {
@@ -665,6 +666,19 @@ void calcFrame(uint32_t ticks)
                     {
                         createPopup(POPUP_ATTENTION, "Failed to load.");
                     }
+                }
+                else if(cursor == 1)
+                {
+                    newGame();
+                    state = SPACE;
+                }
+                else if(cursor == 2)
+                {
+                    state = CREDITS;
+                }
+                else
+                {
+                    running = false;
                 }
             }
 
@@ -688,6 +702,15 @@ void calcFrame(uint32_t ticks)
                 {
                     player.hold.cargo[i] = 0;
                 }
+            }
+            break;
+        }
+        case CREDITS:
+        {
+            bool done = calcCredits(ticks);
+            if(done || keyUp(B_B))
+            {
+                state = TITLE;
             }
             break;
         }
@@ -827,6 +850,11 @@ void drawFrame()
             //Keep drawing game UI
             drawUI(state == STATION, &player, npcs, starSystem.station.position, player.hasAutodock && isAutodockPossible(&player.ship, &starSystem));
             drawGameOverScreen();
+            break;
+        }
+        case CREDITS:
+        {
+            drawCredits();
             break;
         }
     }
