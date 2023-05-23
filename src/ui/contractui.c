@@ -6,7 +6,7 @@
 
 #include "uiutils.h"
 
-#include "../universe/generator.h"
+#include "../universe/generator/generator.h"
 
 static int8_t cursor = 0;
 

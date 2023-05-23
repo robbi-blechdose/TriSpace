@@ -2,14 +2,21 @@
 #define _GENERATOR_H
 
 #include <SDL.h>
-#include "starsystem.h"
-#include "../engine/util.h"
+#include "../starsystem.h"
+#include "../../engine/util.h"
 
-typedef struct {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-} Color;
+//Planet types are ordered by closeness to the sun
+typedef enum {
+    PT_Venus,
+    PT_Mars,
+    PT_Earth,
+    PT_Ocean,
+    PT_Forest,
+    PT_Ice,
+    PT_Dead,
+    PT_Gas,
+    NUM_PLANET_TYPES
+} PlanetType;
 
 typedef struct {
     uint8_t numStars;

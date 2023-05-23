@@ -6,7 +6,7 @@
 
 #include "asteroids.h"
 #include "satellites.h"
-#include "generator.h"
+#include "generator/generator.h"
 #include "../ship_collisions.h"
 #include "../npcs/ai.h"
 

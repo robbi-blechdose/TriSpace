@@ -4,7 +4,7 @@
 #include "../engine/image.h"
 #include "../engine/camera.h"
 
-#include "../universe/generator.h"
+#include "../universe/generator/generator.h"
 #include "../universe/universe.h"
 
 #include "uiutils.h"
