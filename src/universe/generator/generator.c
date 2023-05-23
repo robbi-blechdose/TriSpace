@@ -10,8 +10,8 @@ Color getColorForValue(uint8_t paletteIndex, float value)
 {
     //Get an index between 0 and 8
     uint8_t index = value / 32;
-    Color a = palettes[paletteIndex][index];
-    Color b = palettes[paletteIndex][index + 1];
+    Color a = planetGeneratorData[paletteIndex].palettes[index];
+    Color b = planetGeneratorData[paletteIndex].palettes[index + 1];
     Color ret;
     ret.r = a.r + (b.r - a.r) * ((value / 32) - index);
     ret.g = a.g + (b.g - a.g) * ((value / 32) - index);
@@ -22,7 +22,7 @@ Color getColorForValue(uint8_t paletteIndex, float value)
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
     uint8_t data[256 * 256 * 3];
-    float size = (2 + randf(5)) * planetTextureScalers[paletteIndex];
+    float size = (2 + randf(5)) * planetGeneratorData[paletteIndex].textureScaler;
 
     //Generate texture
     fnl_state noise = fnlCreateState();
@@ -75,9 +75,9 @@ void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
 {
     info->techLevel = 1 + randr(MAX_TECH_LEVEL - 1);
     info->government = ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 3);
-    info->treeDiff = planetTradeDiffs[paletteIndex][0];
-    info->rockDiff = planetTradeDiffs[paletteIndex][1];
-    info->waterDiff = planetTradeDiffs[paletteIndex][2];
+    info->treeDiff = planetGeneratorData[paletteIndex].tradeDiffs.tree;
+    info->rockDiff = planetGeneratorData[paletteIndex].tradeDiffs.rock;
+    info->waterDiff = planetGeneratorData[paletteIndex].tradeDiffs.water;
     generateSystemName((char*) &info->name);
 }
 
@@ -191,8 +191,8 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
 vec2 generateSystemPos(uint32_t seed, uint8_t i, uint8_t j)
 {
     srand(seed);
-    //TODO: improve
-    return (vec2) {i * 10, j * 10};
+    //TODO: improve?
+    return (vec2) {i * 10 + (randf(4) - 2), j * 10 + (randf(4) - 2)};
 }
 
 void generateSystemName(char* buffer)

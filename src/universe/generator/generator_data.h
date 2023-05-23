@@ -11,12 +11,19 @@ typedef struct {
     uint8_t b;
 } Color;
 
+typedef struct {
+    Color palettes[8];
+    float textureScaler;
+    struct {
+        int8_t tree;
+        int8_t rock;
+        int8_t water;
+    } tradeDiffs;
+} PlanetGeneratorData;
+
 //Palettes are ordered by closeness to the sun
 #define NUM_PALETTES 8
-extern const Color palettes[NUM_PALETTES][8];
-//Diffs are: Tree, Rock, Water
-extern const int8_t planetTradeDiffs[NUM_PALETTES][3];
-extern const float planetTextureScalers[NUM_PALETTES];
+extern const PlanetGeneratorData planetGeneratorData[NUM_PALETTES];
 
 //----- System name data -----//
 
@@ -42,7 +49,7 @@ extern const char* sdDescriptionsN[NUM_SD_DESCRIPTIONS_N];
 extern const char* sdAdjectivesP[NUM_SD_ADJECTIVES_P];
 #define NUM_SD_ADJECTIVES_N 3
 extern const char* sdAdjectivesN[NUM_SD_ADJECTIVES_N];
-#define NUM_SD_NOUNS 10
+#define NUM_SD_NOUNS 11
 extern const char* sdNouns[NUM_SD_NOUNS];
 
 #endif
