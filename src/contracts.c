@@ -46,9 +46,9 @@ const char* contractLastnames[NUM_LASTNAMES] = {
     "Addams"
 };
 
-void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contractDifficulty)
+void selectTargetSystem(Contract* c, int8_t currentStarSystem[2], uint8_t contractDifficulty)
 {
-    uint8_t possibleSystems[64][2];
+    int8_t possibleSystems[64][2];
     uint8_t possibleSystemsIndex = 0;
 
     float maxDistance = 15 * contractDifficulty; //TODO: replace with MAX_FUEL constant
@@ -57,7 +57,7 @@ void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contr
     {
         for(uint8_t j = 0; j < UNIVERSE_SIZE; j++)
         {
-            uint8_t targetSystem[2] = {i, j};
+            int8_t targetSystem[2] = {i, j};
             if(!(i == currentStarSystem[0] && j == currentStarSystem[1])
                 && getDistanceToSystem(currentStarSystem, targetSystem) <= maxDistance)
             {
@@ -81,7 +81,7 @@ void selectTargetSystem(Contract* c, uint8_t currentStarSystem[2], uint8_t contr
     }
 }
 
-Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex)
+Contract generateContract(int8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex)
 {
     srand(currentStarSystem[0] + currentStarSystem[1] * UNIVERSE_SIZE + contractIndex * 255);
     Contract c;
@@ -125,7 +125,7 @@ Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_
     return c;
 }
 
-void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2],
+void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, int8_t currentSystem[2],
                                     uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE])
 {
     srand((currentSystem[0] + currentSystem[1] * UNIVERSE_SIZE) * 10);
@@ -162,7 +162,7 @@ bool activateContract(Contract* contract, CargoHold* playerHold)
     return false;
 }
 
-bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Npc npcs[])
+bool checkContract(Contract* contract, CargoHold* playerHold, int8_t currentSystem[2], Npc npcs[])
 {
     if(currentSystem[0] != contract->targetSystem[0] || currentSystem[1] != contract->targetSystem[1])
     {
@@ -174,7 +174,7 @@ bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSys
         case CONTRACT_GET_ITEM:
         case CONTRACT_SMUGGLE:
         {
-            if(currentSystem == contract->targetSystem)
+            if(currentSystem[0] == contract->targetSystem[0] && currentSystem[1] == contract->targetSystem[1])
             {
                 if(playerHold->cargo[contract->cargo] >= contract->cargoAmount)
                 {
@@ -208,7 +208,7 @@ bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSys
     return false;
 }
 
-void contractStarSystemSetup(Contract* contract, Npc npcs[], uint8_t currentSystem[2], StarSystem* starSystem)
+void contractStarSystemSetup(Contract* contract, Npc npcs[], int8_t currentSystem[2], StarSystem* starSystem)
 {
     if(contract->type == CONTRACT_TYPE_NULL)
     {

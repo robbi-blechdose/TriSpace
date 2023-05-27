@@ -29,7 +29,7 @@ SDL_Surface* loadPNG(const char* path)
     return NULL;
 }
 
-GLuint loadRGBTexture(unsigned char* path)
+GLuint loadRGBTexture(const char* path)
 {
     int sw = 0, sh = 0, sc = 0; // sc goes unused.
     unsigned char* sourceData = stbi_load(path, &sw, &sh, &sc, 3);

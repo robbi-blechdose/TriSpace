@@ -20,4 +20,7 @@
 #define TEXT_GREY   0x707070
 #define TEXT_GREEN  0x00FF00
 
+//Fixes warnings for string literals
+#define glDrawText(text, x, y, pixel) glDrawText((const GLubyte*) (text), (x), (y), (pixel))
+
 #endif

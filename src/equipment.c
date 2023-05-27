@@ -129,6 +129,10 @@ bool buyEquipment(Player* player, EquipmentType type)
             }
             break;
         }
+        default:
+        {
+            break;
+        }
     }
     player->hold.money += sellPrice;
     

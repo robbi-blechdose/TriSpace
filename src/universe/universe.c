@@ -30,7 +30,7 @@ void initUniverse(StarSystem* starSystem)
     }
 }
 
-void initSystem(uint8_t* currentSystem, StarSystem* starSystem, Npc npcs[])
+void initSystem(int8_t* currentSystem, StarSystem* starSystem, Npc npcs[])
 {
     generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
     //Clear NPC ships
@@ -45,7 +45,7 @@ void initSystem(uint8_t* currentSystem, StarSystem* starSystem, Npc npcs[])
     }
 }
 
-void switchSystem(uint8_t* currentSystem, uint8_t newSystem[2], StarSystem* starSystem, Npc npcs[])
+void switchSystem(int8_t* currentSystem, int8_t newSystem[2], StarSystem* starSystem, Npc npcs[])
 {
     if(newSystem[0] == currentSystem[0] && newSystem[1] == currentSystem[1])
     {
@@ -148,12 +148,12 @@ void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Npc npc
     }
 }
 
-uint32_t getSeedForSystem(uint8_t x, uint8_t y)
+uint32_t getSeedForSystem(int8_t x, int8_t y)
 {
     return systemSeeds[x][y];
 }
 
-float getDistanceToSystem(uint8_t currentSystem[2], uint8_t targetSystem[2])
+float getDistanceToSystem(int8_t currentSystem[2], int8_t targetSystem[2])
 {
     vec2 currentPos = generateSystemPos(systemSeeds[currentSystem[0]][currentSystem[1]], currentSystem[0], currentSystem[1]);
     vec2 targetPos = generateSystemPos(systemSeeds[targetSystem[0]][targetSystem[1]], targetSystem[0], targetSystem[1]);

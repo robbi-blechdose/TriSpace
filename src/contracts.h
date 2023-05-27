@@ -26,7 +26,7 @@ typedef struct {
     uint8_t employerFirstname;
     uint8_t employerLastname;
 
-    uint8_t targetSystem[2];
+    int8_t targetSystem[2];
 
     CargoType cargo;
     union {
@@ -43,13 +43,13 @@ extern const char* contractLastnames[NUM_LASTNAMES];
 #define MIN_STATION_CONTRACTS 2
 #define MAX_STATION_CONTRACTS 5
 
-Contract generateContract(uint8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex);
-void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, uint8_t currentSystem[2],
+Contract generateContract(int8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex);
+void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, int8_t currentSystem[2],
                                     uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE]);
 
 bool activateContract(Contract* contract, CargoHold* playerHold);
-bool checkContract(Contract* contract, CargoHold* playerHold, uint8_t currentSystem[2], Npc npcs[]);
-void contractStarSystemSetup(Contract* contract, Npc npcs[], uint8_t currentSystem[2], StarSystem* starSystem);
+bool checkContract(Contract* contract, CargoHold* playerHold, int8_t currentSystem[2], Npc npcs[]);
+void contractStarSystemSetup(Contract* contract, Npc npcs[], int8_t currentSystem[2], StarSystem* starSystem);
 void printObjective(char* str, Contract* contract);
 
 #endif

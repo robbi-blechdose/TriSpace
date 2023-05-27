@@ -108,5 +108,5 @@ void drawFPS(uint16_t fps)
 {
     char buffer[12];
 	sprintf(buffer, "FPS: %i", fps);
-	glDrawText(buffer, 2, 2, 0xFFFFFF);
+	glDrawText((const GLubyte*) buffer, 2, 2, 0xFFFFFF);
 }

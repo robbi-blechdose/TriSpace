@@ -15,7 +15,7 @@ void initPNG();
 void quitPNG();
 
 SDL_Surface* loadPNG(const char* path);
-GLuint loadRGBTexture(unsigned char* path);
+GLuint loadRGBTexture(const char* path);
 void deleteRGBTexture(GLuint texture);
 
 void drawTexQuad(float posX, float posY, float sizeX, float sizeY, float z,

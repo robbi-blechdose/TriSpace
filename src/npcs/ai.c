@@ -298,5 +298,10 @@ void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)
             calcNPCAiPolice(npc, player, ticks, distanceToPlayer);
             break;
         }
+        case SHIP_TYPE_PLAYER:
+        {
+            //This should never happen
+            break;
+        }
     }
 }

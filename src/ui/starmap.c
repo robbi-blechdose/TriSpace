@@ -84,7 +84,7 @@ void drawCircle(float radius)
     glEnd();
 }
 
-void drawStarmap3d(uint8_t* currentSystem, float fuel, uint8_t contractSystem[2], bool contractActive)
+void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], bool contractActive)
 {
     glBindTexture(GL_TEXTURE_2D, starTexture);
 
@@ -159,6 +159,7 @@ void drawStarmap3d(uint8_t* currentSystem, float fuel, uint8_t contractSystem[2]
     //Draw contract system circle
     if(contractActive)
     {
+        //TODO: scale circle by num stars?
         uint8_t numStars = getNumStarsForSystem(getSeedForSystem(contractSystem[0], contractSystem[1]));
         vec2 systemPos = generateSystemPos(getSeedForSystem(contractSystem[0], contractSystem[1]), contractSystem[0], contractSystem[1]);
         glTranslatef(systemPos.x, 0, systemPos.y);

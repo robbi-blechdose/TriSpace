@@ -45,7 +45,6 @@ uint32_t counterTime = 0;
 #endif
 
 typedef enum {
-    NONE,
     //World states
     SPACE,
     STATION,
@@ -73,7 +72,7 @@ bool running = true;
 
 State state;
 
-uint8_t currentSystem[2] = {0, 0};
+int8_t currentSystem[2] = {0, 0};
 StarSystem starSystem;
 
 uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE];
@@ -379,7 +378,7 @@ void calcContracts()
         {
             if(checkContract(&currentContract, &player.hold, currentSystem, npcs))
             {
-                uint8_t buffer[64];
+                char buffer[64];
                 sprintf(buffer, "Contract done.\n%d credits\nhave been\ntransferred.", currentContract.pay);
                 createPopup(POPUP_CHECKMARK, buffer);
                 completedContracts[currentSystem[0]][currentSystem[1]]++;
@@ -761,7 +760,7 @@ void drawFrame()
         }
         case MAP:
         {
-            uint8_t contractSystem[2];
+            int8_t contractSystem[2];
             if(currentContract.type != CONTRACT_TYPE_NULL)
             {
                 contractSystem[0] = currentContract.targetSystem[0];
@@ -783,6 +782,10 @@ void drawFrame()
         case CONTRACTS:
         {
             drawContractUI3d(&currentContract, stationContracts);
+            break;
+        }
+        default:
+        {
             break;
         }
     }
@@ -855,6 +858,10 @@ void drawFrame()
         case CREDITS:
         {
             drawCredits();
+            break;
+        }
+        default:
+        {
             break;
         }
     }
