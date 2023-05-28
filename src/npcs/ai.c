@@ -32,9 +32,10 @@ bool randChance(uint32_t divisor, uint32_t ticks)
 
 vec3 getRandomSpherePoint(vec3 center, float radius)
 {
-    vec3 vec = {.x = randf(1), .y = randf(1), .z = randf(1)};
+    vec3 vec = {.x = randf(2) - 1, .y = randf(2) - 1, .z = randf(2) - 1};
     vec = normalizev3(vec);
     vec = scalev3(radius, vec);
+    vec = addv3(vec, center);
     return vec;
 }
 
@@ -284,6 +285,7 @@ void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)
         case SHIP_TYPE_SMALLPIRATE:
         case SHIP_TYPE_SMALLPIRATE2:
         case SHIP_TYPE_ALIEN:
+        case SHIP_TYPE_SPHERE_PIRATE:
         {
             calcNPCAiEnemy(npc, player, ticks, distanceToPlayer);
             break;
@@ -299,6 +301,7 @@ void calcNPCAi(Npc* npc, Player* player, Npc* npcs, uint32_t ticks)
             break;
         }
         case SHIP_TYPE_PLAYER:
+        case SHIP_TYPE_NULL:
         {
             //This should never happen
             break;

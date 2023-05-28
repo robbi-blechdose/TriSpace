@@ -101,13 +101,18 @@ void generateNPCShips(Npc npcs[], uint8_t maxShips, StarSystem* starSystem, vec3
 
             if(randr(100) < enemyChance)
             {
-                if(randr(100) < 50)
+                uint8_t rand2 = randr(100);
+                if(rand2 < 35)
                 {
                     shipType = SHIP_TYPE_SMALLPIRATE;
                 }
-                else
+                else if(rand2 < 70)
                 {
                     shipType = SHIP_TYPE_SMALLPIRATE2;
+                }
+                else
+                {
+                    shipType = SHIP_TYPE_SPHERE_PIRATE;
                 }
             }
             else if(randr(100) < policeChance)

@@ -14,7 +14,18 @@ const ShipTypeData shipTypes[NUM_SHIP_TYPES] = {
     [SHIP_TYPE_SMALLPIRATE2] = {.maxSpeed = 11, .maxTurnSpeed = 2, .maxShields = 6, .maxEnergy = 5, .shieldRegen = 0.5f, .energyRegen = 1, .hitSphere = 1.5f},
     [SHIP_TYPE_CRUISELINER] = {.maxSpeed = 5, .maxTurnSpeed = 1, .maxShields = 10, .maxEnergy = 5, .shieldRegen = 0.5f, .energyRegen = 1, .hitSphere = 5.0f},
     [SHIP_TYPE_POLICE] = {.maxSpeed = 10, .maxTurnSpeed = 3, .maxShields = 6, .maxEnergy = 6, .shieldRegen = 0.5f, .energyRegen = 1, .hitSphere = 1.5f},
-    [SHIP_TYPE_ALIEN] = {.maxSpeed = 11, .maxTurnSpeed = 4, .maxShields = 7, .maxEnergy = 7, .shieldRegen = 0.3f, .energyRegen = 1.1f, .hitSphere = 1.5f}
+    [SHIP_TYPE_ALIEN] = {.maxSpeed = 11, .maxTurnSpeed = 4, .maxShields = 7, .maxEnergy = 7, .shieldRegen = 0.3f, .energyRegen = 1.1f, .hitSphere = 1.5f},
+    [SHIP_TYPE_SPHERE_PIRATE] = {.maxSpeed = 9, .maxTurnSpeed = 2, .maxShields = 8, .maxEnergy = 5, .shieldRegen = 0.4f, .energyRegen = 1, .hitSphere = 1.5f}
+};
+
+const char* shipAssets[NUM_SHIP_TYPES][2] = {
+    [SHIP_TYPE_PLAYER] = {0, 0},
+    [SHIP_TYPE_SMALLPIRATE] = {"res/obj/ships/Ship.obj", "res/tex/ships/PirateShip.png"},
+    [SHIP_TYPE_SMALLPIRATE2] = {"res/obj/ships/Ship_02.obj", "res/tex/ships/Ship_02.png"},
+    [SHIP_TYPE_CRUISELINER] = {"res/obj/ships/CruiseShip.obj", "res/tex/ships/CruiseShip.png"},
+    [SHIP_TYPE_POLICE] = {"res/obj/ships/PoliceShip.obj", "res/tex/ships/PoliceShip.png"},
+    [SHIP_TYPE_ALIEN] = {"res/obj/ships/AlienShip.obj", "res/tex/ships/AlienShip.png"},
+    [SHIP_TYPE_SPHERE_PIRATE] = {"res/obj/ships/SphereShip.obj", "res/tex/ships/SphereShip.png"}
 };
 
 const WeaponType weaponTypes[] = {
@@ -28,20 +39,14 @@ uint8_t sampleShoot;
 
 void initShip()
 {
-    //The player ship should never be drawn, so setting this to 0 is okay
+    //The player ship should never be drawn, so we're skipping it
     shipMeshes[0] = 0;
     shipTextures[0] = 0;
-
-    shipMeshes[1] = loadModelList("res/obj/ships/Ship.obj");
-    shipTextures[1] = loadRGBTexture("res/tex/ships/PirateShip.png");
-    shipMeshes[2] = loadModelList("res/obj/ships/Ship_02.obj");
-    shipTextures[2] = loadRGBTexture("res/tex/ships/Ship_02.png");
-    shipMeshes[3] = loadModelList("res/obj/ships/CruiseShip.obj");
-    shipTextures[3] = loadRGBTexture("res/tex/ships/CruiseShip.png");
-    shipMeshes[4] = loadModelList("res/obj/ships/PoliceShip.obj");
-    shipTextures[4] = loadRGBTexture("res/tex/ships/PoliceShip.png");
-    shipMeshes[5] = loadModelList("res/obj/ships/AlienShip.obj");
-    shipTextures[5] = loadRGBTexture("res/tex/ships/AlienShip.png");
+    for(uint8_t i = 1; i < NUM_SHIP_TYPES; i++)
+    {
+        shipMeshes[i] = loadModelList(shipAssets[i][0]);
+        shipTextures[i] = loadRGBTexture(shipAssets[i][1]);
+    }
     
     sampleShoot = loadSample("res/sfx/flaunch.wav");
 }

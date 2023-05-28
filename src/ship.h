@@ -31,7 +31,7 @@ typedef struct {
     float distanceToHit;
 } Weapon;
 
-#define NUM_SHIP_TYPES 6
+#define NUM_SHIP_TYPES 7
 typedef enum {
     SHIP_TYPE_PLAYER,
     SHIP_TYPE_SMALLPIRATE,
@@ -39,6 +39,7 @@ typedef enum {
     SHIP_TYPE_CRUISELINER,
     SHIP_TYPE_POLICE,
     SHIP_TYPE_ALIEN,
+    SHIP_TYPE_SPHERE_PIRATE,
     SHIP_TYPE_NULL = 255
 } ShipType;
 
