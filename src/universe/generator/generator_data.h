@@ -3,6 +3,11 @@
 
 #include <stdint.h>
 
+//--------- Star data --------//
+
+#define MAX_STARS 3
+extern const uint8_t starNumProbabilities[MAX_STARS];
+
 //-------- Planet data -------//
 
 typedef struct {

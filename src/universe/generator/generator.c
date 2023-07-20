@@ -6,6 +6,73 @@
 #include "../asteroids.h"
 #include "generator_data.h"
 
+void generateSystemCharacteristics(SystemCharacteristics* chars, uint8_t stationPlanetIndex)
+{
+    chars->techLevel = 1 + randr(MAX_TECH_LEVEL - 1);
+    chars->government = ((float) chars->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 3);
+    chars->treeDiff = planetGeneratorData[stationPlanetIndex].tradeDiffs.tree;
+    chars->rockDiff = planetGeneratorData[stationPlanetIndex].tradeDiffs.rock;
+    chars->waterDiff = planetGeneratorData[stationPlanetIndex].tradeDiffs.water;
+}
+
+uint8_t getNumStars()
+{
+    uint32_t randTemp = randr(100);
+    uint8_t count = MAX_STARS;
+    for(uint8_t i = 0; i < MAX_STARS; i++)
+    {
+        if(randTemp < starNumProbabilities[i])
+        {
+            return count;
+        }
+        count--;
+    }
+    return 1;
+}
+
+void generateStarSystemInfo(StarSystemInfo* info, uint32_t seed)
+{
+    srand(seed);
+
+    //Name
+    generateSystemName((char*) &info->name);
+
+    //Stars
+    info->numStars = getNumStars();
+    for(uint8_t i = 0; i < info->numStars; i++)
+    {
+        uint8_t value = randr(100);
+        if(value < 15)
+        {
+            info->starTypes[i] = ST_RED;
+        }
+        else if(value < 30)
+        {
+            info->starTypes[i] = ST_BLUE;
+        }
+        else
+        {
+            info->starTypes[i] = ST_NORMAL;
+        }
+    }
+
+    //Planets
+    info->numPlanets = 1 + randr(MAX_PLANETS - 1);
+    for(uint8_t i = 0; i < info->numPlanets; i++)
+    {
+        info->planetTypes[i] = (i + randr(NUM_PLANET_TYPES - info->numPlanets)) % NUM_PLANET_TYPES;
+    }
+
+    //Space station
+    info->stationPlanetIndex = randr(info->numPlanets - 1);
+
+    //Asteroid field
+    info->hasAsteroidField = randr(100) < 40;
+
+    //System info
+    generateSystemCharacteristics(&info->characteristics, info->planetTypes[info->stationPlanetIndex]);
+}
+
 Color getColorForValue(uint8_t paletteIndex, float value)
 {
     //Get an index between 0 and 8
@@ -71,71 +138,21 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 	return t;
 }
 
-void generateSystemInfo(SystemInfo* info, uint8_t paletteIndex)
-{
-    info->techLevel = 1 + randr(MAX_TECH_LEVEL - 1);
-    info->government = ((float) info->techLevel / MAX_TECH_LEVEL) * 2 + randr(MAX_GOVERNMENT - 3);
-    info->treeDiff = planetGeneratorData[paletteIndex].tradeDiffs.tree;
-    info->rockDiff = planetGeneratorData[paletteIndex].tradeDiffs.rock;
-    info->waterDiff = planetGeneratorData[paletteIndex].tradeDiffs.water;
-    generateSystemName((char*) &info->name);
-}
-
-uint8_t getNumStarsForSystem(uint32_t seed)
-{
-    srand(seed);
-    uint32_t numStarsTemp = randr(100);
-    if(numStarsTemp < 15)
-    {
-        return 3;
-    }
-    else if(numStarsTemp < 40)
-    {
-        return 2;
-    }
-    else
-    {
-        return 1;
-    }
-}
-
-void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed)
-{
-    //This takes care of the srand() call for us
-    sbd->numStars = getNumStarsForSystem(seed);
-    sbd->numPlanets = 1 + randr(MAX_PLANETS - 1);
-    sbd->spIndex = randr(sbd->numPlanets - 1);
-    for(uint8_t i = 0; i < sbd->numPlanets; i++)
-    {
-        sbd->paletteIndices[i] = (i + randr(NUM_PALETTES - sbd->numPlanets)) % NUM_PALETTES;
-    }
-    generateSystemInfo(&sbd->info, sbd->paletteIndices[sbd->spIndex]);
-}
-
 void generateStarSystem(StarSystem* system, uint32_t seed)
 {
-    //This takes care of the srand() call for us
-    SystemBaseData sbd;
-    generateSystemBaseData(&sbd, seed);
-    system->info.techLevel = sbd.info.techLevel;
-    system->info.government = sbd.info.government;
-    system->info.treeDiff = sbd.info.treeDiff;
-    system->info.rockDiff = sbd.info.rockDiff;
-    system->info.waterDiff = sbd.info.waterDiff;
+    //The srand() call happens in here
+    generateStarSystemInfo(&system->info, seed);
 
-    system->numStars = sbd.numStars;
-    system->numPlanets = sbd.numPlanets;
-
+    //Star generation
     float baseStarSize = 40 + randf(30);
     float firstOrbit = baseStarSize * 3;
-
     uint8_t xUsed = 0;
-    for(uint8_t i = 0; i < system->numStars; i++)
+
+    for(uint8_t i = 0; i < system->info.numStars; i++)
     {
         system->stars[i].size = baseStarSize + randf(5);
-        system->stars[i].position.x = 0;
-        system->stars[i].position.y = 0;
-        system->stars[i].position.z = 0;
+        system->stars[i].position = (vec3) {0, 0, 0};
+        //TODO: replace with proper "orient on a circle" code (see the code in starmap.c)
         //Create binary or trinary star systems
         if(i > 0)
         {
@@ -152,10 +169,11 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
         }
     }
 
-    for(uint8_t i = 0; i < system->numPlanets; i++)
+    //Planet generation
+    for(uint8_t i = 0; i < system->info.numPlanets; i++)
     {
         system->planets[i].size = 10.0f + randf(10);
-        system->planets[i].texture = generatePlanetTexture(seed, sbd.paletteIndices[i]);
+        system->planets[i].texture = generatePlanetTexture(seed, system->info.planetTypes[i]);
         system->planets[i].hasRing = randr(100) < 30;
 
         float orbitRadius = firstOrbit + (i * 35.0f);
@@ -166,25 +184,15 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     }
 
     //Space station generation
-    system->station.position.x = system->planets[sbd.spIndex].position.x + system->planets[sbd.spIndex].size * 2;
-    system->station.position.y = system->planets[sbd.spIndex].position.y;
-    system->station.position.z = system->planets[sbd.spIndex].position.z;
-    system->station.dockingPosition.x = system->station.position.x + 5;
-    system->station.dockingPosition.y = system->station.position.y;
-    system->station.dockingPosition.z = system->station.position.z + 1.25f;
-    system->station.exitPosition.x = system->station.position.x + 7;
-    system->station.exitPosition.y = system->station.position.y;
-    system->station.exitPosition.z = system->station.position.z + 3;
+    vec3 stationPlanetPos = system->planets[system->info.stationPlanetIndex].position;
+    system->station.position = addv3(stationPlanetPos, (vec3) {system->planets[system->info.stationPlanetIndex].size * 2, 0, 0});
+    system->station.dockingPosition = addv3(system->station.position, (vec3) {5, 0, 1.25f});
+    system->station.exitPosition = addv3(system->station.position, (vec3) {7, 0, 3});
 
     //Asteroid field generation
-    if(randr(100) < 40)
+    if(system->info.hasAsteroidField)
     {
-        system->hasAsteroidField = 1;
         system->asteroidFieldPos = getRandomFreePos(system, ASTEROID_FIELD_SIZE);
-    }
-    else
-    {
-        system->hasAsteroidField = 0;
     }
 }
 
@@ -192,7 +200,7 @@ vec2 generateSystemPos(uint32_t seed, uint8_t i, uint8_t j)
 {
     srand(seed);
     //TODO: improve?
-    return (vec2) {i * 10 + (randf(4) - 2), j * 10 + (randf(4) - 2)};
+    return (vec2) {i * 10 + (randf(3) - 1.5f), j * 10 + (randf(3) - 1.5f)};
 }
 
 void generateSystemName(char* buffer)
@@ -259,17 +267,17 @@ void generateSystemName(char* buffer)
     //printf("Prefix: %d Syllables: %d Number: %d\n", prefix, syllables, num);
 }
 
-void generateSystemDescription(char* buffer, SystemBaseData* sbd)
+void generateSystemDescription(char* buffer, StarSystemInfo* info)
 {
     //Preamble (optional) and name
     if(randr(100) < 40)
     {
         strcpy(buffer, sdPreambles[randr(NUM_SD_PREAMBLES - 1)]);
-        strcat(buffer, sbd->info.name);
+        strcat(buffer, info->name);
     }
     else
     {
-        strcpy(buffer, sbd->info.name);
+        strcpy(buffer, info->name);
     }
 
     //Description beginning, adjective

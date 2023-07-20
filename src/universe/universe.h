@@ -16,15 +16,15 @@
 #define SPAWN_INTERVAL_DISTANCE 80
 #define SPAWN_CHANCE 15
 
-void initUniverse(StarSystem* starSystem);
+void initUniverse();
 
-void initSystem(int8_t* currentSystem, StarSystem* starSystem, Npc npcs[]);
-void switchSystem(int8_t* currentSystem, int8_t newSystem[2], StarSystem* starSystem, Npc npcs[]);
+void initSystem(int8_t* currentSystem, StarSystem* system, Npc npcs[]);
+void switchSystem(int8_t* currentSystem, int8_t newSystem[2], StarSystem* system, Npc npcs[]);
 
-void calcNPCShips(StarSystem* starSystem, Player* player, Npc npcs[], uint32_t ticks);
+void calcNPCShips(StarSystem* system, Player* player, Npc npcs[], uint32_t ticks);
 
 void setInitialSpawnPos(vec3 playerPos);
-void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Npc npcs[], uint32_t ticks);
+void calcUniverseSpawnNPCShips(StarSystem* system, Ship* playerShip, Npc npcs[], uint32_t ticks);
 
 uint32_t getSeedForSystem(int8_t x, int8_t y);
 float getDistanceToSystem(int8_t currentSystem[2], int8_t targetSystem[2]);

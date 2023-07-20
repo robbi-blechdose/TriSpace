@@ -5,32 +5,20 @@
 #include "../starsystem.h"
 #include "../../engine/util.h"
 
-//Planet types are ordered by closeness to the sun
-typedef enum {
-    PT_Venus,
-    PT_Mars,
-    PT_Earth,
-    PT_Ocean,
-    PT_Forest,
-    PT_Ice,
-    PT_Dead,
-    PT_Gas,
-    NUM_PLANET_TYPES
-} PlanetType;
+/**
+ * Generate basic information about a star system
+ **/
+void generateStarSystemInfo(StarSystemInfo* info, uint32_t seed);
 
-typedef struct {
-    uint8_t numStars;
-    uint8_t numPlanets;
-    uint8_t paletteIndices[8];
-    uint8_t spIndex;
-    SystemInfo info;
-} SystemBaseData;
-
-uint8_t getNumStarsForSystem(uint32_t seed);
-void generateSystemBaseData(SystemBaseData* sbd, uint32_t seed);
+/**
+ * Generate a full star system, including:
+ * - texture data for planets
+ * - positions for all bodies
+ **/
 void generateStarSystem(StarSystem* system, uint32_t seed);
+
 vec2 generateSystemPos(uint32_t seed, uint8_t i, uint8_t j);
 void generateSystemName(char* buffer);
-void generateSystemDescription(char* buffer, SystemBaseData* sbd);
+void generateSystemDescription(char* buffer, StarSystemInfo* info);
 
 #endif

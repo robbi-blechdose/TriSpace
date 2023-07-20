@@ -5,7 +5,7 @@
 bool checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
 {
     //Basic collisions for planets
-    for(uint8_t i = 0; i < starSystem->numPlanets; i++)
+    for(uint8_t i = 0; i < starSystem->info.numPlanets; i++)
     {
         if(distance3d(&starSystem->planets[i].position, &ship->position) < starSystem->planets[i].size + 2)
         {
@@ -13,7 +13,7 @@ bool checkStarSystemCollision(Ship* ship, StarSystem* starSystem)
         }
     }
     //Basic collisions for stars
-    for(uint8_t i = 0; i < starSystem->numStars; i++)
+    for(uint8_t i = 0; i < starSystem->info.numStars; i++)
     {
         if(distance3d(&starSystem->stars[i].position, &ship->position) < starSystem->stars[i].size + 2)
         {

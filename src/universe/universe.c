@@ -16,7 +16,7 @@ uint8_t sampleExplosion;
 
 vec3 lastPlayerPos;
 
-void initUniverse(StarSystem* starSystem)
+void initUniverse()
 {
     sampleExplosion = loadSample("res/sfx/explosion.wav");
     //Generate system seeds
@@ -30,22 +30,22 @@ void initUniverse(StarSystem* starSystem)
     }
 }
 
-void initSystem(int8_t* currentSystem, StarSystem* starSystem, Npc npcs[])
+void initSystem(int8_t* currentSystem, StarSystem* system, Npc npcs[])
 {
-    generateStarSystem(starSystem, systemSeeds[currentSystem[0]][currentSystem[1]]);
+    generateStarSystem(system, systemSeeds[currentSystem[0]][currentSystem[1]]);
     //Clear NPC ships
     for(uint8_t i = 0; i < MAX_NPCS; i++)
     {
         npcs[i].ship.type = SHIP_TYPE_NULL;
     }
     //Create asteroids for system (if any)
-    if(starSystem->hasAsteroidField)
+    if(system->info.hasAsteroidField)
     {
-        createAsteroids(starSystem->asteroidFieldPos);
+        createAsteroids(system->asteroidFieldPos);
     }
 }
 
-void switchSystem(int8_t* currentSystem, int8_t newSystem[2], StarSystem* starSystem, Npc npcs[])
+void switchSystem(int8_t* currentSystem, int8_t newSystem[2], StarSystem* system, Npc npcs[])
 {
     if(newSystem[0] == currentSystem[0] && newSystem[1] == currentSystem[1])
     {
@@ -53,12 +53,12 @@ void switchSystem(int8_t* currentSystem, int8_t newSystem[2], StarSystem* starSy
     }
     currentSystem[0] = newSystem[0];
     currentSystem[1] = newSystem[1];
-    deleteStarSystem(starSystem);
+    deleteStarSystem(system);
     clearSatellites();
-    initSystem(currentSystem, starSystem, npcs);
+    initSystem(currentSystem, system, npcs);
 }
 
-void calcNPCShips(StarSystem* starSystem, Player* player, Npc npcs[], uint32_t ticks)
+void calcNPCShips(StarSystem* system, Player* player, Npc npcs[], uint32_t ticks)
 {
     for(uint8_t i = 0; i < MAX_NPCS; i++)
     {
@@ -67,7 +67,7 @@ void calcNPCShips(StarSystem* starSystem, Player* player, Npc npcs[], uint32_t t
             calcNPCAi(&npcs[i], player, npcs, ticks);
             calcShip(&npcs[i].ship, ticks);
 
-            if(checkStarSystemCollision(&npcs[i].ship, starSystem))
+            if(checkStarSystemCollision(&npcs[i].ship, system))
             {
                 npcs[i].ship.shields = -1;
             }
@@ -83,7 +83,7 @@ void calcNPCShips(StarSystem* starSystem, Player* player, Npc npcs[], uint32_t t
     }
 }
 
-void generateNPCShips(Npc npcs[], uint8_t maxShips, StarSystem* starSystem, vec3 center)
+void generateNPCShips(Npc npcs[], uint8_t maxShips, StarSystem* system, vec3 center)
 {
     for(uint8_t i = 0; i < NUM_NORM_NPCS; i++)
     {
@@ -95,7 +95,7 @@ void generateNPCShips(Npc npcs[], uint8_t maxShips, StarSystem* starSystem, vec3
             }
 
             //Ship type
-            uint8_t enemyChance = (MAX_GOVERNMENT * 100 - starSystem->info.government * 100) / MAX_GOVERNMENT;
+            uint8_t enemyChance = (MAX_GOVERNMENT * 100 - system->info.characteristics.government * 100) / MAX_GOVERNMENT;
             uint8_t policeChance = 100 - enemyChance;
             uint8_t shipType = SHIP_TYPE_NULL;
 
@@ -126,7 +126,7 @@ void generateNPCShips(Npc npcs[], uint8_t maxShips, StarSystem* starSystem, vec3
 
             if(shipType != SHIP_TYPE_NULL)
             {
-                vec3 pos = getRandomFreePosBounds(starSystem, center, (vec3) {.x = 80, .y = 50, .z = 80}, 10, 30);
+                vec3 pos = getRandomFreePosBounds(system, center, (vec3) {.x = 80, .y = 50, .z = 80}, 10, 30);
                 npcs[i].ship = (Ship) {.type = shipType,
                                        .weapon.type = 0, //TODO: Randomize a bit
                                        .shields = shipTypes[shipType].maxShields,
@@ -142,12 +142,12 @@ void setInitialSpawnPos(vec3 playerPos)
     lastPlayerPos = playerPos;
 }
 
-void calcUniverseSpawnNPCShips(StarSystem* starSystem, Ship* playerShip, Npc npcs[], uint32_t ticks)
+void calcUniverseSpawnNPCShips(StarSystem* system, Ship* playerShip, Npc npcs[], uint32_t ticks)
 {
     if(distance3d(&lastPlayerPos, &playerShip->position) > SPAWN_INTERVAL_DISTANCE)
     {
         //Generate NPC ships
-        generateNPCShips(npcs, NUM_NORM_NPCS, starSystem, playerShip->position);
+        generateNPCShips(npcs, NUM_NORM_NPCS, system, playerShip->position);
         //Store position for next run
         lastPlayerPos = playerShip->position;
     }

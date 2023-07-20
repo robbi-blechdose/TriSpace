@@ -40,7 +40,7 @@ typedef struct {
     uint16_t money;
 } CargoHold;
 
-uint8_t getPriceForCargo(CargoType type, SystemInfo* info);
+uint8_t getPriceForCargo(CargoType type, SystemCharacteristics* chars);
 void printNameForCargo(char* str, CargoType type);
 void printUnitForCargo(char* str, CargoType type);
 
@@ -54,7 +54,7 @@ uint8_t getCargoHoldSize(CargoHold* hold);
 /**
  * Transfers cargo between two holds, using the current star system for price calculations
  **/
-bool transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info, uint8_t limit);
+bool transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemCharacteristics* chars, uint8_t limit);
 
 void createStationHold(CargoHold* hold);
 

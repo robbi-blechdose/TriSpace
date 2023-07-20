@@ -10,7 +10,7 @@
 #include "uiutils.h"
 
 GLuint starMesh;
-GLuint starTexture;
+static GLuint sunTextures[2];
 
 GLuint systemInfoTexture;
 
@@ -25,13 +25,16 @@ void initStarmap(GLuint uiTex)
     uiTexture = uiTex;
 
     starMesh = loadModelList("res/obj/Planet.obj");
-    starTexture = loadRGBTexture("res/tex/Sun.png");
+    sunTextures[0] = loadRGBTexture("res/tex/suns/Normal.png");
+    sunTextures[1] = loadRGBTexture("res/tex/suns/Blue.png");
+    sunTextures[2] = loadRGBTexture("res/tex/suns/Red.png");
 }
 
 void quitStarmap()
 {
     glDeleteList(starMesh);
-    deleteRGBTexture(starTexture);
+    deleteRGBTexture(sunTextures[0]);
+    deleteRGBTexture(sunTextures[1]);
 }
 
 #define CAMERA_HEIGHT 15
@@ -86,8 +89,6 @@ void drawCircle(float radius)
 
 void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], bool contractActive)
 {
-    glBindTexture(GL_TEXTURE_2D, starTexture);
-
     uint8_t xmin = cursor[0] < 2 ? 0 : cursor[0] - 2;
     uint8_t xmax = cursor[0] > UNIVERSE_SIZE - 3 ? UNIVERSE_SIZE - 1 : cursor[0] + 2;
 
@@ -98,11 +99,13 @@ void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], 
     {
         for(uint8_t j = ymin; j < ymax + 1; j++)
         {
-            uint8_t numStars = getNumStarsForSystem(getSeedForSystem(i, j));
+            StarSystemInfo info;
+            generateStarSystemInfo(&info, getSeedForSystem(i, j));
             vec2 systemPos = generateSystemPos(getSeedForSystem(i, j), i, j);
 
+            glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[0]]);
             glPushMatrix();
-            switch(numStars)
+            switch(info.numStars)
             {
                 case 1:
                 {
@@ -115,6 +118,8 @@ void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], 
                     vec2 sc = starDistSinCos(randf(2 * M_PI));
                     glTranslatef(systemPos.x - sc.x, 0, systemPos.y - sc.y);
                     glCallList(starMesh);
+
+                    glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[1]]);
                     glTranslatef(sc.x * 2, 0, sc.y * 2);
                     glCallList(starMesh);
                     break;
@@ -132,12 +137,14 @@ void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], 
                     glCallList(starMesh);
                     glTranslatef(-sc.x, 0, -sc.y);
 
+                    glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[1]]);
                     angle += 2.0f / 3.0f * M_PI;
                     sc = starDistSinCos(angle);
                     glTranslatef(sc.x, 0, sc.y);
                     glCallList(starMesh);
                     glTranslatef(-sc.x, 0, -sc.y);
 
+                    glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[2]]);
                     angle += 2.0f / 3.0f * M_PI;
                     sc = starDistSinCos(angle);
                     glTranslatef(sc.x, 0, sc.y);
@@ -160,7 +167,8 @@ void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], 
     if(contractActive)
     {
         //TODO: scale circle by num stars?
-        uint8_t numStars = getNumStarsForSystem(getSeedForSystem(contractSystem[0], contractSystem[1]));
+        StarSystemInfo info;
+        generateStarSystemInfo(&info, getSeedForSystem(contractSystem[0], contractSystem[1]));
         vec2 systemPos = generateSystemPos(getSeedForSystem(contractSystem[0], contractSystem[1]), contractSystem[0], contractSystem[1]);
         glTranslatef(systemPos.x, 0, systemPos.y);
         glColor3f(1, 1, 0);
@@ -185,29 +193,29 @@ void drawSystemInfoBox()
     //Background
     drawTexQuad(0, 0, 240, 72, UIBH, 0, PTC(12), PTC(239), PTC(83));
     //Content
-    SystemBaseData sbd;
-    generateSystemBaseData(&sbd, getSeedForSystem(cursor[0], cursor[1]));
+    StarSystemInfo info;
+    generateStarSystemInfo(&info, getSeedForSystem(cursor[0], cursor[1]));
 
     char buffer[29];
-    glDrawText(sbd.info.name, CENTER(strlen(sbd.info.name)), 168 + 4, TEXT_WHITE);
+    glDrawText(info.name, CENTER(strlen(info.name)), 168 + 4, TEXT_WHITE);
 
     glDrawText("Tech level:", 8, 168 + 4 + 10, TEXT_GREEN);
-    sprintf(buffer, "%d", sbd.info.techLevel);
+    sprintf(buffer, "%d", info.characteristics.techLevel);
     glDrawText(buffer, 8 + 96, 168 + 4 + 10, TEXT_WHITE);
 
     glDrawText("Government:", 8, 168 + 4 + 18, TEXT_GREEN);
-    sprintf(buffer, "%s", governmentLevels[sbd.info.government]);
+    sprintf(buffer, "%s", governmentLevels[info.characteristics.government]);
     glDrawText(buffer, 8 + 96, 168 + 4 + 18, TEXT_WHITE);
 
     glDrawText("Planets:", 8, 168 + 4 + 26, TEXT_GREEN);
-    for(uint8_t i = 0; i < sbd.numPlanets; i++)
+    for(uint8_t i = 0; i < info.numPlanets; i++)
     {
         drawTexQuad(80 + i * 12, 34, 8, 8, UITH,
-                    PTC(240), PTC(sbd.paletteIndices[i] * 8), PTC(248), PTC(7 + sbd.paletteIndices[i] * 8));
+                    PTC(240), PTC(info.planetTypes[i] * 8), PTC(248), PTC(7 + info.planetTypes[i] * 8));
     }
 
     char description[29 * 3];
-    generateSystemDescription(description, &sbd);
+    generateSystemDescription(description, &info);
     glDrawText(description, 8, 168 + 4 + 36, TEXT_WHITE);
 
     glEnd();

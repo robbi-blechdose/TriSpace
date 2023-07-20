@@ -43,8 +43,8 @@ extern const char* contractLastnames[NUM_LASTNAMES];
 #define MIN_STATION_CONTRACTS 2
 #define MAX_STATION_CONTRACTS 5
 
-Contract generateContract(int8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex);
-void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, int8_t currentSystem[2],
+Contract generateContract(int8_t currentStarSystem[2], SystemCharacteristics* chars, uint8_t contractIndex);
+void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemCharacteristics* chars, int8_t currentSystem[2],
                                     uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE]);
 
 bool activateContract(Contract* contract, CargoHold* playerHold);

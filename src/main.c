@@ -144,7 +144,7 @@ bool loadGame()
         readElement(&completedContracts, sizeof(completedContracts));
 
         //Generate contracts for now current system
-        generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
+        generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info.characteristics, currentSystem, completedContracts);
         //Set up the current contract (if necessary)
         contractStarSystemSetup(&currentContract, npcs, currentSystem, &starSystem);
 
@@ -446,7 +446,7 @@ void calcFrame(uint32_t ticks)
                     player.ship.position = getRandomFreePos(&starSystem, 50);
                     setInitialSpawnPos(player.ship.position);
                     //Generate contracts for this system
-                    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
+                    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info.characteristics, currentSystem, completedContracts);
                     //Generate new station cargo hold for this system
                     createStationHold(&stationHold);
                     //Set up the current contract (if necessary)
@@ -737,7 +737,7 @@ void drawFrame()
         case GAME_OVER:
         {
             drawStarSystem(&starSystem);
-            if(starSystem.hasAsteroidField)
+            if(starSystem.info.hasAsteroidField)
             {
                 drawAsteroids();
             }
@@ -924,7 +924,7 @@ int main(int argc, char **argv)
     //Initialize game systems
     initGame();
 
-    initUniverse(&starSystem);
+    initUniverse();
     initSpacedust();
     createStationHold(&stationHold);
     state = TITLE;

@@ -1,6 +1,14 @@
 #include "generator_data.h"
 #include "generator.h"
 
+//--------- Star data --------//
+
+const uint8_t starNumProbabilities[MAX_STARS] = {
+    10,
+    30,
+    100
+};
+
 //-------- Planet data -------//
 
 const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {

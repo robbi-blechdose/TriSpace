@@ -253,9 +253,9 @@ void drawContract(Contract* contract)
     glDrawText(buffer, 42, 136, TEXT_WHITE);
 
     glDrawText("Destination system:", 2, 152, TEXT_GREEN);
-    SystemBaseData sbd;
-    generateSystemBaseData(&sbd, getSeedForSystem(contract->targetSystem[0], contract->targetSystem[1]));
-    glDrawText(sbd.info.name, 18, 160, TEXT_WHITE);
+    StarSystemInfo info;
+    generateStarSystemInfo(&info, getSeedForSystem(contract->targetSystem[0], contract->targetSystem[1]));
+    glDrawText(info.name, 18, 160, TEXT_WHITE);
 
     glDrawText("Objective:", 2, 176, TEXT_GREEN);
     printObjective(buffer, contract);

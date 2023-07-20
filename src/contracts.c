@@ -81,7 +81,7 @@ void selectTargetSystem(Contract* c, int8_t currentStarSystem[2], uint8_t contra
     }
 }
 
-Contract generateContract(int8_t currentStarSystem[2], SystemInfo* info, uint8_t contractIndex)
+Contract generateContract(int8_t currentStarSystem[2], SystemCharacteristics* chars, uint8_t contractIndex)
 {
     srand(currentStarSystem[0] + currentStarSystem[1] * UNIVERSE_SIZE + contractIndex * 255);
     Contract c;
@@ -96,7 +96,7 @@ Contract generateContract(int8_t currentStarSystem[2], SystemInfo* info, uint8_t
         {
             c.cargo = randr(NUM_CARGO_TYPES - 1);
             c.cargoAmount = 1 + randr(20);
-            c.pay = getPriceForCargo(c.cargo, info) * c.cargoAmount + 50 + randr(400);
+            c.pay = getPriceForCargo(c.cargo, chars) * c.cargoAmount + 50 + randr(400);
             break;
         }
         case CONTRACT_SMUGGLE:
@@ -106,7 +106,7 @@ Contract generateContract(int8_t currentStarSystem[2], SystemInfo* info, uint8_t
             difficulty = 2;
             c.cargoAmount = 5 + randr(5) * 4;
             //Base pay + cargo price / 2 + pay on top
-            c.pay = 400 + (getPriceForCargo(c.cargo, info) * c.cargoAmount) / 2 + randr(20) * 10;
+            c.pay = 400 + (getPriceForCargo(c.cargo, chars) * c.cargoAmount) / 2 + randr(20) * 10;
             break;
         }
         case CONTRACT_DESTROY_SHIP:
@@ -125,7 +125,7 @@ Contract generateContract(int8_t currentStarSystem[2], SystemInfo* info, uint8_t
     return c;
 }
 
-void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemInfo* info, int8_t currentSystem[2],
+void generateContractsForSystem(Contract stationContracts[], uint8_t* numStationContracts, SystemCharacteristics* chars, int8_t currentSystem[2],
                                     uint8_t completedContracts[UNIVERSE_SIZE][UNIVERSE_SIZE])
 {
     srand((currentSystem[0] + currentSystem[1] * UNIVERSE_SIZE) * 10);
@@ -134,7 +134,7 @@ void generateContractsForSystem(Contract stationContracts[], uint8_t* numStation
 
     for(uint8_t i = 0; i < *numStationContracts; i++)
     {
-        stationContracts[i] = generateContract(currentSystem, info, completedContracts[currentSystem[0]][currentSystem[1]] + i);
+        stationContracts[i] = generateContract(currentSystem, chars, completedContracts[currentSystem[0]][currentSystem[1]] + i);
     }
 }
 

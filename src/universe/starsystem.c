@@ -5,8 +5,7 @@
 GLuint planetMesh;
 GLuint planetRingMesh;
 GLuint planetRingTexture;
-GLuint sunTexture;
-
+GLuint sunTextures[NUM_SUN_TYPES];
 GLuint stationMesh;
 GLuint stationTexture;
 
@@ -15,7 +14,9 @@ void initStarSystem()
     planetMesh = loadModelList("res/obj/Planet.obj");
     planetRingMesh = loadModelList("res/obj/Planet_Ring.obj");
     planetRingTexture = loadRGBTexture("res/tex/Planet_Ring.png");
-    sunTexture = loadRGBTexture("res/tex/Sun.png");
+    sunTextures[0] = loadRGBTexture("res/tex/suns/Normal.png");
+    sunTextures[1] = loadRGBTexture("res/tex/suns/Blue.png");
+    sunTextures[2] = loadRGBTexture("res/tex/suns/Red.png");
 
     stationMesh = loadModelList("res/obj/SpaceStation.obj");
     stationTexture = loadRGBTexture("res/tex/SpaceStation.png");
@@ -26,48 +27,49 @@ void quitStarSystem()
     glDeleteList(planetMesh);
     glDeleteList(planetRingMesh);
     deleteRGBTexture(planetRingTexture);
-    deleteRGBTexture(sunTexture);
+    deleteRGBTexture(sunTextures[0]);
+    deleteRGBTexture(sunTextures[1]);
 
     glDeleteList(stationMesh);
     deleteRGBTexture(stationTexture);
 }
 
-void deleteStarSystem(StarSystem* starSystem)
+void deleteStarSystem(StarSystem* system)
 {
-    for(uint8_t i = 0; i < starSystem->numPlanets; i++)
+    for(uint8_t i = 0; i < system->info.numPlanets; i++)
     {
-        deleteRGBTexture(starSystem->planets[i].texture);
+        deleteRGBTexture(system->planets[i].texture);
     }
 }
 
-void drawStarSystem(StarSystem* starSystem)
+void drawStarSystem(StarSystem* system)
 {
-    glBindTexture(GL_TEXTURE_2D, sunTexture);
-    for(uint8_t i = 0; i < starSystem->numStars; i++)
+    for(uint8_t i = 0; i < system->info.numStars; i++)
     {
         glPushMatrix();
-        glTranslatef(starSystem->stars[i].position.x, starSystem->stars[i].position.y, starSystem->stars[i].position.z);
-        if(starSystem->stars[i].size != 1.0f)
+        glTranslatef(system->stars[i].position.x, system->stars[i].position.y, system->stars[i].position.z);
+        if(system->stars[i].size != 1.0f)
         {
-            float size = starSystem->stars[i].size;
+            float size = system->stars[i].size;
             glScalef(size, size, size);
         }
+        glBindTexture(GL_TEXTURE_2D, sunTextures[system->info.starTypes[i]]);
         glCallList(planetMesh);
         glPopMatrix();
     }
 
-    for(uint8_t i = 0; i < starSystem->numPlanets; i++)
+    for(uint8_t i = 0; i < system->info.numPlanets; i++)
     {
         glPushMatrix();
-        glTranslatef(starSystem->planets[i].position.x, starSystem->planets[i].position.y, starSystem->planets[i].position.z);
-        if(starSystem->planets[i].size != 1.0f)
+        glTranslatef(system->planets[i].position.x, system->planets[i].position.y, system->planets[i].position.z);
+        if(system->planets[i].size != 1.0f)
         {
-            float size = starSystem->planets[i].size;
+            float size = system->planets[i].size;
             glScalef(size, size, size);
         }
-        glBindTexture(GL_TEXTURE_2D, starSystem->planets[i].texture);
+        glBindTexture(GL_TEXTURE_2D, system->planets[i].texture);
         glCallList(planetMesh);
-        if(starSystem->planets[i].hasRing)
+        if(system->planets[i].hasRing)
         {
             glDisable(GL_CULL_FACE);
             glBindTexture(GL_TEXTURE_2D, planetRingTexture);
@@ -79,7 +81,7 @@ void drawStarSystem(StarSystem* starSystem)
 
     glBindTexture(GL_TEXTURE_2D, stationTexture);
     glPushMatrix();
-    glTranslatef(starSystem->station.position.x, starSystem->station.position.y, starSystem->station.position.z);
+    glTranslatef(system->station.position.x, system->station.position.y, system->station.position.z);
     glScalef(5, 5, 5);
     glCallList(stationMesh);
     glPopMatrix();
@@ -90,7 +92,7 @@ bool hasDockingDistance(vec3* pos, vec3* dockingPos)
     return distance3d(pos, dockingPos) < 2;
 }
 
-vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, float minDistanceFromObjects, float minDistanceFromCenter)
+vec3 getRandomFreePosBounds(StarSystem* system, vec3 center, vec3 bounds, float minDistanceFromObjects, float minDistanceFromCenter)
 {
     vec3 vec;
     bool ok = false;
@@ -107,17 +109,17 @@ vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, fl
             continue;
         }
 
-        for(uint8_t i = 0; i < starSystem->numStars; i++)
+        for(uint8_t i = 0; i < system->info.numStars; i++)
         {
-            if(distance3d(&vec, &starSystem->stars[i].position) < starSystem->stars[i].size + minDistanceFromObjects)
+            if(distance3d(&vec, &system->stars[i].position) < system->stars[i].size + minDistanceFromObjects)
             {
                 ok = false;
                 break;
             }
         }
-        for(uint8_t i = 0; i < starSystem->numPlanets; i++)
+        for(uint8_t i = 0; i < system->info.numPlanets; i++)
         {
-            if(distance3d(&vec, &starSystem->planets[i].position) < starSystem->planets[i].size + minDistanceFromObjects)
+            if(distance3d(&vec, &system->planets[i].position) < system->planets[i].size + minDistanceFromObjects)
             {
                 ok = false;
                 break;
@@ -127,16 +129,16 @@ vec3 getRandomFreePosBounds(StarSystem* starSystem, vec3 center, vec3 bounds, fl
     return vec;
 }
 
-vec3 getRandomFreePos(StarSystem* starSystem, float minDistanceFromObjects)
+vec3 getRandomFreePos(StarSystem* system, float minDistanceFromObjects)
 {
-    return getRandomFreePosBounds(starSystem, (vec3) {.x = 0, .y = 0, .z = 0}, (vec3) {.x = 500, .y = 150, .z = 500}, minDistanceFromObjects, 0);
+    return getRandomFreePosBounds(system, (vec3) {.x = 0, .y = 0, .z = 0}, (vec3) {.x = 500, .y = 150, .z = 500}, minDistanceFromObjects, 0);
 }
 
-bool hasSunFuelDistance(StarSystem* starSystem, vec3* pos)
+bool hasSunFuelDistance(StarSystem* system, vec3* pos)
 {
-    for(uint8_t i = 0; i < starSystem->numStars; i++)
+    for(uint8_t i = 0; i < system->info.numStars; i++)
     {
-        if(distance3d(pos, &starSystem->stars[i].position) < starSystem->stars[i].size + 5)
+        if(distance3d(pos, &system->stars[i].position) < system->stars[i].size + 5)
         {
             return true;
         }

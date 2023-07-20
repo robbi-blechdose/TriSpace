@@ -257,7 +257,7 @@ void drawPlayerInfoUI(uint8_t cursor, Player* player)
     glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, TEXT_DKGREY);
 }
 
-void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info)
+void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemCharacteristics* chars)
 {
     glLoadIdentity();
     glBindTexture(GL_TEXTURE_2D, uiTexture);
@@ -279,7 +279,7 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     {
         printNameForCargo(name, i);
         printUnitForCargo(type, i);
-        sprintf(buffer, "%-13s%3s %5d  %2d|%2d", name, type, getPriceForCargo(i, info), stationHold->cargo[i], playerHold->cargo[i]);
+        sprintf(buffer, "%-13s%3s %5d  %2d|%2d", name, type, getPriceForCargo(i, chars), stationHold->cargo[i], playerHold->cargo[i]);
         glDrawText(buffer, 4, 24 + i * 8, i == cursor ? 0x00FFFF : TEXT_WHITE);
     }
 

@@ -1,64 +1,64 @@
 #include "cargo.h"
 
-uint8_t getPriceForCargo(CargoType type, SystemInfo* info)
+uint8_t getPriceForCargo(CargoType type, SystemCharacteristics* chars)
 {
     switch(type)
     {
         case Food:
         {
-            return 5 + info->waterDiff + (info->techLevel / 4);
+            return 5 + chars->waterDiff + (chars->techLevel / 4);
         }
         case Textiles:
         {
-            return 7 + info->treeDiff + (info->techLevel / 4);
+            return 7 + chars->treeDiff + (chars->techLevel / 4);
         }
         case Liquor:
         {
-            return 10 - info->government * 2;
+            return 10 - chars->government * 2;
         }
         case Furs:
         {
-            return 7 + ((float) info->techLevel / MAX_TECH_LEVEL) * 5;
+            return 7 + ((float) chars->techLevel / MAX_TECH_LEVEL) * 5;
         }
         case Radioactives:
         {
-            return 20 + ((float) info->techLevel / MAX_TECH_LEVEL) * 10;
+            return 20 + ((float) chars->techLevel / MAX_TECH_LEVEL) * 10;
         }
         case Luxuries:
         {
-            return 60 + (((float) (MAX_TECH_LEVEL - info->techLevel)) / MAX_TECH_LEVEL) * 60;
+            return 60 + (((float) (MAX_TECH_LEVEL - chars->techLevel)) / MAX_TECH_LEVEL) * 60;
         }
         case Computers:
         {
-            return 50 + (MAX_TECH_LEVEL - info->techLevel) * 5;
+            return 50 + (MAX_TECH_LEVEL - chars->techLevel) * 5;
         }
         case Machinery:
         {
-            return 55 + (MAX_TECH_LEVEL - info->techLevel) * 3;
+            return 55 + (MAX_TECH_LEVEL - chars->techLevel) * 3;
         }
         case Gold:
         {
-            return 45 + (((float) (MAX_TECH_LEVEL - info->techLevel)) / MAX_TECH_LEVEL) * 30;
+            return 45 + (((float) (MAX_TECH_LEVEL - chars->techLevel)) / MAX_TECH_LEVEL) * 30;
         }
         case Platinum:
         {
-            return 55 + (((float) (MAX_TECH_LEVEL - info->techLevel)) / MAX_TECH_LEVEL) * 30;
+            return 55 + (((float) (MAX_TECH_LEVEL - chars->techLevel)) / MAX_TECH_LEVEL) * 30;
         }
         case Dilithium:
         {
-            return 10 + ((float) info->techLevel / MAX_TECH_LEVEL) * 90;
+            return 10 + ((float) chars->techLevel / MAX_TECH_LEVEL) * 90;
         }
         case Slaves:
         {
-            return 50 + ((float) info->government / MAX_GOVERNMENT) * 150.0f;
+            return 50 + ((float) chars->government / MAX_GOVERNMENT) * 150.0f;
         }
         case Firearms:
         {
-            return 20 + (MAX_TECH_LEVEL / (float) info->techLevel) * 40 + ((float) info->government / MAX_GOVERNMENT) * 40;
+            return 20 + (MAX_TECH_LEVEL / (float) chars->techLevel) * 40 + ((float) chars->government / MAX_GOVERNMENT) * 40;
         }
         case Narcotics:
         {
-            return 10 + (MAX_TECH_LEVEL / (float) info->techLevel) * 20 + ((float) info->government / MAX_GOVERNMENT) * 40;
+            return 10 + (MAX_TECH_LEVEL / (float) chars->techLevel) * 20 + ((float) chars->government / MAX_GOVERNMENT) * 40;
         }
     }
 }
@@ -144,9 +144,9 @@ uint8_t getCargoHoldSize(CargoHold* hold)
     return size;
 }
 
-bool transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemInfo* info, uint8_t limit)
+bool transferCargo(CargoHold* holdSell, CargoHold* holdBuy, CargoType type, SystemCharacteristics* chars, uint8_t limit)
 {
-    uint8_t cost = getPriceForCargo(type, info);
+    uint8_t cost = getPriceForCargo(type, chars);
     if(holdBuy->money >= cost && getCargoHoldSize(holdBuy) < holdBuy->size && holdSell->cargo[type] > 0)
     {
         holdBuy->money -= cost;

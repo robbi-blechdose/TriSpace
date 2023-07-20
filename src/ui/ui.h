@@ -17,7 +17,7 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
 
 void drawPlayerInfoUI(uint8_t cursor, Player* player);
 
-void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemInfo* info);
+void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold, SystemCharacteristics* chars);
 
 void drawGameOverScreen();
 
