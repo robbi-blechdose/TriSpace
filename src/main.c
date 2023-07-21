@@ -119,39 +119,40 @@ bool saveGame()
 
 bool loadGame()
 {
-    if(openSave(".trispace", "game.sav", 0))
+    if(!openSave(".trispace", "game.sav", 0))
     {
-        uint16_t version = 0;
-        readElement(&version, sizeof(version));
-        if(version / 10 != SAVE_VERSION / 10) //Check major version for save compatability
-        {
-            closeSave();
-            return false;
-        }
-
-        loadPlayer(&player);
-        //Reset ship rotation + position since we're inside a station
-        player.ship.rotation = quatFromAngles((vec3) {0, DEG_TO_RAD(-90), 0});
-        player.ship.position = (vec3) {-1.5f, 0, 0};
-
-        readElement(&currentSystem[0], sizeof(uint8_t));
-        readElement(&currentSystem[1], sizeof(uint8_t));
-        setStarmapCursor(currentSystem[0], currentSystem[1]);
-
-        deleteStarSystem(&starSystem);
-        initSystem(currentSystem, &starSystem, npcs);
-        readElement(&currentContract, sizeof(currentContract));
-        readElement(&completedContracts, sizeof(completedContracts));
-
-        //Generate contracts for now current system
-        generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info.characteristics, currentSystem, completedContracts);
-        //Set up the current contract (if necessary)
-        contractStarSystemSetup(&currentContract, npcs, currentSystem, &starSystem);
-
-        closeSave();
-        return true;
+        return false;
     }
-    return false;
+
+    uint16_t version = 0;
+    readElement(&version, sizeof(version));
+    if(version / 10 != SAVE_VERSION / 10) //Check major version for save compatability
+    {
+        closeSave();
+        return false;
+    }
+
+    loadPlayer(&player);
+    //Reset ship rotation + position since we're inside a station
+    player.ship.rotation = quatFromAngles((vec3) {0, DEG_TO_RAD(-90), 0});
+    player.ship.position = (vec3) {-1.5f, 0, 0};
+
+    readElement(&currentSystem[0], sizeof(uint8_t));
+    readElement(&currentSystem[1], sizeof(uint8_t));
+    setStarmapCursor(currentSystem[0], currentSystem[1]);
+
+    deleteStarSystem(&starSystem);
+    initSystem(currentSystem, &starSystem, npcs);
+    readElement(&currentContract, sizeof(currentContract));
+    readElement(&completedContracts, sizeof(completedContracts));
+
+    //Generate contracts for now current system
+    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info.characteristics, currentSystem, completedContracts);
+    //Set up the current contract (if necessary)
+    contractStarSystemSetup(&currentContract, npcs, currentSystem, &starSystem);
+
+    closeSave();
+    return true;
 }
 
 void newGame()

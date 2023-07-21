@@ -9,26 +9,25 @@
 
 typedef struct {
     uint8_t length;
-    char** list;
+    const char** list;
 } CommList;
 
-#define NUM_SENDER_TYPES 3
 const CommList introComms[NUM_SENDER_TYPES] = {
-    {3, (char*[3]) {"Prepare to die!", "Accept your fate!", "That ship is scrap."}},
-    {4, (char*[4]) {"Prepare to be boarded.", "Shut down your engines.", "Surrender your ship.", "You're breaking the law!"}},
-    {2, (char*[2]) {"%!& #&%[$   [$!%+#", "#+*$!% §$%&'+#"}}
+    [SENDER_ENEMY]  = {3, (char*[3]) {"Prepare to die!", "Accept your fate!", "That ship is scrap."}},
+    [SENDER_POLICE] = {4, (char*[4]) {"Prepare to be boarded.", "Shut down your engines.", "Surrender your ship.", "You're breaking the law!"}},
+    [SENDER_ALIEN]  = {2, (char*[2]) {"%!& #&%[$   [$!%+#", "#+*$!% §$%&'+#"}}
 };
 
 const CommList damageComms[NUM_SENDER_TYPES] = {
-    {3, (char*[3]) {"You'll pay for that!", "Ow!", "Arrr!"}},
-    {1, (char*[2]) {"Cease your attacks!"}},
-    {1, (char*[1]) {"$%&%!"}}
+    [SENDER_ENEMY]  = {3, (char*[3]) {"You'll pay for that!", "Ow!", "Arrr!"}},
+    [SENDER_POLICE] = {1, (char*[2]) {"Cease your attacks!"}},
+    [SENDER_ALIEN]  = {2, (char*[2]) {"$%&%!", "#*!$"}}
 };
 
 const CommList specialComms[NUM_SENDER_TYPES] = {
-    {},
-    {2, (char*[2]) {"Illegal goods detected!", "You're carrying illegal goods."}},
-    {}
+    [SENDER_ENEMY]  = {},
+    [SENDER_POLICE] = {2, (char*[2]) {"Illegal goods detected!", "You're carrying illegal goods."}},
+    [SENDER_ALIEN]  = {}
 };
 
 #define NUM_COMM_FLASHES 4
@@ -75,12 +74,11 @@ void drawComms()
     }
 
     //We're within a flash, draw
-
     glDrawText("INCOMING TRANSMISSION", CENTER(21), 16, 0xFFFFFF);
     glDrawText(commMessage, CENTER(strlen(commMessage)), 140, 0xFFFFFF);
 }
 
-void setCommMessage(uint8_t sender, uint8_t type)
+void setCommMessage(CommSender sender, CommType type)
 {
     commTicks = 1;
     commFlashIndex = 0;

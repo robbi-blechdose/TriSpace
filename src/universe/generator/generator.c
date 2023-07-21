@@ -86,9 +86,10 @@ Color getColorForValue(uint8_t paletteIndex, float value)
     return ret;
 }
 
+#define TEXTURE_SIZE 256
 GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 {
-    uint8_t data[256 * 256 * 3];
+    uint8_t data[TEXTURE_SIZE * TEXTURE_SIZE * 3];
     float size = (2 + randf(5)) * planetGeneratorData[paletteIndex].textureScaler;
 
     //Generate texture
@@ -96,14 +97,14 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
     noise.noise_type = FNL_NOISE_VALUE;
     noise.fractal_type = FNL_FRACTAL_FBM;
     noise.seed = seed + rand();
-    for(uint16_t i = 0; i < 256; i++)
+    for(uint16_t i = 0; i < TEXTURE_SIZE; i++)
     {
-        for(uint16_t j = 0; j < 256; j++)
+        for(uint16_t j = 0; j < TEXTURE_SIZE; j++)
         {
             //Noise value (-1 to 1) is scaled to be within 0 to 256
             float temp = (fnlGetNoise2D(&noise, i * size, j * size) + 1.0f) * 128;
             Color c = getColorForValue(paletteIndex, temp);
-            uint32_t index = i * 256 * 3 + j * 3;
+            uint32_t index = i * TEXTURE_SIZE * 3 + j * 3;
             data[index] = c.r;
             data[index + 1] = c.g;
             data[index + 2] = c.b;
@@ -111,7 +112,7 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
     }
 
     //Texture seam fix
-    for(uint16_t i = 0; i < 256; i++)
+    for(uint16_t i = 0; i < TEXTURE_SIZE; i++)
     {
         for(uint16_t j = 0; j < 16; j++)
         {
@@ -134,7 +135,7 @@ GLuint generatePlanetTexture(uint32_t seed, uint8_t paletteIndex)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, 256, 256, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	return t;
 }
 
@@ -199,7 +200,6 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
 vec2 generateSystemPos(uint32_t seed, uint8_t i, uint8_t j)
 {
     srand(seed);
-    //TODO: improve?
     return (vec2) {i * 10 + (randf(3) - 1.5f), j * 10 + (randf(3) - 1.5f)};
 }
 

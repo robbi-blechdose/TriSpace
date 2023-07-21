@@ -6,15 +6,20 @@
 void calcComms(uint32_t ticks);
 void drawComms();
 
-#define SENDER_ENEMY 0
-#define SENDER_POLICE 1
-#define SENDER_ALIEN 2
+typedef enum {
+    SENDER_ENEMY,
+    SENDER_POLICE,
+    SENDER_ALIEN,
+    NUM_SENDER_TYPES
+} CommSender;
 
-#define TYPE_INTRO 0
-#define TYPE_DAMAGE 1
-#define TYPE_SPECIAL 2
+typedef enum {
+    TYPE_INTRO,
+    TYPE_DAMAGE,
+    TYPE_SPECIAL
+} CommType;
 
-void setCommMessage(uint8_t sender, uint8_t type);
+void setCommMessage(CommSender sender, CommType type);
 
 #define STATION_LAND_CLEAR 0
 

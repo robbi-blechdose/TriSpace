@@ -51,7 +51,7 @@ void selectTargetSystem(Contract* c, int8_t currentStarSystem[2], uint8_t contra
     int8_t possibleSystems[64][2];
     uint8_t possibleSystemsIndex = 0;
 
-    float maxDistance = 15 * contractDifficulty; //TODO: replace with MAX_FUEL constant
+    float maxDistance = MAX_FUEL * contractDifficulty;
 
     for(uint8_t i = 0; i < UNIVERSE_SIZE; i++)
     {
