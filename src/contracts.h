@@ -10,16 +10,19 @@
 #include "universe/universe.h"
 #include "npcs/npc.h"
 
-#define NUM_CONTRACT_TYPES      4
-#define CONTRACT_GET_ITEM       0
-#define CONTRACT_SMUGGLE        1
-#define CONTRACT_DESTROY_SHIP   2
-#define CONTRACT_RECONNAISSANCE 3
-#define CONTRACT_TYPE_NULL    255
-extern const char* contractTypes[NUM_CONTRACT_TYPES];
+typedef enum {
+    CONTRACT_GET_ITEM,
+    CONTRACT_SMUGGLE,
+    CONTRACT_DESTROY_SHIP,
+    CONTRACT_RECONNAISSANCE,
+    NUM_CONTRACT_TYPES,
+
+    CONTRACT_TYPE_NULL = 255
+} ContractType;
+extern const char* contractTypeNames[NUM_CONTRACT_TYPES];
 
 typedef struct {
-    uint8_t type;
+    ContractType type;
 
     uint16_t pay;
 

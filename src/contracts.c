@@ -2,7 +2,7 @@
 #include "engine/util.h"
 #include "universe/satellites.h"
 
-const char* contractTypes[NUM_CONTRACT_TYPES] = {
+const char* contractTypeNames[NUM_CONTRACT_TYPES] = {
     "Obtain cargo",
     "Smuggle cargo",
     "Destroy ship",
