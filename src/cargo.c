@@ -60,6 +60,10 @@ uint8_t getPriceForCargo(CargoType type, SystemCharacteristics* chars)
         {
             return 10 + (MAX_TECH_LEVEL / (float) chars->techLevel) * 20 + ((float) chars->government / MAX_GOVERNMENT) * 40;
         }
+        default:
+        {
+            return 0;
+        }
     }
 }
 

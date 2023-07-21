@@ -13,20 +13,20 @@ typedef struct {
 } CommList;
 
 const CommList introComms[NUM_SENDER_TYPES] = {
-    [SENDER_ENEMY]  = {3, (char*[3]) {"Prepare to die!", "Accept your fate!", "That ship is scrap."}},
-    [SENDER_POLICE] = {4, (char*[4]) {"Prepare to be boarded.", "Shut down your engines.", "Surrender your ship.", "You're breaking the law!"}},
-    [SENDER_ALIEN]  = {2, (char*[2]) {"%!& #&%[$   [$!%+#", "#+*$!% §$%&'+#"}}
+    [SENDER_ENEMY]  = {3, (const char*[3]) {"Prepare to die!", "Accept your fate!", "That ship is scrap."}},
+    [SENDER_POLICE] = {4, (const char*[4]) {"Prepare to be boarded.", "Shut down your engines.", "Surrender your ship.", "You're breaking the law!"}},
+    [SENDER_ALIEN]  = {2, (const char*[2]) {"%!& #&%[$   [$!%+#", "#+*$!% §$%&'+#"}}
 };
 
 const CommList damageComms[NUM_SENDER_TYPES] = {
-    [SENDER_ENEMY]  = {3, (char*[3]) {"You'll pay for that!", "Ow!", "Arrr!"}},
-    [SENDER_POLICE] = {1, (char*[2]) {"Cease your attacks!"}},
-    [SENDER_ALIEN]  = {2, (char*[2]) {"$%&%!", "#*!$"}}
+    [SENDER_ENEMY]  = {3, (const char*[3]) {"You'll pay for that!", "Ow!", "Arrr!"}},
+    [SENDER_POLICE] = {1, (const char*[2]) {"Cease your attacks!"}},
+    [SENDER_ALIEN]  = {2, (const char*[2]) {"$%&%!", "#*!$"}}
 };
 
 const CommList specialComms[NUM_SENDER_TYPES] = {
     [SENDER_ENEMY]  = {},
-    [SENDER_POLICE] = {2, (char*[2]) {"Illegal goods detected!", "You're carrying illegal goods."}},
+    [SENDER_POLICE] = {2, (const char*[2]) {"Illegal goods detected!", "You're carrying illegal goods."}},
     [SENDER_ALIEN]  = {}
 };
 

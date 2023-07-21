@@ -539,11 +539,11 @@ void calcFrame(uint32_t ticks)
             }
             else if(keyUp(B_LEFT))
             {
-                transferCargo(&player.hold, &stationHold, uiTradeCursor, &starSystem.info, 1);
+                transferCargo(&player.hold, &stationHold, uiTradeCursor, &starSystem.info.characteristics, 1);
             }
             else if(keyUp(B_RIGHT))
             {
-                transferCargo(&stationHold, &player.hold, uiTradeCursor, &starSystem.info, 0);
+                transferCargo(&stationHold, &player.hold, uiTradeCursor, &starSystem.info.characteristics, 0);
             }
             else if(keyUp(B_B))
             {
@@ -824,7 +824,7 @@ void drawFrame()
         }
         case TRADING:
         {
-            drawTradingUI(uiTradeCursor, &player.hold, &stationHold, &starSystem.info);
+            drawTradingUI(uiTradeCursor, &player.hold, &stationHold, &starSystem.info.characteristics);
             break;
         }
         case EQUIP:
@@ -930,7 +930,7 @@ int main(int argc, char **argv)
     createStationHold(&stationHold);
     state = TITLE;
     currentContract.type = CONTRACT_TYPE_NULL;
-    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info, currentSystem, completedContracts);
+    generateContractsForSystem(stationContracts, &numStationContracts, &starSystem.info.characteristics, currentSystem, completedContracts);
 
     playMusic(MUSIC_MAIN, 0);
 

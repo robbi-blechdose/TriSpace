@@ -1,7 +1,7 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
-#include <SDL.h>
+#include <stdint.h>
 #include "../starsystem.h"
 #include "../../engine/util.h"
 
