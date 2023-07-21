@@ -2,7 +2,7 @@
 #define STARSYSTEM_H
 
 #include <stdbool.h>
-#include <SDL.h>
+#include <stdint.h>
 
 #include "GL/gl.h"
 #include "../engine/util.h"

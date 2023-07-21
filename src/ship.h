@@ -2,7 +2,7 @@
 #define SHIP_H
 
 #include <stdbool.h>
-#include <SDL.h>
+#include <stdint.h>
 
 #include "engine/includes/3dMath.h"
 #include "engine/util.h"

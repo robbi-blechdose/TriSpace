@@ -1,5 +1,6 @@
 #include "ai.h"
 
+#include <stdlib.h>
 #include "../engine/util.h"
 #include "../comms.h"
 

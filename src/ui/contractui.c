@@ -128,6 +128,11 @@ void calcContractUIInternal(uint32_t ticks, Contract* contract)
 
             break;
         }
+        default:
+        {
+            //This should not happen
+            break;
+        }
     }
 }
 
@@ -205,6 +210,11 @@ void drawContractUI3dInternal(Contract* contract)
                     glColor3f(1, 1, 1);
                 }
             }
+            break;
+        }
+        default:
+        {
+            //This should not happen
             break;
         }
     }
@@ -326,6 +336,11 @@ void moveContractUICursor(int8_t dir, Contract* contracts, uint8_t numContracts)
         {
             waypoints = satelliteWaypoints;
             playerShip.position = waypoints[0];
+            break;
+        }
+        default:
+        {
+            //This should not happen
             break;
         }
     }

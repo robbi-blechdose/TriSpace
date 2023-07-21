@@ -1,5 +1,7 @@
 #include "equipment.h"
 
+#include <stdio.h>
+
 uint16_t equipmentPrices[] = {
     [Fuel] = 2,
     [Cargo30] = 1500,

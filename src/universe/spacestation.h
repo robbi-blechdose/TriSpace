@@ -1,7 +1,6 @@
 #ifndef SPACESTATION_H
 #define SPACESTATION_H
 
-#include <stdint.h>
 #include <stdbool.h>
 
 #include "../engine/includes/3dMath.h"

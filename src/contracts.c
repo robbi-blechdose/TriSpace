@@ -1,4 +1,7 @@
 #include "contracts.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 #include "engine/util.h"
 #include "universe/satellites.h"
 
@@ -120,6 +123,12 @@ Contract generateContract(int8_t currentStarSystem[2], SystemCharacteristics* ch
             c.pay = 100 + c.numSatellites * 75 + randr(25) * 5;
             break;
         }
+        default:
+        {
+            //This should not happen, mark with pay number
+            c.pay = 54321;
+            break;
+        }
     }
     selectTargetSystem(&c, currentStarSystem, difficulty);
     return c;
@@ -157,6 +166,11 @@ bool activateContract(Contract* contract, CargoHold* playerHold)
                 return true;
             }
             break;
+        }
+        default:
+        {
+            //This should not happen
+            return false;
         }
     }
     return false;
@@ -203,6 +217,11 @@ bool checkContract(Contract* contract, CargoHold* playerHold, int8_t currentSyst
                 return true;
             }
             break;
+        }
+        default:
+        {
+            //This should not happen
+            return false;
         }
     }
     return false;
@@ -254,6 +273,11 @@ void contractStarSystemSetup(Contract* contract, Npc npcs[], int8_t currentSyste
             }
             break;
         }
+        default:
+        {
+            //Do nothing for all other types
+            break;
+        }
     }
 }
 
@@ -286,6 +310,12 @@ void printObjective(char* str, Contract* contract)
         case CONTRACT_RECONNAISSANCE:
         {
             sprintf(str, "Check out each of the %d\nnav satellites.\nKeep your eyes open!", contract->numSatellites);
+            break;
+        }
+        default:
+        {
+            //This should not happen, print info into objective
+            sprintf(str, "ERROR CONTRACT TYPE IS %d.", contract->type);
             break;
         }
     }
