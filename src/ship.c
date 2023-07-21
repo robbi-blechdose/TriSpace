@@ -39,21 +39,22 @@ uint8_t sampleShoot;
 
 void initShip()
 {
-    //The player ship should never be drawn, so we're skipping it
-    shipMeshes[0] = 0;
-    shipTextures[0] = 0;
     for(uint8_t i = 1; i < NUM_SHIP_TYPES; i++)
     {
         shipMeshes[i] = loadModelList(shipAssets[i][0]);
         shipTextures[i] = loadRGBTexture(shipAssets[i][1]);
     }
+    //The player ship is only used for the contract UI and otherwise never drawn,
+    //so we can just steal the mesh from the first small pirate ship
+    shipMeshes[0] = shipMeshes[1];
     
     sampleShoot = loadSample("res/sfx/flaunch.wav");
 }
 
 void quitShip()
 {
-    for(uint8_t i = 0; i < NUM_SHIP_TYPES; i++)
+    //Start at 1 to skip player ship
+    for(uint8_t i = 1; i < NUM_SHIP_TYPES; i++)
     {
         glDeleteList(shipMeshes[i]);
         deleteRGBTexture(shipTextures[i]);

@@ -50,7 +50,7 @@ void initContractUI(GLuint uiTex)
     //Init ships
     playerShip = (Ship) {.position = waypoints[0],
                          .rotation = QUAT_INITIAL,
-                         .type = SHIP_TYPE_SMALLPIRATE};
+                         .type = SHIP_TYPE_PLAYER};
     policeShip = (Ship) {.position = (vec3) {-12, 0, -8},
                          .rotation = QUAT_INITIAL,
                          .type = SHIP_TYPE_POLICE};
