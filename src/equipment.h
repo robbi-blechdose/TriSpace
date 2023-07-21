@@ -1,5 +1,5 @@
-#ifndef _EQUIPMENT_H
-#define _EQUIPMENT_H
+#ifndef EQUIPMENT_H
+#define EQUIPMENT_H
 
 #include <stdbool.h>
 

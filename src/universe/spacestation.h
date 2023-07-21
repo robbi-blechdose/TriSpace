@@ -1,5 +1,5 @@
-#ifndef _SPACESTATION_H
-#define _SPACESTATION_H
+#ifndef SPACESTATION_H
+#define SPACESTATION_H
 
 #include <stdint.h>
 #include <stdbool.h>

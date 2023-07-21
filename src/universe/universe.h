@@ -1,5 +1,5 @@
-#ifndef _SPACE_H
-#define _SPACE_H
+#ifndef UNIVERSE_H
+#define UNIVERSE_H
 
 #include "../ship.h"
 #include "starsystem.h"

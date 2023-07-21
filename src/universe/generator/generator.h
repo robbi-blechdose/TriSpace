@@ -1,5 +1,5 @@
-#ifndef _GENERATOR_H
-#define _GENERATOR_H
+#ifndef GENERATOR_H
+#define GENERATOR_H
 
 #include <SDL.h>
 #include "../starsystem.h"

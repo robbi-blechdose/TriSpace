@@ -1,5 +1,5 @@
-#ifndef _CARGO_H
-#define _CARGO_H
+#ifndef CARGO_H
+#define CARGO_H
 
 #include <stdbool.h>
 #include <stdint.h>

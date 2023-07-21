@@ -1,5 +1,5 @@
-#ifndef _CONTRACT_UI_H
-#define _CONTRACT_UI_H
+#ifndef CONTRACT_UI_H
+#define CONTRACT_UI_H
 
 #include "../contracts.h"
 

@@ -1,5 +1,5 @@
-#ifndef _AUTODOCKING_H
-#define _AUTODOCKING_H
+#ifndef AUTODOCKING_H
+#define AUTODOCKING_H
 
 #include <stdbool.h>
 #include <stdint.h>

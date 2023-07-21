@@ -1,5 +1,5 @@
-#ifndef _EQUIP_UI_H
-#define _EQUIP_UI_H
+#ifndef EQUIP_UI_H
+#define EQUIP_UI_H
 
 #include "../player.h"
 

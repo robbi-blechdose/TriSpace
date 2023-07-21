@@ -1,5 +1,5 @@
-#ifndef _TITLE_SCREEN_H
-#define _TITLE_SCREEN_H
+#ifndef TITLE_SCREEN_H
+#define TITLE_SCREEN_H
 
 #include <stdint.h>
 #include <stdbool.h>

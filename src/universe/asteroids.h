@@ -1,5 +1,5 @@
-#ifndef _ASTEROIDS_H
-#define _ASTEROIDS_H
+#ifndef ASTEROIDS_H
+#define ASTEROIDS_H
 
 #include <stdbool.h>
 

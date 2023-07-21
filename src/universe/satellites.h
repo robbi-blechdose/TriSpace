@@ -1,5 +1,5 @@
-#ifndef _SATELLITES_H
-#define _SATELLITES_H
+#ifndef SATELLITES_H
+#define SATELLITES_H
 
 #include <stdbool.h>
 

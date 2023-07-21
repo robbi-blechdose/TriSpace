@@ -1,5 +1,5 @@
-#ifndef _STARMAP_H
-#define _STARMAP_H
+#ifndef STARMAP_H
+#define STARMAP_H
 
 #include <stdint.h>
 #include <stdbool.h>

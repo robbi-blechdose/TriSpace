@@ -1,5 +1,5 @@
-#ifndef _STARSYSTEM_H
-#define _STARSYSTEM_H
+#ifndef STARSYSTEM_H
+#define STARSYSTEM_H
 
 #include <stdbool.h>
 #include <SDL.h>

@@ -1,5 +1,5 @@
-#ifndef _CONTRACTS_H
-#define _CONTRACTS_H
+#ifndef CONTRACTS_H
+#define CONTRACTS_H
 
 #include <stdint.h>
 #include <stdbool.h>

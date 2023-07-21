@@ -1,5 +1,5 @@
-#ifndef _SHIP_H
-#define _SHIP_H
+#ifndef SHIP_H
+#define SHIP_H
 
 #include <stdbool.h>
 #include <SDL.h>

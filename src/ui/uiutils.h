@@ -1,5 +1,5 @@
-#ifndef _UI_UTILS_H
-#define _UI_UTILS_H
+#ifndef UI_UTILS_H
+#define UI_UTILS_H
 
 //UI Base Height
 #define UIBH 10

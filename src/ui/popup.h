@@ -1,5 +1,5 @@
-#ifndef _POPUP_H
-#define _POPUP_H
+#ifndef POPUP_H
+#define POPUP_H
 
 #include <stdbool.h>
 #include <stdint.h>

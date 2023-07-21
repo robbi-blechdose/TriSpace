@@ -1,5 +1,5 @@
-#ifndef _MISSILES_H
-#define _MISSILES_H
+#ifndef MISSILES_H
+#define MISSILES_H
 
 #include <stdint.h>
 #include "../engine/includes/3dMath.h"

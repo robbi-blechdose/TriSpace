@@ -1,5 +1,5 @@
-#ifndef _COMMS_H
-#define _COMMS_H
+#ifndef COMMS_H
+#define COMMS_H
 
 #include <stdint.h>
 

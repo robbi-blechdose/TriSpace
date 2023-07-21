@@ -1,5 +1,5 @@
-#ifndef _UI_H
-#define _UI_H
+#ifndef UI_H
+#define UI_H
 
 #include <stdbool.h>
 

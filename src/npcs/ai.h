@@ -1,5 +1,5 @@
-#ifndef _NPC_AI
-#define _NPC_AI
+#ifndef AI_H
+#define AI_H
 
 #include "npc.h"
 #include "../player.h"
