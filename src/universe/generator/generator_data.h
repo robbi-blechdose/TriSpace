@@ -3,9 +3,11 @@
 
 #include <stdint.h>
 
+#include "../../engine/includes/FastNoiseLite.h"
+#include "../starsystem.h"
+
 //--------- Star data --------//
 
-#define MAX_STARS 3
 extern const uint8_t starNumProbabilities[MAX_STARS];
 
 //-------- Planet data -------//
@@ -19,6 +21,8 @@ typedef struct {
 typedef struct {
     Color palettes[8];
     float textureScaler;
+    fnl_noise_type noiseType;
+    fnl_fractal_type fractalType;
     struct {
         int8_t tree;
         int8_t rock;
@@ -27,8 +31,7 @@ typedef struct {
 } PlanetGeneratorData;
 
 //Palettes are ordered by closeness to the sun
-#define NUM_PALETTES 8
-extern const PlanetGeneratorData planetGeneratorData[NUM_PALETTES];
+extern const PlanetGeneratorData planetGeneratorData[NUM_PLANET_TYPES];
 
 //----- System name data -----//
 

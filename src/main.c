@@ -170,13 +170,14 @@ void newGame()
 
     #ifdef DEBUG
     player.hold.money = 50000;
+    player.fuel = MAX_FUEL * 1000;
     #else
     player.hold.money = 150;
+    player.fuel = MAX_FUEL;
     #endif
     player.hold.size = CARGO_HOLD_SIZE_NORM;
     player.hasAutodock = false;
     player.hasFuelScoops = false;
-    player.fuel = MAX_FUEL;
     //Initialize system
     currentSystem[0] = 0;
     currentSystem[1] = 0;

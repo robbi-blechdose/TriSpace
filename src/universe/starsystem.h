@@ -23,6 +23,7 @@ typedef enum {
     PT_Ice,
     PT_Dead,
     PT_Gas,
+    PT_DarkCities,
     NUM_PLANET_TYPES
 } PlanetType;
 

@@ -11,7 +11,7 @@ const uint8_t starNumProbabilities[MAX_STARS] = {
 
 //-------- Planet data -------//
 
-const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
+const PlanetGeneratorData planetGeneratorData[NUM_PLANET_TYPES] = {
     [PT_Venus] = {
         .palettes = {
             //Base colors
@@ -27,6 +27,8 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 69, .g = 62, .b = 45},
         },
         .textureScaler = 1.3f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = 2, .water = -2}
     },
     [PT_Mars] = {
@@ -41,6 +43,8 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 255, .g = 255, .b = 255}
         },
         .textureScaler = 1.0f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -1, .rock = 1, .water = -1}
     },
     [PT_Earth] = {
@@ -58,6 +62,8 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 107, .g = 128, .b = 38}
         },
         .textureScaler = 0.9f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = 1, .rock = -1, .water = 0}
     },
     [PT_Ocean] = {
@@ -75,6 +81,8 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 105, .g = 105, .b = 105}
         },
         .textureScaler = 0.5f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = 0, .rock = -1, .water = 2}
     },
     [PT_Forest] = {
@@ -93,6 +101,8 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 247, .g = 247, .b = 247}
         },
         .textureScaler = 1.0f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = 2, .rock = -1, .water = 0}
     },
     [PT_Ice] = {
@@ -110,6 +120,8 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 230, .g = 240, .b = 245}
         },
         .textureScaler = 2.0f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = 1, .water = 2}
     },
     [PT_Dead] = {
@@ -124,6 +136,8 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 150, .g = 150, .b = 150},
         },
         .textureScaler = 3.0f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = 2, .water = -2}
     },
     [PT_Gas] = {
@@ -138,7 +152,25 @@ const PlanetGeneratorData planetGeneratorData[NUM_PALETTES] = {
             {.r = 97, .g = 19, .b = 232}
         },
         .textureScaler = 0.6f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = -2, .water = 0}
+    },
+    [PT_DarkCities] = {
+        .palettes = {
+            {.r = 59, .g = 49, .b = 49},
+            {.r = 71, .g = 58, .b = 49},
+            {.r = 97, .g = 50, .b = 23},
+            {.r = 209, .g = 146, .b = 8},
+            {.r = 247, .g = 194, .b = 10},
+            {.r = 247, .g = 200, .b = 15},
+            {.r = 247, .g = 242, .b = 183},
+            {.r = 250, .g = 250, .b = 195}
+        },
+        .textureScaler = 2.5f,
+        .noiseType = FNL_NOISE_CELLULAR,
+        .fractalType = FNL_FRACTAL_NONE,
+        .tradeDiffs = {.tree = -1, .rock = 2, .water = 1}
     }
 };
 
