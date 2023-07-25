@@ -10,7 +10,7 @@
 #include "uiutils.h"
 
 GLuint starMesh;
-static GLuint sunTextures[NUM_SUN_TYPES];
+static GLuint starTextures[NUM_STAR_TYPES];
 
 GLuint systemInfoTexture;
 
@@ -25,16 +25,18 @@ void initStarmap(GLuint uiTex)
     uiTexture = uiTex;
 
     starMesh = loadModelList("res/obj/Planet.obj");
-    sunTextures[0] = generateStarTexture(ST_NORMAL);
-    sunTextures[1] = generateStarTexture(ST_BLUE);
-    sunTextures[2] = generateStarTexture(ST_RED);
+    starTextures[0] = generateStarTexture(ST_NORMAL);
+    starTextures[1] = generateStarTexture(ST_BLUE);
+    starTextures[2] = generateStarTexture(ST_RED);
 }
 
 void quitStarmap()
 {
     glDeleteList(starMesh);
-    deleteRGBTexture(sunTextures[0]);
-    deleteRGBTexture(sunTextures[1]);
+    for(uint8_t i = 0; i < NUM_STAR_TYPES; i++)
+    {
+        deleteRGBTexture(starTextures[i]);
+    }
 }
 
 #define CAMERA_HEIGHT 15

@@ -9,7 +9,7 @@ const uint8_t starNumProbabilities[MAX_STARS] = {
     100
 };
 
-const TextureGeneratorData starGeneratorData[NUM_SUN_TYPES] = {
+const TextureGeneratorData starGeneratorData[NUM_STAR_TYPES] = {
     [ST_NORMAL] = {
         .palettes = {
             {.r = 56, .g = 0, .b = 0},

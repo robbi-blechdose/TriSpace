@@ -23,7 +23,7 @@ typedef struct {
 
 extern const uint8_t starNumProbabilities[MAX_STARS];
 
-extern const TextureGeneratorData starGeneratorData[NUM_SUN_TYPES];
+extern const TextureGeneratorData starGeneratorData[NUM_STAR_TYPES];
 
 //-------- Planet data -------//
 

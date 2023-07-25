@@ -31,7 +31,7 @@ typedef enum {
     ST_NORMAL,
     ST_BLUE,
     ST_RED,
-    NUM_SUN_TYPES
+    NUM_STAR_TYPES
 } StarType;
 
 typedef struct {
