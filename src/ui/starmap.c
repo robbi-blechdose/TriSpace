@@ -10,7 +10,7 @@
 #include "uiutils.h"
 
 GLuint starMesh;
-static GLuint sunTextures[2];
+static GLuint sunTextures[NUM_SUN_TYPES];
 
 GLuint systemInfoTexture;
 
@@ -25,9 +25,9 @@ void initStarmap(GLuint uiTex)
     uiTexture = uiTex;
 
     starMesh = loadModelList("res/obj/Planet.obj");
-    sunTextures[0] = loadRGBTexture("res/tex/suns/Normal.png");
-    sunTextures[1] = loadRGBTexture("res/tex/suns/Blue.png");
-    sunTextures[2] = loadRGBTexture("res/tex/suns/Red.png");
+    sunTextures[0] = generateStarTexture(ST_NORMAL);
+    sunTextures[1] = generateStarTexture(ST_BLUE);
+    sunTextures[2] = generateStarTexture(ST_RED);
 }
 
 void quitStarmap()

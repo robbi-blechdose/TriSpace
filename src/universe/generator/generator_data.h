@@ -6,12 +6,6 @@
 #include "../../engine/includes/FastNoiseLite.h"
 #include "../starsystem.h"
 
-//--------- Star data --------//
-
-extern const uint8_t starNumProbabilities[MAX_STARS];
-
-//-------- Planet data -------//
-
 typedef struct {
     uint8_t r;
     uint8_t g;
@@ -23,6 +17,18 @@ typedef struct {
     float textureScaler;
     fnl_noise_type noiseType;
     fnl_fractal_type fractalType;
+} TextureGeneratorData;
+
+//--------- Star data --------//
+
+extern const uint8_t starNumProbabilities[MAX_STARS];
+
+extern const TextureGeneratorData starGeneratorData[NUM_SUN_TYPES];
+
+//-------- Planet data -------//
+
+typedef struct {
+    TextureGeneratorData texture;
     struct {
         int8_t tree;
         int8_t rock;
@@ -30,7 +36,7 @@ typedef struct {
     } tradeDiffs;
 } PlanetGeneratorData;
 
-//Palettes are ordered by closeness to the sun
+//Planets are ordered by closeness to the sun
 extern const PlanetGeneratorData planetGeneratorData[NUM_PLANET_TYPES];
 
 //----- System name data -----//

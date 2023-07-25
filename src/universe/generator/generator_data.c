@@ -9,167 +9,233 @@ const uint8_t starNumProbabilities[MAX_STARS] = {
     100
 };
 
+const TextureGeneratorData starGeneratorData[NUM_SUN_TYPES] = {
+    [ST_NORMAL] = {
+        .palettes = {
+            {.r = 56, .g = 0, .b = 0},
+            {.r = 98, .g = 0, .b = 0},
+            {.r = 149, .g = 0, .b = 0},
+            {.r = 199, .g = 16, .b = 0},
+            {.r = 250, .g = 128, .b = 0},
+            {.r = 255, .g = 188, .b = 6},
+            {.r = 255, .g = 234, .b = 199},
+            {.r = 255, .g = 255, .b = 255}
+        },
+        .textureScaler = 1.5f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM
+    },
+    [ST_BLUE] = {
+        .palettes = {
+            {.r = 0, .g = 39, .b = 28},
+            {.r = 0, .g = 51, .b = 44},
+            {.r = 0, .g = 91, .b = 93},
+            {.r = 0, .g = 137, .b = 146},
+            {.r = 0, .g = 187, .b = 227},
+            {.r = 6, .g = 203, .b = 255},
+            {.r = 135, .g = 234, .b = 255},
+            {.r = 255, .g = 255, .b = 255}
+        },
+        .textureScaler = 1.5f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM
+    },
+    [ST_RED] = {
+        .palettes = {
+            {.r = 52, .g = 0, .b = 0},
+            {.r = 60, .g = 0, .b = 0},
+            {.r = 96, .g = 0, .b = 0},
+            {.r = 130, .g = 0, .b = 17},
+            {.r = 185, .g = 0, .b = 36},
+            {.r = 243, .g = 0, .b = 43},
+            {.r = 255, .g = 163, .b = 15},
+            {.r = 237, .g = 198, .b = 144}
+        },
+        .textureScaler = 1.5f,
+        .noiseType = FNL_NOISE_VALUE,
+        .fractalType = FNL_FRACTAL_FBM
+    }
+};
+
 //-------- Planet data -------//
 
 const PlanetGeneratorData planetGeneratorData[NUM_PLANET_TYPES] = {
     [PT_Venus] = {
-        .palettes = {
-            //Base colors
-            {.r = 41, .g = 6, .b = 4},
-            {.r = 99, .g = 14, .b = 10},
-            {.r = 133, .g = 72, .b = 3},
-            //Lava
-            {.r = 255, .g = 62, .b = 23},
-            {.r = 255, .g = 147, .b = 23},
-            {.r = 255, .g = 198, .b = 10},
-            //Mountains
-            {.r = 209, .g = 168, .b = 121},
-            {.r = 69, .g = 62, .b = 45},
+        .texture = {
+            .palettes = {
+                //Base colors
+                {.r = 41, .g = 6, .b = 4},
+                {.r = 99, .g = 14, .b = 10},
+                {.r = 133, .g = 72, .b = 3},
+                //Lava
+                {.r = 255, .g = 62, .b = 23},
+                {.r = 255, .g = 147, .b = 23},
+                {.r = 255, .g = 198, .b = 10},
+                //Mountains
+                {.r = 209, .g = 168, .b = 121},
+                {.r = 69, .g = 62, .b = 45},
+            },
+            .textureScaler = 1.3f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 1.3f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = 2, .water = -2}
     },
     [PT_Mars] = {
-        .palettes = {
-            {.r = 145, .g = 69, .b = 25},
-            {.r = 199, .g = 88, .b = 24},
-            {.r = 227, .g = 132, .b = 36},
-            {.r = 240, .g = 153, .b = 67},
-            {.r = 247, .g = 163, .b = 89},
-            {.r = 199, .g = 160, .b = 125},
-            {.r = 199, .g = 145, .b = 97},
-            {.r = 255, .g = 255, .b = 255}
+        .texture = {
+            .palettes = {
+                {.r = 145, .g = 69, .b = 25},
+                {.r = 199, .g = 88, .b = 24},
+                {.r = 227, .g = 132, .b = 36},
+                {.r = 240, .g = 153, .b = 67},
+                {.r = 247, .g = 163, .b = 89},
+                {.r = 199, .g = 160, .b = 125},
+                {.r = 199, .g = 145, .b = 97},
+                {.r = 255, .g = 255, .b = 255}
+            },
+            .textureScaler = 1.0f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 1.0f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -1, .rock = 1, .water = -1}
     },
     [PT_Earth] = {
-        .palettes = {
-            //Ocean
-            {.r = 33, .g = 13, .b = 130},
-            {.r = 32, .g = 41, .b = 212},
-            {.r = 122, .g = 228, .b = 240},
-            {.r = 44, .g = 130, .b = 232},
-            //Sand
-            {.r = 250, .g = 226, .b = 92},
-            //Grass
-            {.r = 73, .g = 163, .b = 42},
-            {.r = 105, .g = 212, .b = 68},
-            {.r = 107, .g = 128, .b = 38}
+        .texture = {
+            .palettes = {
+                //Ocean
+                {.r = 33, .g = 13, .b = 130},
+                {.r = 32, .g = 41, .b = 212},
+                {.r = 122, .g = 228, .b = 240},
+                {.r = 44, .g = 130, .b = 232},
+                //Sand
+                {.r = 250, .g = 226, .b = 92},
+                //Grass
+                {.r = 73, .g = 163, .b = 42},
+                {.r = 105, .g = 212, .b = 68},
+                {.r = 107, .g = 128, .b = 38}
+            },
+            .textureScaler = 0.9f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 0.9f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = 1, .rock = -1, .water = 0}
     },
     [PT_Ocean] = {
-        .palettes = {
-            //Ocean
-            {.r = 7, .g = 45, .b = 105},
-            {.r = 29, .g = 85, .b = 173},
-            {.r = 12, .g = 105, .b = 235},
-            {.r = 42, .g = 76, .b = 212},
-            {.r = 29, .g = 173, .b = 209},
-            //Shores
-            {.r = 246, .g = 255, .b = 161},
-            {.r = 243, .g = 255, .b = 130},
-            //Mountains
-            {.r = 105, .g = 105, .b = 105}
+        .texture = {
+            .palettes = {
+                //Ocean
+                {.r = 7, .g = 45, .b = 105},
+                {.r = 29, .g = 85, .b = 173},
+                {.r = 12, .g = 105, .b = 235},
+                {.r = 42, .g = 76, .b = 212},
+                {.r = 29, .g = 173, .b = 209},
+                //Shores
+                {.r = 246, .g = 255, .b = 161},
+                {.r = 243, .g = 255, .b = 130},
+                //Mountains
+                {.r = 105, .g = 105, .b = 105}
+            },
+            .textureScaler = 0.5f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 0.5f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = 0, .rock = -1, .water = 2}
     },
     [PT_Forest] = {
-        .palettes = {
-            //Ground
-            {.r = 110, .g = 46, .b = 1},
-            {.r = 79, .g = 110, .b = 1},
-            //Trees (low)
-            {.r = 97, .g = 158, .b = 17},
-            {.r = 84, .g = 125, .b = 30},
-            //Trees (high)
-            {.r = 142, .g = 191, .b = 8},
-            {.r = 185, .g = 222, .b = 82},
-            //Trees (very high, snow tips)
-            {.r = 175, .g = 252, .b = 73},
-            {.r = 247, .g = 247, .b = 247}
+        .texture = {
+            .palettes = {
+                //Ground
+                {.r = 110, .g = 46, .b = 1},
+                {.r = 79, .g = 110, .b = 1},
+                //Trees (low)
+                {.r = 97, .g = 158, .b = 17},
+                {.r = 84, .g = 125, .b = 30},
+                //Trees (high)
+                {.r = 142, .g = 191, .b = 8},
+                {.r = 185, .g = 222, .b = 82},
+                //Trees (very high, snow tips)
+                {.r = 175, .g = 252, .b = 73},
+                {.r = 247, .g = 247, .b = 247}
+            },
+            .textureScaler = 1.0f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 1.0f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = 2, .rock = -1, .water = 0}
     },
     [PT_Ice] = {
-        .palettes = {
-            //Frozen oceans
-            {.r = 51, .g = 181, .b = 181},
-            {.r = 54, .g = 129, .b = 191},
-            {.r = 107, .g = 182, .b = 214},
-            {.r = 145, .g = 209, .b = 237},
-            //Mountains
-            {.r = 85, .g = 86, .b = 87},
-            {.r = 61, .g = 61, .b = 61},
-            //Snow caps
-            {.r = 224, .g = 224, .b = 224},
-            {.r = 230, .g = 240, .b = 245}
+        .texture = {
+            .palettes = {
+                //Frozen oceans
+                {.r = 51, .g = 181, .b = 181},
+                {.r = 54, .g = 129, .b = 191},
+                {.r = 107, .g = 182, .b = 214},
+                {.r = 145, .g = 209, .b = 237},
+                //Mountains
+                {.r = 85, .g = 86, .b = 87},
+                {.r = 61, .g = 61, .b = 61},
+                //Snow caps
+                {.r = 224, .g = 224, .b = 224},
+                {.r = 230, .g = 240, .b = 245}
+            },
+            .textureScaler = 2.0f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 2.0f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = 1, .water = 2}
     },
     [PT_Dead] = {
-        .palettes = {
-            {.r = 43, .g = 43, .b = 43},
-            {.r = 66, .g = 66, .b = 66},
-            {.r = 75, .g = 75, .b = 75},
-            {.r = 90, .g = 90, .b = 90},
-            {.r = 120, .g = 120, .b = 120},
-            {.r = 80, .g = 80, .b = 80},
-            {.r = 130, .g = 130, .b = 130},
-            {.r = 150, .g = 150, .b = 150},
+        .texture = {
+            .palettes = {
+                {.r = 43, .g = 43, .b = 43},
+                {.r = 66, .g = 66, .b = 66},
+                {.r = 75, .g = 75, .b = 75},
+                {.r = 90, .g = 90, .b = 90},
+                {.r = 120, .g = 120, .b = 120},
+                {.r = 80, .g = 80, .b = 80},
+                {.r = 130, .g = 130, .b = 130},
+                {.r = 150, .g = 150, .b = 150},
+            },
+            .textureScaler = 3.0f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 3.0f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = 2, .water = -2}
     },
     [PT_Gas] = {
-        .palettes = {
-            {.r = 0, .g = 41, .b = 99},
-            {.r = 19, .g = 83, .b = 173},
-            {.r = 12, .g = 106, .b = 237},
-            {.r = 12, .g = 38, .b = 237},
-            {.r = 68, .b = 29, .b = 224},
-            {.r = 63, .g = 32, .b = 189},
-            {.r = 90, .g = 32, .b = 189},
-            {.r = 97, .g = 19, .b = 232}
+        .texture = {
+            .palettes = {
+                {.r = 0, .g = 41, .b = 99},
+                {.r = 19, .g = 83, .b = 173},
+                {.r = 12, .g = 106, .b = 237},
+                {.r = 12, .g = 38, .b = 237},
+                {.r = 68, .b = 29, .b = 224},
+                {.r = 63, .g = 32, .b = 189},
+                {.r = 90, .g = 32, .b = 189},
+                {.r = 97, .g = 19, .b = 232}
+            },
+            .textureScaler = 0.6f,
+            .noiseType = FNL_NOISE_VALUE,
+            .fractalType = FNL_FRACTAL_FBM
         },
-        .textureScaler = 0.6f,
-        .noiseType = FNL_NOISE_VALUE,
-        .fractalType = FNL_FRACTAL_FBM,
         .tradeDiffs = {.tree = -2, .rock = -2, .water = 0}
     },
     [PT_DarkCities] = {
-        .palettes = {
-            {.r = 59, .g = 49, .b = 49},
-            {.r = 71, .g = 58, .b = 49},
-            {.r = 97, .g = 50, .b = 23},
-            {.r = 209, .g = 146, .b = 8},
-            {.r = 247, .g = 194, .b = 10},
-            {.r = 247, .g = 200, .b = 15},
-            {.r = 247, .g = 242, .b = 183},
-            {.r = 250, .g = 250, .b = 195}
+        .texture = {
+            .palettes = {
+                {.r = 59, .g = 49, .b = 49},
+                {.r = 71, .g = 58, .b = 49},
+                {.r = 97, .g = 50, .b = 23},
+                {.r = 209, .g = 146, .b = 8},
+                {.r = 247, .g = 194, .b = 10},
+                {.r = 247, .g = 200, .b = 15},
+                {.r = 247, .g = 242, .b = 183},
+                {.r = 250, .g = 250, .b = 195}
+            },
+            .textureScaler = 2.5f,
+            .noiseType = FNL_NOISE_CELLULAR,
+            .fractalType = FNL_FRACTAL_NONE
         },
-        .textureScaler = 2.5f,
-        .noiseType = FNL_NOISE_CELLULAR,
-        .fractalType = FNL_FRACTAL_NONE,
         .tradeDiffs = {.tree = -1, .rock = 2, .water = 1}
     }
 };

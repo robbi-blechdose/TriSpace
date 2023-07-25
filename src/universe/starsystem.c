@@ -2,6 +2,7 @@
 
 #include "../engine/model.h"
 #include "../engine/image.h"
+#include "generator/generator.h"
 
 GLuint planetMesh;
 GLuint planetRingMesh;
@@ -15,9 +16,9 @@ void initStarSystem()
     planetMesh = loadModelList("res/obj/Planet.obj");
     planetRingMesh = loadModelList("res/obj/Planet_Ring.obj");
     planetRingTexture = loadRGBTexture("res/tex/Planet_Ring.png");
-    sunTextures[0] = loadRGBTexture("res/tex/suns/Normal.png");
-    sunTextures[1] = loadRGBTexture("res/tex/suns/Blue.png");
-    sunTextures[2] = loadRGBTexture("res/tex/suns/Red.png");
+    sunTextures[0] = generateStarTexture(ST_NORMAL);
+    sunTextures[1] = generateStarTexture(ST_BLUE);
+    sunTextures[2] = generateStarTexture(ST_RED);
 
     stationMesh = loadModelList("res/obj/SpaceStation.obj");
     stationTexture = loadRGBTexture("res/tex/SpaceStation.png");

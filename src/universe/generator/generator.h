@@ -10,6 +10,8 @@
  **/
 void generateStarSystemInfo(StarSystemInfo* info, uint32_t seed);
 
+GLuint generateStarTexture(StarType type);
+
 /**
  * Generate a full star system, including:
  * - texture data for planets

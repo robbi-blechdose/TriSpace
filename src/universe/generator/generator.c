@@ -73,12 +73,12 @@ void generateStarSystemInfo(StarSystemInfo* info, uint32_t seed)
     generateSystemCharacteristics(&info->characteristics, info->planetTypes[info->stationPlanetIndex]);
 }
 
-Color getColorForValue(PlanetGeneratorData pgd, float value)
+Color getColorForValue(TextureGeneratorData tgd, float value)
 {
     //Get an index between 0 and 8
     uint8_t index = value / 32;
-    Color a = pgd.palettes[index];
-    Color b = pgd.palettes[index + 1];
+    Color a = tgd.palettes[index];
+    Color b = tgd.palettes[index + 1];
     Color ret;
     ret.r = a.r + (b.r - a.r) * ((value / 32) - index);
     ret.g = a.g + (b.g - a.g) * ((value / 32) - index);
@@ -87,15 +87,15 @@ Color getColorForValue(PlanetGeneratorData pgd, float value)
 }
 
 #define TEXTURE_SIZE 256
-GLuint generatePlanetTexture(uint32_t seed, PlanetGeneratorData pgd)
+GLuint generateSphereTexture(uint32_t seed, TextureGeneratorData tgd)
 {
     uint8_t data[TEXTURE_SIZE * TEXTURE_SIZE * 3];
-    float size = (2 + randf(5)) * pgd.textureScaler;
+    float size = (2 + randf(5)) * tgd.textureScaler;
 
     //Generate texture
     fnl_state noise = fnlCreateState();
-    noise.noise_type = pgd.noiseType;
-    noise.fractal_type = pgd.fractalType;
+    noise.noise_type = tgd.noiseType;
+    noise.fractal_type = tgd.fractalType;
     noise.seed = seed + rand();
     for(uint16_t i = 0; i < TEXTURE_SIZE; i++)
     {
@@ -103,7 +103,7 @@ GLuint generatePlanetTexture(uint32_t seed, PlanetGeneratorData pgd)
         {
             //Noise value (-1 to 1) is scaled to be within 0 to 256
             float temp = (fnlGetNoise2D(&noise, i * size, j * size) + 1.0f) * 128;
-            Color c = getColorForValue(pgd, temp);
+            Color c = getColorForValue(tgd, temp);
             uint32_t index = i * TEXTURE_SIZE * 3 + j * 3;
             data[index] = c.r;
             data[index + 1] = c.g;
@@ -118,7 +118,7 @@ GLuint generatePlanetTexture(uint32_t seed, PlanetGeneratorData pgd)
         {
             //Noise value (-1 to 1) is scaled to be within 0 to 256
             float temp = (fnlGetNoise2D(&noise, i * size, 255 * size + j * size) + 1.0f) * 128;
-            Color c = getColorForValue(pgd, temp);
+            Color c = getColorForValue(tgd, temp);
             uint32_t index = i * 256 * 3 + j * 3;
             float multA = j / 16.0f;
             float multB = (16 - j) / 16.0f;
@@ -137,6 +137,12 @@ GLuint generatePlanetTexture(uint32_t seed, PlanetGeneratorData pgd)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, TEXTURE_SIZE, TEXTURE_SIZE, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	return t;
+}
+
+GLuint generateStarTexture(StarType type)
+{
+    #define STAR_TEXTURE_SEED 1
+    return generateSphereTexture(STAR_TEXTURE_SEED, starGeneratorData[type]);
 }
 
 void generateStarSystem(StarSystem* system, uint32_t seed)
@@ -174,7 +180,7 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     for(uint8_t i = 0; i < system->info.numPlanets; i++)
     {
         system->planets[i].size = 10.0f + randf(10);
-        system->planets[i].texture = generatePlanetTexture(seed, planetGeneratorData[system->info.planetTypes[i]]);
+        system->planets[i].texture = generateSphereTexture(seed, planetGeneratorData[system->info.planetTypes[i]].texture);
         system->planets[i].hasRing = randr(100) < 30;
 
         float orbitRadius = firstOrbit + (i * 35.0f);
