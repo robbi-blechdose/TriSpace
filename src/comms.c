@@ -38,8 +38,12 @@ const uint32_t commFlashes[5][2] = {
     {400, 1700}
 };
 
+const char* commHeaderIncoming = "INCOMING TRANSMISSION";
+const char* commHeaderInternal = "SYSTEM:";
+
 uint32_t commTicks;
 uint8_t commFlashIndex;
+const char* commHeader;
 const char* commMessage;
 
 void calcComms(uint32_t ticks)
@@ -74,7 +78,7 @@ void drawComms()
     }
 
     //We're within a flash, draw
-    glDrawText("INCOMING TRANSMISSION", CENTER(21), 16, 0xFFFFFF);
+    glDrawText(commHeader, CENTER(strlen(commHeader)), 16, 0xFFFFFF);
     glDrawText(commMessage, CENTER(strlen(commMessage)), 140, 0xFFFFFF);
 }
 
@@ -83,6 +87,7 @@ void setCommMessage(CommSender sender, CommType type)
     commTicks = 1;
     commFlashIndex = 0;
 
+    commHeader = commHeaderIncoming;
     commMessage = introComms[sender].list[randr(introComms[sender].length - 1)];
 
     switch(type)
@@ -112,12 +117,30 @@ void setStationCommMessage(uint8_t index)
     commTicks = 1;
     commFlashIndex = 0;
 
+    commHeader = commHeaderIncoming;
+
     switch(index)
     {
         case STATION_LAND_CLEAR:
         {
             sprintf(buffer, "Cleared to land in bay %d.", randr(5) + 1);
             commMessage = buffer;
+            break;
         }
     }
+}
+
+const char* systemComms[NUM_SYSTEM_COMMS] = {
+    [SC_AUTODOCK_ENABLED] = "Autodocking enabled.",
+    [SC_FUEL_SCOOPS_DONE] = "Fuel tanks full.",
+    [SC_MISSILES_EMPTY] = "Missiles depleted."
+};
+
+void setSystemCommMessage(SystemComm comm)
+{
+    commTicks = 1;
+    commFlashIndex = 0;
+
+    commHeader = commHeaderInternal;
+    commMessage = systemComms[comm];
 }

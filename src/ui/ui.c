@@ -131,7 +131,7 @@ void drawUI(bool onStation, Player* player, Npc npcs[], vec3 stationPos, uint8_t
     {
         if(autodockPossible)
         {
-            drawTexQuad(171, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
+            drawTexQuad(172, 11, 4, 4, UITH, PTC(252), PTC(24), 1, PTC(27));
         }
 
         drawRadarDot(player->ship.position, player->ship.rotation, stationPos, DOT_BLUE);

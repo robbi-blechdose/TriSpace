@@ -105,7 +105,7 @@ void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], 
             generateStarSystemInfo(&info, getSeedForSystem(i, j));
             vec2 systemPos = generateSystemPos(getSeedForSystem(i, j), i, j);
 
-            glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[0]]);
+            glBindTexture(GL_TEXTURE_2D, starTextures[info.starTypes[0]]);
             glPushMatrix();
             switch(info.numStars)
             {
@@ -121,7 +121,7 @@ void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], 
                     glTranslatef(systemPos.x - sc.x, 0, systemPos.y - sc.y);
                     glCallList(starMesh);
 
-                    glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[1]]);
+                    glBindTexture(GL_TEXTURE_2D, starTextures[info.starTypes[1]]);
                     glTranslatef(sc.x * 2, 0, sc.y * 2);
                     glCallList(starMesh);
                     break;
@@ -139,14 +139,14 @@ void drawStarmap3d(int8_t* currentSystem, float fuel, int8_t contractSystem[2], 
                     glCallList(starMesh);
                     glTranslatef(-sc.x, 0, -sc.y);
 
-                    glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[1]]);
+                    glBindTexture(GL_TEXTURE_2D, starTextures[info.starTypes[1]]);
                     angle += 2.0f / 3.0f * M_PI;
                     sc = starDistSinCos(angle);
                     glTranslatef(sc.x, 0, sc.y);
                     glCallList(starMesh);
                     glTranslatef(-sc.x, 0, -sc.y);
 
-                    glBindTexture(GL_TEXTURE_2D, sunTextures[info.starTypes[2]]);
+                    glBindTexture(GL_TEXTURE_2D, starTextures[info.starTypes[2]]);
                     angle += 2.0f / 3.0f * M_PI;
                     sc = starDistSinCos(angle);
                     glTranslatef(sc.x, 0, sc.y);

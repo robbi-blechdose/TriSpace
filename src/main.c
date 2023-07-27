@@ -240,6 +240,7 @@ void calcSpace(uint32_t ticks)
             preCalcAutodockShip(&autodock, &player.ship, &starSystem);
             if(autodock.active)
             {
+                setSystemCommMessage(SC_AUTODOCK_ENABLED);
                 playMusic(MUSIC_DOCKING, 250);
             }
         }
@@ -264,6 +265,10 @@ void calcSpace(uint32_t ticks)
     {
         player.fuelScoopsActive = true;
         player.fuel += 0.8f * ticks / 1000.0f;
+        if(player.fuel >= MAX_FUEL)
+        {
+            setSystemCommMessage(SC_FUEL_SCOOPS_DONE);
+        }
     }
     else
     {
@@ -304,6 +309,10 @@ void calcSpace(uint32_t ticks)
         {
             createMissile(player.ship.position, player.ship.rotation, targetShip);
             player.ship.missiles--;
+            if(player.ship.missiles == 0)
+            {
+                setSystemCommMessage(SC_MISSILES_EMPTY);
+            }
         }
     }
 

@@ -25,4 +25,13 @@ void setCommMessage(CommSender sender, CommType type);
 
 void setStationCommMessage(uint8_t index);
 
+typedef enum {
+    SC_AUTODOCK_ENABLED,
+    SC_FUEL_SCOOPS_DONE,
+    SC_MISSILES_EMPTY,
+    NUM_SYSTEM_COMMS
+} SystemComm;
+
+void setSystemCommMessage(SystemComm comm);
+
 #endif
