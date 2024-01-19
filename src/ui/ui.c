@@ -270,7 +270,7 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     glEnd();
     glDrawText("Trading", CENTER(7), 2, TEXT_DKGREY);
 
-    char buffer[29];
+    char buffer[33];
     char name[15];
     char type[4];
 

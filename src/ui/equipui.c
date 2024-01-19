@@ -94,9 +94,9 @@ void drawEquipUI(Player* player)
     glEnd();
     glDrawText("Equip ship", CENTER(10), 2, TEXT_DKGREY);
 
-    char buffer[29];
+    char buffer[32];
     char name[21];
-    char status[4];
+    char status[5];
 
     glDrawText("ITEM               PRICE  QTY", 4, 128, TEXT_GREEN);
     for(uint8_t i = 0; i < NUM_EQUIPMENT_TYPES; i++)

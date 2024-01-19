@@ -252,7 +252,7 @@ void drawContractUI3d(Contract* activeContract, Contract* contracts)
 
 void drawContract(Contract* contract)
 {
-    char buffer[29];
+    char buffer[29 * 3 + 1];
 
     glDrawText("Employer:", 2, 112, TEXT_GREEN);
     sprintf(buffer, "%s %s", contractFirstnames[contract->employerFirstname], contractLastnames[contract->employerLastname]);
@@ -292,7 +292,7 @@ void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numCo
     {
         drawContract(&contracts[cursor]);
 
-        char buffer[29];
+        char buffer[32];
         sprintf(buffer, "%d/%d", cursor + 1, numContracts);
         glDrawText(buffer, 214, 112, TEXT_WHITE);
     }

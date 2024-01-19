@@ -72,8 +72,10 @@ void calcSpacedust(Ship* playerShip, uint32_t ticks)
                 spacedust[i].y -= WINY_3D / 2;
 
                 //Rotate
-                spacedust[i].x = spacedust[i].x * cosf(angle) - spacedust[i].y * sinf(angle);
-                spacedust[i].y = spacedust[i].x * sinf(angle) + spacedust[i].y * cosf(angle);
+                float newX = spacedust[i].x * cosf(angle) - spacedust[i].y * sinf(angle);
+                float newY = spacedust[i].x * sinf(angle) + spacedust[i].y * cosf(angle);
+                spacedust[i].x = newX;
+                spacedust[i].y = newY;
 
                 //Move back
                 spacedust[i].x += WINX / 2;

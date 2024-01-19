@@ -84,7 +84,7 @@ bool handleInput()
             }
             case SDLK_q:
             {
-                running = 0;
+                running = false;
                 break;
             }
             case SDLK_k:

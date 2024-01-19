@@ -1,6 +1,6 @@
 CC          	= gcc
 
-CFLAGS			= -O3 -flto=auto -Wall -Wno-unknown-pragmas -Wno-missing-braces
+CFLAGS			= -flto=auto -Wall -Wno-unknown-pragmas -Wno-missing-braces
 LDFLAGS     	= -lSDL -lSDL_image -lm -lSDL_mixer -lmikmod
 
 PNAME			= main.elf
@@ -31,5 +31,6 @@ $(OBJS): %.o : %.c
 debug: CFLAGS += -DDEBUG=1 -DNO_FPS_LIMIT=1 -g
 debug: $(PNAME)
 
-oclean:
+clean:
 	rm *.o
+	rm $(PNAME)

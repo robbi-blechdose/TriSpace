@@ -216,7 +216,7 @@ void drawSystemInfoBox()
                     PTC(240), PTC(info.planetTypes[i] * 8), PTC(248), PTC(7 + info.planetTypes[i] * 8));
     }
 
-    char description[29 * 3];
+    char description[29 * 3 + 1] = {0};
     generateSystemDescription(description, &info);
     glDrawText(description, 8, 168 + 4 + 36, TEXT_WHITE);
 
