@@ -76,7 +76,7 @@ void drawTitleScreen()
         glDrawText(menuStrings[i], CENTER(strlen(menuStrings[i])), 146 + i * 16, cursor == i ? 0x00FFFF : TEXT_WHITE);
     }
 
-    glDrawText("2021 - 2023", CENTER(11), 240 - 28, 0xFFFFFF);
+    glDrawText("2021 - 2024", CENTER(11), 240 - 28, 0xFFFFFF);
     glDrawText("Robbi Blechdose", CENTER(15), 240 - 16, 0xFFFFFF);
 }
 
