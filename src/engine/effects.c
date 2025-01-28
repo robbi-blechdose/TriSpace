@@ -1,5 +1,5 @@
 #include "effects.h"
-#include "image.h"
+#include "../fk-engine-core/image.h"
 
 Effect effects[MAX_EFFECTS];
 GLuint effectTexture;

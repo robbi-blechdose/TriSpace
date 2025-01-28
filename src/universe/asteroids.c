@@ -1,7 +1,7 @@
 #include "asteroids.h"
 
-#include "../engine/model.h"
-#include "../engine/image.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/image.h"
 #include "../engine/effects.h"
 
 #include "../cargo.h"

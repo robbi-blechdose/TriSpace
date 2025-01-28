@@ -1,8 +1,8 @@
 #include "universe.h"
 
 #include "../engine/effects.h"
-#include "../engine/audio.h"
-#include "../engine/util.h"
+#include "../fk-engine-core/audio.h"
+#include "../fk-engine-core/util.h"
 
 #include "asteroids.h"
 #include "satellites.h"

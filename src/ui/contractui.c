@@ -1,8 +1,8 @@
 #include "contractui.h"
 
-#include "../engine/image.h"
-#include "../engine/model.h"
-#include "../engine/camera.h"
+#include "../fk-engine-core/image.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/camera.h"
 
 #include "uiutils.h"
 
@@ -84,7 +84,7 @@ void movePlayerShipAlongWaypoints(uint32_t ticks)
 void calcContractUIInternal(uint32_t ticks, Contract* contract)
 {
     setCameraPos((vec3) {0, 15, 15});
-    setCameraRot(quatFromAngles((vec3) {DEG_TO_RAD(-45), 0, 0}));
+    setCameraRotMat(quatFromAngles((vec3) {DEG_TO_RAD(-45), 0, 0}));
 
     switch(contract->type)
     {

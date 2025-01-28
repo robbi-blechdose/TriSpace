@@ -1,8 +1,8 @@
 #include "equipui.h"
 
-#include "../engine/image.h"
-#include "../engine/model.h"
-#include "../engine/camera.h"
+#include "../fk-engine-core/image.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/camera.h"
 
 #include "../equipment.h"
 
@@ -62,7 +62,7 @@ void calcEquipUI(uint32_t ticks)
     }
 
     setCameraPos((vec3) {0, 2.5f, 4});
-    setCameraRot(quatFromAngles((vec3) {DEG_TO_RAD(-45), 0, 0}));
+    setCameraRotMat(quatFromAngles((vec3) {DEG_TO_RAD(-45), 0, 0}));
 }
 
 void drawEquipUI3d(Player* player)

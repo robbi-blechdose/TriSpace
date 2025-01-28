@@ -4,9 +4,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "engine/includes/3dMath.h"
-#include "engine/util.h"
-#include "engine/quaternion.h"
+#include "fk-engine-core/includes/3dMath.h"
+#include "fk-engine-core/util.h"
+#include "fk-engine-core/quaternion.h"
 
 typedef struct {
     uint8_t maxShields;

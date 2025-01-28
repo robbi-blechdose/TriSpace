@@ -1,8 +1,8 @@
 #include "starmap.h"
 
-#include "../engine/model.h"
-#include "../engine/image.h"
-#include "../engine/camera.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/image.h"
+#include "../fk-engine-core/camera.h"
 
 #include "../universe/generator/generator.h"
 #include "../universe/universe.h"
@@ -68,7 +68,7 @@ void calcStarmap(uint32_t ticks)
     }
 
     setCameraPos(cameraPos);
-    setCameraRot(quatFromAngles((vec3) {-M_PI_2, 0, 0}));
+    setCameraRotMat(quatFromAngles((vec3) {-M_PI_2, 0, 0}));
 }
 
 #define STAR_DIST 1.5f

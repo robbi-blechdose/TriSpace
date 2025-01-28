@@ -4,7 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "engine/util.h"
+#include "fk-engine-core/util.h"
 #include "ship.h"
 #include "universe/starsystem.h"
 

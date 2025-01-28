@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 #include "GL/gl.h"
-#include "../engine/util.h"
+#include "../fk-engine-core/util.h"
 
 #define MAX_STARS 3
 #define MAX_PLANETS 6

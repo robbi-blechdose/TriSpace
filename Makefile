@@ -16,7 +16,7 @@ include $(TARGET).mk
 endif
 
 # Files to be compiled
-SRCDIR 		=  ./src ./res ./src/universe ./src/engine ./src/ui ./src/npcs ./src/universe/generator
+SRCDIR 		=  ./src ./res ./src/universe ./src/engine ./src/fk-engine-core ./src/ui ./src/npcs ./src/universe/generator
 VPATH		= $(SRCDIR)
 SRC_C		= $(foreach dir, $(SRCDIR), $(wildcard $(dir)/*.c))
 OBJS		= $(notdir $(patsubst %.c, %.o, $(SRC_C)))

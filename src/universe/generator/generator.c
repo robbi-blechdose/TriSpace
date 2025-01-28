@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "GL/gl.h"
 #define FNL_IMPL
-#include "../../engine/includes/FastNoiseLite.h"
+#include "../../fk-engine-core/includes/FastNoiseLite.h"
 #include "../asteroids.h"
 #include "generator_data.h"
 

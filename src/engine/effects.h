@@ -3,7 +3,7 @@
 
 #include <SDL.h>
 #include "GL/gl.h"
-#include "util.h"
+#include "../fk-engine-core/util.h"
 
 #define MAX_EFFECTS 64
 

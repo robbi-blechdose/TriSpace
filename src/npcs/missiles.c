@@ -1,9 +1,9 @@
 #include "missiles.h"
 
-#include "../engine/model.h"
-#include "../engine/image.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/image.h"
 #include "../engine/effects.h"
-#include "../engine/audio.h"
+#include "../fk-engine-core/audio.h"
 
 typedef struct {
     vec3 position;

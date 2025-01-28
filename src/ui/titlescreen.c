@@ -1,8 +1,8 @@
 #include "titlescreen.h"
 
-#include "../engine/model.h"
-#include "../engine/image.h"
-#include "../engine/camera.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/image.h"
+#include "../fk-engine-core/camera.h"
 
 #include "uiutils.h"
 #include "../version.h"
@@ -44,7 +44,7 @@ void calcTitleScreen(uint32_t ticks)
     }
 
     setCameraPos((vec3) {0, 0.4f, 5.5f});
-    setCameraRot(quatFromAngles((vec3) {0, 0, 0}));
+    setCameraRotMat(quatFromAngles((vec3) {0, 0, 0}));
 }
 
 void drawTitleScreen3d()

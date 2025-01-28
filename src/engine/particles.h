@@ -2,7 +2,7 @@
 #define _PARTICLES_H
 
 #include <SDL.h>
-#include "util.h"
+#include "../fk-engine-core/util.h"
 
 #define NUM_PARTICLES 64
 

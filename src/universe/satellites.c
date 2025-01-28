@@ -1,6 +1,6 @@
 #include "satellites.h"
-#include "../engine/model.h"
-#include "../engine/image.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/image.h"
 
 Satellite satellites[NUM_SATELLITES];
 uint8_t satelliteIndex;

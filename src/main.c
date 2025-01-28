@@ -1,12 +1,12 @@
 #include <SDL.h>
 
-#include "engine/video.h"
-#include "engine/includes/3dMath.h"
-#include "engine/input.h"
-#include "engine/camera.h"
+#include "fk-engine-core/video.h"
+#include "fk-engine-core/includes/3dMath.h"
+#include "fk-engine-core/input.h"
+#include "fk-engine-core/camera.h"
 #include "engine/effects.h"
-#include "engine/savegame.h"
-#include "engine/audio.h"
+#include "fk-engine-core/savegame.h"
+#include "fk-engine-core/audio.h"
 
 #include "universe/starsystem.h"
 #include "universe/spacestation.h"
@@ -281,7 +281,7 @@ void calcSpace(uint32_t ticks)
         player.ship.shields = -1;
     }
     setCameraPos(player.ship.position);
-    setCameraRot(player.ship.rotation);
+    setCameraRotMat(player.ship.rotation);
     calcSpacedust(&player.ship, ticks);
 
     //Collect NPC ships into array
@@ -429,7 +429,7 @@ void calcFrame(uint32_t ticks)
                 player.ship.speed = 0;
             }
             setCameraPos(player.ship.position);
-            setCameraRot(player.ship.rotation);
+            setCameraRotMat(player.ship.rotation);
 
             calcComms(ticks);
 
@@ -480,7 +480,7 @@ void calcFrame(uint32_t ticks)
             }
             calcShip(&player.ship, ticks);
             setCameraPos(player.ship.position);
-            setCameraRot(player.ship.rotation);
+            setCameraRotMat(player.ship.rotation);
             calcSpacedust(&player.ship, ticks);
             break;
         }
@@ -735,7 +735,7 @@ void drawFrame()
     glViewport(0, 0, WINX, WINY_3D);
     setPerspective();
 
-    drawCamera();
+    drawCameraPrepMat();
 
     if(state == HYPERSPACE)
     {

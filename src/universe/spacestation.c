@@ -1,7 +1,7 @@
 #include "spacestation.h"
 
-#include "../engine/model.h"
-#include "../engine/image.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/image.h"
 
 GLuint stationInteriorMesh;
 GLuint stationInteriorTexture;

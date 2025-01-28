@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "../engine/util.h"
+#include "../fk-engine-core/util.h"
 
 #define NUM_SATELLITES 8
 

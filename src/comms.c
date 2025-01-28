@@ -3,7 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "GL/gl.h"
-#include "engine/util.h"
+#include "fk-engine-core/util.h"
 
 #include "ui/uiutils.h"
 

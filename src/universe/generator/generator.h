@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "../starsystem.h"
-#include "../../engine/util.h"
+#include "../../fk-engine-core/util.h"
 
 /**
  * Generate basic information about a star system

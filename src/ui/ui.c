@@ -1,8 +1,8 @@
 #include "ui.h"
 
-#include "../engine/model.h"
-#include "../engine/image.h"
-#include "../engine/includes/3dMath.h"
+#include "../fk-engine-core/model.h"
+#include "../fk-engine-core/image.h"
+#include "../fk-engine-core/includes/3dMath.h"
 #include "../cargo.h"
 #include "../universe/satellites.h"
 

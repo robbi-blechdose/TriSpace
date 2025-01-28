@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "engine/util.h"
+#include "fk-engine-core/util.h"
 #include "universe/satellites.h"
 
 const char* contractTypeNames[NUM_CONTRACT_TYPES] = {

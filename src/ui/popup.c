@@ -1,7 +1,7 @@
 #include "popup.h"
 
 #include <string.h>
-#include "../engine/image.h"
+#include "../fk-engine-core/image.h"
 #include "uiutils.h"
 
 static GLuint uiTexture;

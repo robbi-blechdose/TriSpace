@@ -2,8 +2,8 @@
 #define MISSILES_H
 
 #include <stdint.h>
-#include "../engine/includes/3dMath.h"
-#include "../engine/quaternion.h"
+#include "../fk-engine-core/includes/3dMath.h"
+#include "../fk-engine-core/quaternion.h"
 #include "../ship.h"
 
 void initMissiles();

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-#include "../../engine/includes/FastNoiseLite.h"
+#include "../../fk-engine-core/includes/FastNoiseLite.h"
 #include "../starsystem.h"
 
 typedef struct {
