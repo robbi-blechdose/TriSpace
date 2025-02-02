@@ -3,6 +3,7 @@
 #include "../fk-engine-core/image.h"
 #include "../fk-engine-core/model.h"
 #include "../fk-engine-core/camera.h"
+#include "../fk-engine-core/text.h"
 
 #include "../equipment.h"
 
@@ -92,7 +93,7 @@ void drawEquipUI(Player* player)
     drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(239), PTC(11));
     drawTexQuad(0, 0, 240, 116, UIBH, 0, PTC(26), PTC(239), PTC(141));
     glEnd();
-    glDrawText("Equip ship", CENTER(10), 2, TEXT_DKGREY);
+    glDrawTextCentered("Equip ship", 2, TEXT_DKGREY);
 
     char buffer[32];
     char name[21];
@@ -116,7 +117,7 @@ void drawEquipUI(Player* player)
     }
     
     sprintf(buffer, "%d credits", player->hold.money);
-    glDrawText(buffer, CENTER(strlen(buffer)), 218, TEXT_DKGREY);
+    glDrawTextCentered(buffer, 218, TEXT_DKGREY);
 
     glDrawText("Trading", 12, 240 - 10, TEXT_DKGREY);
     glDrawText("Contracts", 240 - 9 * 8 - 12, 240 - 10, TEXT_DKGREY);

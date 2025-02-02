@@ -3,6 +3,7 @@
 #include "../fk-engine-core/image.h"
 #include "../fk-engine-core/model.h"
 #include "../fk-engine-core/camera.h"
+#include "../fk-engine-core/text.h"
 
 #include "uiutils.h"
 
@@ -280,7 +281,7 @@ void drawContractUI(Contract* activeContract, Contract* contracts, uint8_t numCo
     drawTexQuad(0, 240 - 12, 240, 12, UIBH, 0, 0, PTC(239), PTC(11));
     drawTexQuad(0, 0, 240, 130, UIBH, 0, PTC(12), PTC(239), PTC(141));
     glEnd();
-    glDrawText("Contracts", CENTER(9), 2, TEXT_DKGREY);
+    glDrawTextCentered("Contracts", 2, TEXT_DKGREY);
 
     if(activeContract->type != CONTRACT_TYPE_NULL)
     {

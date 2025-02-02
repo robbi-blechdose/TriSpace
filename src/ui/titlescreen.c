@@ -3,6 +3,7 @@
 #include "../fk-engine-core/model.h"
 #include "../fk-engine-core/image.h"
 #include "../fk-engine-core/camera.h"
+#include "../fk-engine-core/text.h"
 
 #include "uiutils.h"
 #include "../version.h"
@@ -61,9 +62,9 @@ void drawTitle()
     glLoadIdentity();
     //Title and version
     glTextSize(GL_TEXT_SIZE16x16);
-    glDrawText("TriSpace", CENTER(8 * 2), 12, 0xFFFFFF);
+    glDrawText("TriSpace", CENTER_TEXT(8 * 2), 12, 0xFFFFFF);
     glTextSize(GL_TEXT_SIZE8x8);
-    glDrawText(GAME_VERSION, CENTER(strlen(GAME_VERSION)), 32, 0xFFFFFF);
+    glDrawTextCentered(GAME_VERSION, 32, 0xFFFFFF);
 }
 
 void drawTitleScreen()
@@ -73,11 +74,11 @@ void drawTitleScreen()
     //Menu selections
     for(uint8_t i = 0; i < MENU_SIZE; i++)
     {
-        glDrawText(menuStrings[i], CENTER(strlen(menuStrings[i])), 146 + i * 16, cursor == i ? 0x00FFFF : TEXT_WHITE);
+        glDrawTextCentered(menuStrings[i], 146 + i * 16, cursor == i ? 0x00FFFF : TEXT_WHITE);
     }
 
-    glDrawText("2021 - 2024", CENTER(11), 240 - 28, 0xFFFFFF);
-    glDrawText("Robbi Blechdose", CENTER(15), 240 - 16, 0xFFFFFF);
+    glDrawTextCentered("2021 - 2025", 240 - 28, 0xFFFFFF);
+    glDrawTextCentered("robbi-blechdose", 240 - 16, 0xFFFFFF);
 }
 
 void scrollTitleScreenCursor(int8_t dir)
@@ -112,7 +113,7 @@ const char* creditsLines[CREDITS_LINES] = {
     "",
     "",
     "Programming and Graphics:",
-    "  Robbi Blechdose",
+    "  robbi-blechdose",
     "",
     "Explosion effect",
     "  by MattWalkden",
@@ -157,7 +158,7 @@ void drawCredits()
     {
         if(creditsIndex + i < CREDITS_LINES)
         {
-            glDrawText(creditsLines[creditsIndex + i], CENTER(strlen(creditsLines[creditsIndex + i])), 72 + i * 16, TEXT_WHITE);
+            glDrawTextCentered(creditsLines[creditsIndex + i], 72 + i * 16, TEXT_WHITE);
         }
     }
 }

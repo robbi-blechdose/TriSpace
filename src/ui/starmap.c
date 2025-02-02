@@ -3,6 +3,7 @@
 #include "../fk-engine-core/model.h"
 #include "../fk-engine-core/image.h"
 #include "../fk-engine-core/camera.h"
+#include "../fk-engine-core/text.h"
 
 #include "../universe/generator/generator.h"
 #include "../universe/universe.h"
@@ -199,7 +200,7 @@ void drawSystemInfoBox()
     generateStarSystemInfo(&info, getSeedForSystem(cursor[0], cursor[1]));
 
     char buffer[29];
-    glDrawText(info.name, CENTER(strlen(info.name)), 168 + 4, TEXT_WHITE);
+    glDrawTextCentered(info.name, 168 + 4, TEXT_WHITE);
 
     glDrawText("Tech level:", 8, 168 + 4 + 10, TEXT_GREEN);
     sprintf(buffer, "%d", info.characteristics.techLevel);

@@ -3,6 +3,8 @@
 #include "../fk-engine-core/model.h"
 #include "../fk-engine-core/image.h"
 #include "../fk-engine-core/includes/3dMath.h"
+#include "../fk-engine-core/text.h"
+
 #include "../cargo.h"
 #include "../universe/satellites.h"
 
@@ -205,10 +207,10 @@ void drawPlayerInfoUI(uint8_t cursor, Player* player)
     drawTexQuad(0, 112, 240, 104, UIBH, 0, PTC(14), PTC(239), PTC(117));
     drawTexQuad(0, 0, 240, 128, UIBH, 0, PTC(14), PTC(239), PTC(141));
     //Save/Load icons
-    drawTexQuad(CENTER(13), 100, 16, 16, UITH, PTC(32), PTC(224), PTC(47), PTC(239));
-    drawTexQuad(CENTER(13), 82, 16, 16, UITH, PTC(48), PTC(224), PTC(63), PTC(239));
+    drawTexQuad(CENTER_TEXT(13), 100, 16, 16, UITH, PTC(32), PTC(224), PTC(47), PTC(239));
+    drawTexQuad(CENTER_TEXT(13), 82, 16, 16, UITH, PTC(48), PTC(224), PTC(63), PTC(239));
     glEnd();
-    glDrawText("Player Info", CENTER(11), 2, TEXT_DKGREY);
+    glDrawTextCentered("Player Info", 2, TEXT_DKGREY);
 
     //Info
     char buffer[29];
@@ -243,16 +245,8 @@ void drawPlayerInfoUI(uint8_t cursor, Player* player)
     }
 
     //Save/Load
-    if(cursor == 0)
-    {
-        glDrawText("Save game", CENTER(9), 128, 0x00FFFF);
-        glDrawText("Load game", CENTER(9), 146, TEXT_WHITE);
-    }
-    else
-    {
-        glDrawText("Save game", CENTER(9), 128, TEXT_WHITE);
-        glDrawText("Load game", CENTER(9), 146, 0x00FFFF);
-    }
+    glDrawTextCentered("Save game", 128, cursor == 0 ? 0x00FFFF : TEXT_WHITE);
+    glDrawTextCentered("Load game", 146, cursor == 0 ? TEXT_WHITE : 0x00FFFF);
 
     glDrawText("Trading", 240 - 7 * 8 - 12, 240 - 10, TEXT_DKGREY);
 }
@@ -268,7 +262,7 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     drawTexQuad(0, 112, 240, 104, UIBH, 0, PTC(14), PTC(239), PTC(117));
     drawTexQuad(0, 0, 240, 128, UIBH, 0, PTC(14), PTC(239), PTC(141));
     glEnd();
-    glDrawText("Trading", CENTER(7), 2, TEXT_DKGREY);
+    glDrawTextCentered("Trading", 2, TEXT_DKGREY);
 
     char buffer[33];
     char name[15];
@@ -284,7 +278,7 @@ void drawTradingUI(uint8_t cursor, CargoHold* playerHold, CargoHold* stationHold
     }
 
     sprintf(buffer, "%d credits", playerHold->money);
-    glDrawText(buffer, CENTER(strlen(buffer)), 218, TEXT_DKGREY);
+    glDrawTextCentered(buffer, 218, TEXT_DKGREY);
 
     glDrawText("Save & Load", 12, 240 - 10, TEXT_DKGREY);
     glDrawText("Equip ship", 240 - 10 * 8 - 12, 240 - 10, TEXT_DKGREY);
@@ -294,7 +288,7 @@ void drawGameOverScreen()
 {
     glLoadIdentity();
     glBegin(GL_QUADS);
-    glDrawText("GAME OVER", CENTER(9), 90, 0xFFFFFF);
+    glDrawTextCentered("GAME OVER", 90, 0xFFFFFF);
 }
 
 void moveCursorDown(uint8_t* i, uint8_t max)

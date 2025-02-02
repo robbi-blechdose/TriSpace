@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include "GL/gl.h"
 #include "fk-engine-core/util.h"
+#include "fk-engine-core/text.h"
 
 #include "ui/uiutils.h"
 
@@ -78,8 +79,8 @@ void drawComms()
     }
 
     //We're within a flash, draw
-    glDrawText(commHeader, CENTER(strlen(commHeader)), 16, 0xFFFFFF);
-    glDrawText(commMessage, CENTER(strlen(commMessage)), 140, 0xFFFFFF);
+    glDrawTextCentered(commHeader, 16, 0xFFFFFF);
+    glDrawTextCentered(commMessage, 140, 0xFFFFFF);
 }
 
 void setCommMessage(CommSender sender, CommType type)
