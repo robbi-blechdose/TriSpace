@@ -10,7 +10,7 @@
 static GLuint uiTexture;
 
 bool popupActive;
-uint8_t popupIcon;
+PopupIcon popupIcon;
 char popupText[15 * 6];
 
 void initPopup(GLuint uiTex)
@@ -36,7 +36,7 @@ void drawPopupIfActive()
     glEnd();
 }
 
-void createPopup(uint8_t icon, char* text)
+void createPopup(PopupIcon icon, char* text)
 {
     popupActive = true;
     popupIcon = icon;

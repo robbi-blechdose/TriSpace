@@ -10,14 +10,16 @@
  * Can hold 15x6 characters, plus an icon
  **/
 
-#define POPUP_CHECKMARK 0
-#define POPUP_ATTENTION 1
+typedef enum {
+    POPUP_CHECKMARK = 0,
+    POPUP_ATTENTION
+} PopupIcon;
 
 void initPopup(GLuint uiTex);
 void quitPopup();
 
 void drawPopupIfActive();
-void createPopup(uint8_t icon, char* text);
+void createPopup(PopupIcon icon, char* text);
 void closePopup();
 bool isPopupOpen();
 
