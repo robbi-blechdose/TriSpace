@@ -57,6 +57,23 @@ const TextureGeneratorData starGeneratorData[NUM_STAR_TYPES] = {
     }
 };
 
+//--------- Cloud data --------//
+const TextureGeneratorData cloudGeneratorData = {
+    .palettes = {
+        {.r = 220, .g = 220, .b = 220},
+        {.r = 255, .g = 255, .b = 255},
+        {.r = 220, .g = 220, .b = 220},
+        {.r = 255, .g = 255, .b = 255},
+        {.r = 220, .g = 220, .b = 220},
+        {.r = 255, .g = 255, .b = 255},
+        {.r = 220, .g = 220, .b = 220},
+        {.r = 255, .g = 255, .b = 255},
+    },
+    .textureScaler = 1.6f,
+    .noiseType = FNL_NOISE_VALUE,
+    .fractalType = FNL_FRACTAL_FBM
+};
+
 //-------- Planet data -------//
 
 const PlanetGeneratorData planetGeneratorData[NUM_PLANET_TYPES] = {
@@ -309,7 +326,8 @@ const char* sdPreambles[NUM_SD_PREAMBLES] = {
 const char* sdDescriptionsP[NUM_SD_DESCRIPTIONS_P] = {
     " is well known for its ",
     " is famed for its ",
-    " is popular for its "
+    " is popular for its ",
+    " is renowned for its "
 };
 
 const char* sdDescriptionsN[NUM_SD_DESCRIPTIONS_N] = {
@@ -323,7 +341,7 @@ const char* sdAdjectivesP[NUM_SD_ADJECTIVES_P] = {
     "pretty ",
     "harmless ",
     "robotic ",
-    "colorful ",
+    "colorful "
 };
 
 const char* sdAdjectivesN[NUM_SD_ADJECTIVES_N] = {
@@ -343,5 +361,6 @@ const char* sdNouns[NUM_SD_NOUNS] = {
     "cities",
     "drugs",
     "landmarks",
-    "public transport"
+    "public transport",
+    "food"
 };

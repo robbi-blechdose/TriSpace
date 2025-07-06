@@ -68,6 +68,7 @@ typedef struct {
     vec3 position;
     GLuint texture;
     bool hasRing;
+    bool hasClouds;
 } Planet;
 
 typedef struct {

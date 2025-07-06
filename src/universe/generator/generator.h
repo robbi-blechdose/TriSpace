@@ -11,6 +11,7 @@
 void generateStarSystemInfo(StarSystemInfo* info, uint32_t seed);
 
 GLuint generateStarTexture(StarType type);
+GLuint generateCloudTexture();
 
 /**
  * Generate a full star system, including:

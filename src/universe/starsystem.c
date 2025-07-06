@@ -7,6 +7,8 @@
 GLuint planetMesh;
 GLuint planetRingMesh;
 GLuint planetRingTexture;
+GLuint planetCloudMesh;
+GLuint planetCloudTexture;
 GLuint starTextures[NUM_STAR_TYPES];
 GLuint stationMesh;
 GLuint stationTexture;
@@ -16,6 +18,8 @@ void initStarSystem()
     planetMesh = loadModelList("res/obj/Planet.obj");
     planetRingMesh = loadModelList("res/obj/Planet_Ring.obj");
     planetRingTexture = loadRGBTexture("res/tex/Planet_Ring.png");
+    planetCloudMesh = loadModelList("res/obj/Planet_Clouds.obj");
+    planetCloudTexture = generateCloudTexture();
     starTextures[0] = generateStarTexture(ST_NORMAL);
     starTextures[1] = generateStarTexture(ST_BLUE);
     starTextures[2] = generateStarTexture(ST_RED);
@@ -29,6 +33,8 @@ void quitStarSystem()
     glDeleteList(planetMesh);
     glDeleteList(planetRingMesh);
     deleteRGBTexture(planetRingTexture);
+    glDeleteList(planetCloudMesh);
+    deleteRGBTexture(planetCloudTexture);
     for(uint8_t i = 0; i < NUM_STAR_TYPES; i++)
     {
         deleteRGBTexture(starTextures[i]);
@@ -79,6 +85,11 @@ void drawStarSystem(StarSystem* system)
             glBindTexture(GL_TEXTURE_2D, planetRingTexture);
             glCallList(planetRingMesh);
             glEnable(GL_CULL_FACE);
+        }
+        if(system->planets[i].hasClouds)
+        {
+            glBindTexture(GL_TEXTURE_2D, planetCloudTexture);
+            glCallList(planetCloudMesh);
         }
         glPopMatrix();
     }

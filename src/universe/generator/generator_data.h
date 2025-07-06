@@ -25,6 +25,9 @@ extern const uint8_t starNumProbabilities[MAX_STARS];
 
 extern const TextureGeneratorData starGeneratorData[NUM_STAR_TYPES];
 
+//--------- Cloud data --------//
+extern const TextureGeneratorData cloudGeneratorData;
+
 //-------- Planet data -------//
 
 typedef struct {
@@ -55,7 +58,7 @@ extern const char* codas[NUM_CODAS];
 
 #define NUM_SD_PREAMBLES 3
 extern const char* sdPreambles[NUM_SD_PREAMBLES];
-#define NUM_SD_DESCRIPTIONS_P 3
+#define NUM_SD_DESCRIPTIONS_P 4
 extern const char* sdDescriptionsP[NUM_SD_DESCRIPTIONS_P];
 #define NUM_SD_DESCRIPTIONS_N 2
 extern const char* sdDescriptionsN[NUM_SD_DESCRIPTIONS_N];
@@ -63,7 +66,7 @@ extern const char* sdDescriptionsN[NUM_SD_DESCRIPTIONS_N];
 extern const char* sdAdjectivesP[NUM_SD_ADJECTIVES_P];
 #define NUM_SD_ADJECTIVES_N 3
 extern const char* sdAdjectivesN[NUM_SD_ADJECTIVES_N];
-#define NUM_SD_NOUNS 11
+#define NUM_SD_NOUNS 12
 extern const char* sdNouns[NUM_SD_NOUNS];
 
 #endif

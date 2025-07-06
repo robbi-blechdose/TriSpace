@@ -87,7 +87,7 @@ Color getColorForValue(TextureGeneratorData tgd, float value)
 }
 
 #define TEXTURE_SIZE 256
-GLuint generateSphereTexture(uint32_t seed, TextureGeneratorData tgd)
+GLuint generateSphereTexture(uint32_t seed, TextureGeneratorData tgd, float cutoffLow, float cutoffHigh)
 {
     uint8_t data[TEXTURE_SIZE * TEXTURE_SIZE * 3];
     float size = (2 + randf(5)) * tgd.textureScaler;
@@ -105,6 +105,13 @@ GLuint generateSphereTexture(uint32_t seed, TextureGeneratorData tgd)
             float temp = (fnlGetNoise2D(&noise, i * size, j * size) + 1.0f) * 128;
             Color c = getColorForValue(tgd, temp);
             uint32_t index = i * TEXTURE_SIZE * 3 + j * 3;
+            //Currently only used for clouds: Allow "holes" in the texture by setting all pixels to pink (transparent color) outside the specified range
+            if(temp < cutoffLow || temp > cutoffHigh)
+            {
+                c.r = 255;
+                c.g = 0;
+                c.b = 255;
+            }
             data[index] = c.r;
             data[index + 1] = c.g;
             data[index + 2] = c.b;
@@ -142,7 +149,13 @@ GLuint generateSphereTexture(uint32_t seed, TextureGeneratorData tgd)
 GLuint generateStarTexture(StarType type)
 {
     #define STAR_TEXTURE_SEED 1
-    return generateSphereTexture(STAR_TEXTURE_SEED, starGeneratorData[type]);
+    return generateSphereTexture(STAR_TEXTURE_SEED, starGeneratorData[type], 0, 256);
+}
+
+GLuint generateCloudTexture()
+{
+    #define CLOUD_TEXTURE_SEED 42
+    return generateSphereTexture(CLOUD_TEXTURE_SEED, cloudGeneratorData, 96, 144);
 }
 
 void generateStarSystem(StarSystem* system, uint32_t seed)
@@ -180,8 +193,29 @@ void generateStarSystem(StarSystem* system, uint32_t seed)
     for(uint8_t i = 0; i < system->info.numPlanets; i++)
     {
         system->planets[i].size = 10.0f + randf(10);
-        system->planets[i].texture = generateSphereTexture(seed, planetGeneratorData[system->info.planetTypes[i]].texture);
-        system->planets[i].hasRing = randr(100) < 30;
+        system->planets[i].texture = generateSphereTexture(seed, planetGeneratorData[system->info.planetTypes[i]].texture, 0, 256);
+        switch(system->info.planetTypes[i])
+        {
+            //Habitable planets can have cloud layers:
+            case PT_Mars:
+            case PT_Earth:
+            case PT_Ocean:
+            case PT_Forest:
+            case PT_DarkCities:
+            {
+                system->planets[i].hasClouds = randr(100) < 40;
+                break;
+            }
+            //Non-habitable planets can have asteroid rings:
+            case PT_Venus:
+            case PT_Ice:
+            case PT_Dead:
+            case PT_Gas:
+            {
+                system->planets[i].hasRing = randr(100) < 30;
+                break;
+            }
+        }
 
         float orbitRadius = firstOrbit + (i * 35.0f);
         float angle = randf(M_PI * 2);
