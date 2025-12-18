@@ -38,7 +38,7 @@ typedef struct {
     };
 } Contract;
 
-#define NUM_FIRSTNAMES 16
+#define NUM_FIRSTNAMES 17
 extern const char* contractFirstnames[NUM_FIRSTNAMES];
 #define NUM_LASTNAMES 14
 extern const char* contractLastnames[NUM_LASTNAMES];

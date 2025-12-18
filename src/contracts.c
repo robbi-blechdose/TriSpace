@@ -29,7 +29,8 @@ const char* contractFirstnames[NUM_FIRSTNAMES] = {
     "Danielle",
     "Riley",
     "Jennifer",
-    "Patricia"
+    "Patricia",
+    "Virginia"
 };
 
 const char* contractLastnames[NUM_LASTNAMES] = {
