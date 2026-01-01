@@ -18,10 +18,20 @@ typedef struct {
     float y;
     float rotX;
     float rotY;
-    GLuint color;
+    uint8_t color;
 } Spacedust;
 
 Spacedust spacedust[NUM_SPACEDUST];
+Spacedust hyperspaceDust[NUM_HYPERSPACE_DUST][NUM_SPACEDUST];
+uint16_t hyperspaceDustIndex = 0;
+uint16_t hyperspaceDustMin = 0;
+typedef enum {
+    HSDM_DISABLED,
+    HSDM_INCREASE,
+    HSDM_DECREASE,
+} HyperspaceDustMode;
+
+HyperspaceDustMode hyperspaceDustMode = HSDM_DISABLED;
 
 #define WINX 240
 #define WINY 240
@@ -38,6 +48,26 @@ void initSpacedust()
 
 void calcSpacedust(Ship* playerShip, uint32_t ticks)
 {
+    if(hyperspaceDustMode == HSDM_INCREASE)
+    {
+        for(uint8_t i = 0; i < NUM_SPACEDUST; i++)
+        {
+            hyperspaceDust[hyperspaceDustIndex][i].x = spacedust[i].x;
+            hyperspaceDust[hyperspaceDustIndex][i].y = spacedust[i].y;
+            hyperspaceDust[hyperspaceDustIndex][i].color = spacedust[i].color;
+        }
+        hyperspaceDustIndex++;
+    }
+    else if(hyperspaceDustMode == HSDM_DECREASE)
+    {
+        hyperspaceDustMin++;
+        //Once no dust displays, turn off
+        if(hyperspaceDustMin > hyperspaceDustIndex)
+        {
+            hyperspaceDustMode = HSDM_DISABLED;
+        }
+    }
+
     for(uint8_t i = 0; i < NUM_SPACEDUST; i++)
     {
         if(spacedust[i].x < 0 || spacedust[i].y < 0 || spacedust[i].x >= WINX || spacedust[i].y >= WINY_3D)
@@ -54,12 +84,13 @@ void calcSpacedust(Ship* playerShip, uint32_t ticks)
             spacedust[i].rotX *= speed;
             spacedust[i].rotY *= speed;
             //Generate color
-            spacedust[i].color = spacedustColors[randr(NUM_SPACEDUST_COLORS)];
+            spacedust[i].color = randr(NUM_SPACEDUST_COLORS);
         }
         else
         {
-            spacedust[i].x += spacedust[i].rotX * playerShip->speed * ticks / 1000.0f;
-            spacedust[i].y += spacedust[i].rotY * playerShip->speed * ticks / 1000.0f;
+            float speed = playerShip->speed > 20 ? 20 : playerShip->speed;
+            spacedust[i].x += spacedust[i].rotX * speed * ticks / 1000.0f;
+            spacedust[i].y += spacedust[i].rotY * speed * ticks / 1000.0f;
             //TODO: Adjust directions (e.g. a point that was going down should go up if the ship turns downwards)
 
             //Move spacedust in the direction opposite the ship's rotation
@@ -91,8 +122,30 @@ void calcSpacedust(Ship* playerShip, uint32_t ticks)
 
 void drawSpacedust()
 {
+    if(hyperspaceDustMode != HSDM_DISABLED)
+    {
+        for(uint8_t i = hyperspaceDustMin; i <= hyperspaceDustIndex; i++)
+        {
+            for(uint8_t j = 0; j < NUM_SPACEDUST; j++)
+            {
+                glPlotPixel((uint8_t) hyperspaceDust[i][j].x, (uint8_t) hyperspaceDust[i][j].y, spacedustColors[hyperspaceDust[i][j].color]);
+            }
+        }
+    }
+
     for(uint8_t i = 0; i < NUM_SPACEDUST; i++)
     {
-        glPlotPixel((uint8_t) spacedust[i].x, (uint8_t) spacedust[i].y, spacedust[i].color);
+        glPlotPixel((uint8_t) spacedust[i].x, (uint8_t) spacedust[i].y, spacedustColors[spacedust[i].color]);
     }
+}
+
+void enableHyperspaceDust()
+{
+    hyperspaceDustIndex = 0;
+    hyperspaceDustMode = HSDM_INCREASE;
+}
+
+void disableHyperspaceDust()
+{
+    hyperspaceDustMode = HSDM_DECREASE;
 }

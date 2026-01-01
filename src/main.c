@@ -472,6 +472,7 @@ void calcFrame(uint32_t ticks)
             }
             else
             {
+                disableHyperspaceDust();
                 player.ship.speed -= (500.0f * ticks) / 1000.0f;
                 if(player.ship.speed <= 0)
                 {
@@ -642,6 +643,7 @@ void calcFrame(uint32_t ticks)
                     player.fuel -= distance;
                     player.ship.turnSpeedX = 0;
                     player.ship.turnSpeedY = 0;
+                    enableHyperspaceDust();
                 }
             }
 

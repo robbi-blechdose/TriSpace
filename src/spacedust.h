@@ -4,9 +4,13 @@
 #include "ship.h"
 
 #define NUM_SPACEDUST 16
+#define NUM_HYPERSPACE_DUST 50 * 2
 
 void initSpacedust();
 void calcSpacedust(Ship* playerShip, uint32_t ticks);
 void drawSpacedust();
+
+void enableHyperspaceDust();
+void disableHyperspaceDust();
 
 #endif
