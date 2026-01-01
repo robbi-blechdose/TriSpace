@@ -4,6 +4,8 @@
 #include "../fk-engine-core/util.h"
 #include "../comms.h"
 
+#include <stdio.h>
+
 /**
  * UI test code to display npc radar dot:
     //--------------------------------------------------------------------------------------------------
@@ -31,15 +33,6 @@ bool randChance(uint32_t divisor, uint32_t ticks)
     return rand() < RAND_MAX / (divisor * ticks);
 }
 
-vec3 getRandomSpherePoint(vec3 center, float radius)
-{
-    vec3 vec = {.x = randf(2) - 1, .y = randf(2) - 1, .z = randf(2) - 1};
-    vec = normalizev3(vec);
-    vec = scalev3(radius, vec);
-    vec = addv3(vec, center);
-    return vec;
-}
-
 void calcNPCAiStateCircle(Npc* npc, Player* player, uint32_t ticks, float distanceToPlayer)
 {
     //Move towards waypoint
@@ -53,7 +46,7 @@ void calcNPCAiStateCircle(Npc* npc, Player* player, uint32_t ticks, float distan
     }
 
     //Randomly attack
-    if(randChance(1024, ticks))
+    if(randChance(512, ticks))
     {
         npc->state = STATE_ATTACK;
     }

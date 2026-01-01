@@ -18,6 +18,7 @@
 #include "ship_collisions.h"
 #include "contracts.h"
 #include "spacedust.h"
+#include "backgroundstars.h"
 #include "autodocking.h"
 #include "equipment.h"
 #include "player.h"
@@ -735,7 +736,14 @@ void drawFrame()
     glViewport(0, 0, WINX, WINY_3D);
     setPerspective();
 
-    drawCameraPrepMat();
+    drawCameraMatRot();
+
+    if(state == SPACE || state == HYPERSPACE || state == GAME_OVER)
+    {
+        drawBackgroundStars();
+    }
+
+    drawCameraPos();
 
     if(state == HYPERSPACE)
     {
@@ -890,6 +898,7 @@ void initGame()
     initContractUI(uiTexture);
 
     initEffects();
+    initBackgroundStars();
 
     initStarSystem();
     initSpaceStation();
